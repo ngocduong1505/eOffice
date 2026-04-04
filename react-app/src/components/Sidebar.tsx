@@ -23,7 +23,6 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
       { id: 's1', label: 'Danh sách' },
       { id: 's2', label: 'Tiếp nhận (Tạo văn bản)' },
       { id: 's3', label: 'Chi tiết' },
-      { id: 's7', label: 'Thiết lập luồng' },
     ],
   },
   {
@@ -63,6 +62,13 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
       { id: 's20', label: 'Sổ đăng ký' },
       { id: 's21', label: 'Cấu hình sổ' },
       { id: 's22', label: 'Báo cáo' },
+    ],
+  },
+  {
+    key: 'template', icon: '⚙️', label: 'Mẫu luồng',
+    defaultScreen: 's7',
+    items: [
+      { id: 's7', label: 'Thiết lập luồng' },
     ],
   },
 ]
