@@ -1,10 +1,9 @@
 import Sidebar from '@/components/Sidebar'
-import FlowNav from '@/components/FlowNav'
 import { useNavigation } from '@/hooks/useNavigation'
 
 // Screens – vb-den
 import S1DanhSach from '@/screens/vb-den/S1DanhSach'
-import S2TiepNhan from '@/screens/vb-den/S2TiepNhan'
+import S2TiepNhan from '@/screens/vb-den/S2TaoVbDen'
 import S3ChiTiet from '@/screens/vb-den/S3ChiTiet'
 import S4ChiDao from '@/screens/vb-den/S4ChiDao'
 import S5DangXuLy from '@/screens/vb-den/S5DangXuLy'
@@ -65,7 +64,6 @@ export default function AppShell() {
       <main style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         <ScreenComponent />
       </main>
-      <FlowNav />
     </div>
   )
 }

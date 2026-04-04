@@ -18,7 +18,6 @@ Giao diện văn phòng số được chuyển đổi từ prototype HTML thuầ
 - **22 màn hình** bao gồm toàn bộ luồng nghiệp vụ văn phòng
 - **Sidebar** thu gọn / mở rộng theo nhóm chức năng
 - **Navigation** bằng React Context (không dùng router)
-- **FlowNav** — thanh điều hướng nhanh giữa tất cả 22 màn hình (dành cho prototype demo)
 
 ## Cấu trúc màn hình
 
@@ -59,7 +58,6 @@ src/
 │   ├── AppShell.tsx             # Layout chính
 │   ├── Sidebar.tsx              # Sidebar điều hướng
 │   ├── Topbar.tsx               # Header breadcrumb
-│   └── FlowNav.tsx              # Bottom nav bar (prototype)
 └── screens/
     ├── vb-den/                  # S1–S7
     ├── vb-di/                   # S8–S13
