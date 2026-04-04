@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 // UI_DOC_IN_008_MODAL — Hoàn thành xử lý
 // Trigger: nút [Hoàn thành xử lý] khi trạng thái = "Chờ xử lý"
@@ -27,28 +27,23 @@ const HO_SO_OPTIONS = [
 const MAX_FILE_SIZE = 20 * 1024 * 1024
 const ALLOWED_EXT = ['.pdf', '.doc', '.docx', '.xls', '.xlsx']
 
-const RichToolbar = () => (
-  <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
-    {['B', 'I', 'U', '≡'].map(f => (
-      <button key={f} style={{
-        border: '1px solid var(--border)', background: '#f8fafc',
-        borderRadius: 4, width: 26, height: 26, cursor: 'pointer',
-        fontSize: f === 'B' ? '.85rem' : '.8rem',
-        fontWeight: f === 'B' ? 700 : 400,
-        fontStyle: f === 'I' ? 'italic' : 'normal',
-        textDecoration: f === 'U' ? 'underline' : 'none',
-        color: 'var(--text2)',
-      }}>{f}</button>
-    ))}
-  </div>
-)
 
 export default function ModalHoanThanh({ open, onClose, onSubmit, chiDaoInfo }: Props) {
   const [ketQua, setKetQua] = useState('')
   const [files, setFiles] = useState<AttachedFile[]>([])
   const [hoSo, setHoSo] = useState<string[]>([])
   const [errors, setErrors] = useState<Record<string, string>>({})
-  const fileRef = useRef<HTMLInputElement>(null)
+  const [hoSoOpen, setHoSoOpen] = useState(false)
+  const hoSoRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!hoSoOpen) return
+    const handler = (e: MouseEvent) => {
+      if (hoSoRef.current && !hoSoRef.current.contains(e.target as Node)) setHoSoOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [hoSoOpen])
 
   if (!open) return null
 
@@ -117,22 +112,6 @@ export default function ModalHoanThanh({ open, onClose, onSubmit, chiDaoInfo }: 
         {/* Body */}
         <div style={{ padding: '20px 24px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-          {/* Info card: chỉ đạo / giao việc */}
-          <div style={{
-            background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 10,
-            padding: '12px 16px',
-          }}>
-            <div style={{ fontSize: '.72rem', fontWeight: 700, color: '#1d4ed8', textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>
-              Chỉ đạo / Giao việc
-            </div>
-            <div style={{ fontSize: '.82rem', color: 'var(--dark)', lineHeight: 1.6 }}>
-              {chiDaoInfo?.noiDung ?? 'Giao P.KHTH chủ trì xây dựng báo cáo KCB quý I/2026. Hoàn thành trước 28/03/2026.'}
-            </div>
-            <div style={{ fontSize: '.72rem', color: '#1d4ed8', marginTop: 8 }}>
-              {chiDaoInfo?.nguoiGiao ?? 'Lê Văn Giám Đốc'} · {chiDaoInfo?.thoiGian ?? '25/03/2026 09:45'}
-            </div>
-          </div>
-
           {/* Kết quả xử lý */}
           <div className="fg">
             <label style={{ fontSize: '.82rem', fontWeight: 600, color: 'var(--text2)', marginBottom: 6, display: 'block' }}>
@@ -144,42 +123,7 @@ export default function ModalHoanThanh({ open, onClose, onSubmit, chiDaoInfo }: 
               placeholder="Nhập kết quả xử lý..."
               style={{ height: 130, resize: 'vertical', width: '100%', boxSizing: 'border-box' }}
             />
-            <RichToolbar />
             {errors.ketQua && <div style={{ fontSize: '.75rem', color: '#dc2626', marginTop: 4 }}>{errors.ketQua}</div>}
-          </div>
-
-          {/* Tệp kết quả đính kèm */}
-          <div className="fg">
-            <label style={{ fontSize: '.82rem', fontWeight: 600, color: 'var(--text2)', marginBottom: 6, display: 'block' }}>
-              Tệp kết quả đính kèm
-            </label>
-            <input ref={fileRef} type="file" multiple accept=".pdf,.doc,.docx,.xls,.xlsx" style={{ display: 'none' }} onChange={handleFileChange} />
-            <button
-              onClick={() => fileRef.current?.click()}
-              style={{
-                border: '1px dashed var(--border)', background: '#fafbfc', borderRadius: 8,
-                padding: '10px 16px', cursor: 'pointer', fontSize: '.8rem', color: 'var(--text2)',
-                width: '100%',
-              }}
-            >
-              📎 Đính kèm văn bản phản hồi / báo cáo (PDF, Word, Excel · tối đa 20MB/tệp)
-            </button>
-            {errors.files && <div style={{ fontSize: '.75rem', color: '#dc2626', marginTop: 4 }}>{errors.files}</div>}
-            {files.length > 0 && (
-              <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {files.map(f => (
-                  <div key={f.name} style={{
-                    display: 'flex', alignItems: 'center', gap: 8,
-                    background: '#f8fafc', border: '1px solid var(--border)', borderRadius: 6,
-                    padding: '6px 10px',
-                  }}>
-                    <span style={{ fontSize: '.8rem', flex: 1, color: 'var(--dark)' }}>📄 {f.name}</span>
-                    <span style={{ fontSize: '.72rem', color: 'var(--text3)' }}>{fmtSize(f.size)}</span>
-                    <button onClick={() => removeFile(f.name)} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#dc2626', fontSize: '.8rem' }}>✕</button>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
 
           {/* Hồ sơ lưu trữ */}
@@ -187,22 +131,68 @@ export default function ModalHoanThanh({ open, onClose, onSubmit, chiDaoInfo }: 
             <label style={{ fontSize: '.82rem', fontWeight: 600, color: 'var(--text2)', marginBottom: 6, display: 'block' }}>
               Hồ sơ lưu trữ
             </label>
-            <div style={{ border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden' }}>
-              {HO_SO_OPTIONS.map((o, i, arr) => (
-                <div
-                  key={o.value}
-                  onClick={() => toggleHoSo(o.value)}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 10,
-                    padding: '10px 14px', cursor: 'pointer',
-                    background: hoSo.includes(o.value) ? '#f0fdf4' : '#fff',
-                    borderBottom: i < arr.length - 1 ? '1px solid var(--border)' : 'none',
-                  }}
-                >
-                  <input type="checkbox" checked={hoSo.includes(o.value)} onChange={() => {}} style={{ cursor: 'pointer' }} />
-                  <span style={{ fontSize: '.82rem', color: 'var(--dark)' }}>{o.label}</span>
+            <div ref={hoSoRef} style={{ position: 'relative' }}>
+              {/* Trigger button */}
+              <div
+                onClick={() => setHoSoOpen(o => !o)}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  border: '1px solid var(--border)', borderRadius: 8, padding: '8px 12px',
+                  cursor: 'pointer', background: '#fff', minHeight: 38,
+                  boxShadow: hoSoOpen ? '0 0 0 2px rgba(22,163,74,.25)' : 'none',
+                  borderColor: hoSoOpen ? '#16a34a' : 'var(--border)',
+                }}
+              >
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, flex: 1 }}>
+                  {hoSo.length === 0
+                    ? <span style={{ fontSize: '.82rem', color: 'var(--text3)' }}>Chọn hồ sơ lưu trữ...</span>
+                    : hoSo.map(v => {
+                        const opt = HO_SO_OPTIONS.find(o => o.value === v)
+                        return (
+                          <span key={v} style={{
+                            display: 'inline-flex', alignItems: 'center', gap: 4,
+                            background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 4,
+                            padding: '2px 8px', fontSize: '.75rem', color: '#15803d',
+                          }}>
+                            {opt?.label}
+                            <span
+                              onMouseDown={e => { e.stopPropagation(); toggleHoSo(v) }}
+                              style={{ cursor: 'pointer', lineHeight: 1, marginLeft: 2, color: '#16a34a' }}
+                            >×</span>
+                          </span>
+                        )
+                      })
+                  }
                 </div>
-              ))}
+                <span style={{ fontSize: '.7rem', color: 'var(--text3)', marginLeft: 8, flexShrink: 0 }}>
+                  {hoSoOpen ? '▲' : '▼'}
+                </span>
+              </div>
+
+              {/* Dropdown */}
+              {hoSoOpen && (
+                <div style={{
+                  position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0,
+                  border: '1px solid var(--border)', borderRadius: 8, background: '#fff',
+                  boxShadow: '0 8px 24px rgba(0,0,0,.12)', zIndex: 10, overflow: 'hidden',
+                }}>
+                  {HO_SO_OPTIONS.map((o, i, arr) => (
+                    <div
+                      key={o.value}
+                      onMouseDown={e => { e.preventDefault(); toggleHoSo(o.value) }}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 10,
+                        padding: '10px 14px', cursor: 'pointer',
+                        background: hoSo.includes(o.value) ? '#f0fdf4' : '#fff',
+                        borderBottom: i < arr.length - 1 ? '1px solid var(--border)' : 'none',
+                      }}
+                    >
+                      <input type="checkbox" checked={hoSo.includes(o.value)} onChange={() => {}} style={{ cursor: 'pointer' }} />
+                      <span style={{ fontSize: '.82rem', color: 'var(--dark)' }}>{o.label}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="hint">Không bắt buộc. Văn bản sẽ được lưu vào các hồ sơ đã chọn sau khi hoàn thành.</div>
           </div>

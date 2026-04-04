@@ -36,13 +36,13 @@ const DATA: VanBan[] = [
 
 // ─── Status config ─────────────────────────────────────────────────────────────
 const STATUS_CONFIG: Record<VbStatus, { label: string; cls: string; actionLabel: string; actionCls: string }> = {
-  'nhap': { label: 'Nháp', cls: 'stag st-draft', actionLabel: 'Tiếp tục', actionCls: 'ra ra-m' },
-  'cho-chi-dao': { label: 'Chờ chỉ đạo', cls: 'stag st-direct', actionLabel: 'Chỉ đạo ngay', actionCls: 'ra ra-warn' },
-  'cho-dieu-phoi': { label: 'Chờ điều phối', cls: 'stag st-coord', actionLabel: 'Điều phối ngay', actionCls: 'ra ra-warn' },
-  'cho-xu-ly': { label: 'Chờ xử lý', cls: 'stag st-pending', actionLabel: 'Hoàn thành xử lý', actionCls: 'ra ra-p' },
-  'dang-xu-ly': { label: 'Đang xử lý', cls: 'stag st-coord', actionLabel: 'Xem chi tiết', actionCls: 'ra ra-m' },
-  'hoan-thanh': { label: 'Hoàn thành', cls: 'stag st-done', actionLabel: 'Thêm vào hồ sơ', actionCls: 'ra ra-g' },
-  'qua-han': { label: 'Quá hạn', cls: 'stag st-overdue', actionLabel: 'Xử lý khẩn', actionCls: 'ra ra-danger' },
+  'nhap': { label: 'Nháp', cls: 'stag st-draft', actionLabel: 'Tiếp tục', actionCls: 'ra' },
+  'cho-chi-dao': { label: 'Chờ chỉ đạo', cls: 'stag st-direct', actionLabel: 'Chỉ đạo ngay', actionCls: 'ra' },
+  'cho-dieu-phoi': { label: 'Chờ điều phối', cls: 'stag st-coord', actionLabel: 'Điều phối ngay', actionCls: 'ra' },
+  'cho-xu-ly': { label: 'Chờ xử lý', cls: 'stag st-pending', actionLabel: 'Hoàn thành xử lý', actionCls: 'ra' },
+  'dang-xu-ly': { label: 'Đang xử lý', cls: 'stag st-coord', actionLabel: 'Xem chi tiết', actionCls: 'ra' },
+  'hoan-thanh': { label: 'Hoàn thành', cls: 'stag st-done', actionLabel: 'Thêm vào hồ sơ', actionCls: 'ra' },
+  'qua-han': { label: 'Quá hạn', cls: 'stag st-overdue', actionLabel: 'Xử lý khẩn', actionCls: 'ra' },
 }
 
 // ─── Hạn xử lý filter ────────────────────────────────────────────────────────

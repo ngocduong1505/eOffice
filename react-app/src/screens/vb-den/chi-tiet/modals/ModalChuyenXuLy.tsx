@@ -5,14 +5,11 @@ import { useState, useRef } from 'react'
 
 type LoaiChuyen = 'chinh' | 'phoi-hop'
 
-interface AttachedFile { name: string; size: number }
-
 interface SubmitData {
   loaiChuyen: LoaiChuyen
   nguoiNhan: string[]
   ykienChuyen: string
   hanXuLy: string
-  fileDinhKem: AttachedFile[]
 }
 
 interface Props {
@@ -41,9 +38,7 @@ export default function ModalChuyenXuLy({ open, onClose, onSubmit, defaultHanXuL
   const [nguoiNhan, setNguoiNhan] = useState<string[]>([])
   const [ykienChuyen, setYkienChuyen] = useState('')
   const [hanXuLy, setHanXuLy] = useState(defaultHanXuLy || DEFAULT_HAN)
-  const [files, setFiles] = useState<AttachedFile[]>([])
   const [errors, setErrors] = useState<Record<string, string>>({})
-  const fileRef = useRef<HTMLInputElement>(null)
 
   if (!open) return null
 
@@ -55,23 +50,6 @@ export default function ModalChuyenXuLy({ open, onClose, onSubmit, defaultHanXuL
     )
     setErrors(p => ({ ...p, nguoiNhan: '' }))
   }
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const picked = Array.from(e.target.files ?? [])
-    const errs: string[] = []
-    const valid: AttachedFile[] = []
-    picked.forEach(f => {
-      const ext = '.' + f.name.split('.').pop()?.toLowerCase()
-      if (!ALLOWED_EXT.includes(ext)) { errs.push(`${f.name}: sai định dạng.`); return }
-      if (f.size > MAX_FILE_SIZE) { errs.push(`${f.name}: vượt quá 20MB.`); return }
-      valid.push({ name: f.name, size: f.size })
-    })
-    if (errs.length) setErrors(p => ({ ...p, files: errs.join(' ') }))
-    setFiles(prev => [...prev, ...valid])
-    e.target.value = ''
-  }
-
-  const removeFile = (name: string) => setFiles(prev => prev.filter(f => f.name !== name))
 
   const validate = (): Record<string, string> => {
     const e: Record<string, string> = {}
@@ -86,8 +64,8 @@ export default function ModalChuyenXuLy({ open, onClose, onSubmit, defaultHanXuL
   const handleSubmit = () => {
     const e = validate()
     if (Object.keys(e).length) { setErrors(e); return }
-    onSubmit({ loaiChuyen: loaiChuyen as LoaiChuyen, nguoiNhan, ykienChuyen, hanXuLy, fileDinhKem: files })
-    setLoaiChuyen(''); setNguoiNhan([]); setYkienChuyen(''); setHanXuLy(defaultHanXuLy || DEFAULT_HAN); setFiles([]); setErrors({})
+    onSubmit({ loaiChuyen: loaiChuyen as LoaiChuyen, nguoiNhan, ykienChuyen, hanXuLy })
+    setLoaiChuyen(''); setNguoiNhan([]); setYkienChuyen(''); setHanXuLy(defaultHanXuLy || DEFAULT_HAN); setErrors({})
   }
 
   const canSubmit = loaiChuyen && nguoiNhan.length > 0 && hanXuLy
@@ -173,7 +151,7 @@ export default function ModalChuyenXuLy({ open, onClose, onSubmit, defaultHanXuL
                     borderBottom: i < arr.length - 1 ? '1px solid var(--border)' : 'none',
                   }}
                 >
-                  <input type="checkbox" checked={nguoiNhan.includes(o.value)} onChange={() => {}} style={{ cursor: 'pointer' }} />
+                  <input type="checkbox" checked={nguoiNhan.includes(o.value)} onChange={() => { }} style={{ cursor: 'pointer' }} />
                   <span style={{ fontSize: '.82rem', color: 'var(--dark)' }}>{o.label}</span>
                 </div>
               ))}
@@ -209,40 +187,6 @@ export default function ModalChuyenXuLy({ open, onClose, onSubmit, defaultHanXuL
             />
             <div className="hint">Không được trễ hơn hạn xử lý gốc: 28/03/2026</div>
             {errors.hanXuLy && <div style={{ fontSize: '.75rem', color: '#dc2626', marginTop: 4 }}>{errors.hanXuLy}</div>}
-          </div>
-
-          {/* Tệp đính kèm bổ sung */}
-          <div className="fg">
-            <label style={{ fontSize: '.82rem', fontWeight: 600, color: 'var(--text2)', marginBottom: 6, display: 'block' }}>
-              Tệp đính kèm bổ sung
-            </label>
-            <input ref={fileRef} type="file" multiple accept=".pdf,.doc,.docx,.xls,.xlsx" style={{ display: 'none' }} onChange={handleFileChange} />
-            <button
-              onClick={() => fileRef.current?.click()}
-              style={{
-                border: '1px dashed var(--border)', background: '#fafbfc', borderRadius: 8,
-                padding: '10px 16px', cursor: 'pointer', fontSize: '.8rem', color: 'var(--text2)',
-                width: '100%',
-              }}
-            >
-              📎 Chọn tệp (PDF, Word, Excel · tối đa 20MB/tệp)
-            </button>
-            {errors.files && <div style={{ fontSize: '.75rem', color: '#dc2626', marginTop: 4 }}>{errors.files}</div>}
-            {files.length > 0 && (
-              <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {files.map(f => (
-                  <div key={f.name} style={{
-                    display: 'flex', alignItems: 'center', gap: 8,
-                    background: '#f8fafc', border: '1px solid var(--border)', borderRadius: 6,
-                    padding: '6px 10px',
-                  }}>
-                    <span style={{ fontSize: '.8rem', flex: 1, color: 'var(--dark)' }}>📄 {f.name}</span>
-                    <span style={{ fontSize: '.72rem', color: 'var(--text3)' }}>{fmtSize(f.size)}</span>
-                    <button onClick={() => removeFile(f.name)} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#dc2626', fontSize: '.8rem' }}>✕</button>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
         </div>
 

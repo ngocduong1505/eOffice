@@ -5,7 +5,7 @@ import { useState } from 'react'
 
 interface SubmitData {
   ykien: string
-  thuKy: string
+  nguoiNhan: string
   hanXuLy: string
 }
 
@@ -24,25 +24,9 @@ const THU_KY_OPTIONS = [
 
 const TODAY = new Date().toISOString().slice(0, 16)
 
-const RichToolbar = () => (
-  <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
-    {['B', 'I', 'U', '≡'].map(f => (
-      <button key={f} style={{
-        border: '1px solid var(--border)', background: '#f8fafc',
-        borderRadius: 4, width: 26, height: 26, cursor: 'pointer',
-        fontSize: f === 'B' ? '.85rem' : '.8rem',
-        fontWeight: f === 'B' ? 700 : 400,
-        fontStyle: f === 'I' ? 'italic' : 'normal',
-        textDecoration: f === 'U' ? 'underline' : 'none',
-        color: 'var(--text2)',
-      }}>{f}</button>
-    ))}
-  </div>
-)
-
 export default function ModalChiDao({ open, onClose, onSubmit, defaultHanXuLy = '' }: Props) {
   const [ykien, setYkien] = useState('')
-  const [thuKy, setThuKy] = useState('')
+  const [nguoiNhan, setNguoiNhan] = useState('')
   const [hanXuLy, setHanXuLy] = useState(defaultHanXuLy || '2026-03-28T17:00')
   const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -51,7 +35,7 @@ export default function ModalChiDao({ open, onClose, onSubmit, defaultHanXuLy = 
   const validate = (): Record<string, string> => {
     const e: Record<string, string> = {}
     if (!ykien.trim()) e.ykien = 'Vui lòng nhập nội dung chỉ đạo.'
-    if (!thuKy) e.thuKy = 'Vui lòng chọn Thư ký xử lý.'
+    if (!nguoiNhan) e.nguoiNhan = 'Vui lòng chọn người nhận.'
     if (!hanXuLy || hanXuLy < TODAY) e.hanXuLy = 'Hạn xử lý không hợp lệ.'
     return e
   }
@@ -59,11 +43,11 @@ export default function ModalChiDao({ open, onClose, onSubmit, defaultHanXuLy = 
   const handleSubmit = () => {
     const e = validate()
     if (Object.keys(e).length) { setErrors(e); return }
-    onSubmit({ ykien, thuKy, hanXuLy })
-    setYkien(''); setThuKy(''); setHanXuLy(defaultHanXuLy || ''); setErrors({})
+    onSubmit({ ykien, nguoiNhan, hanXuLy })
+    setYkien(''); setNguoiNhan(''); setHanXuLy(defaultHanXuLy || ''); setErrors({})
   }
 
-  const canSubmit = ykien.trim() && thuKy && hanXuLy
+  const canSubmit = ykien.trim() && nguoiNhan && hanXuLy
 
   return (
     <div style={{
@@ -103,20 +87,19 @@ export default function ModalChiDao({ open, onClose, onSubmit, defaultHanXuLy = 
               placeholder="Nhập nội dung chỉ đạo..."
               style={{ height: 120, resize: 'vertical', width: '100%', boxSizing: 'border-box' }}
             />
-            <RichToolbar />
             {errors.ykien && <div style={{ fontSize: '.75rem', color: '#dc2626', marginTop: 4 }}>{errors.ykien}</div>}
           </div>
 
-          {/* Thư ký xử lý */}
+          {/* Chọn người nhận */}
           <div className="fg">
             <label style={{ fontSize: '.82rem', fontWeight: 600, color: 'var(--text2)', marginBottom: 6, display: 'block' }}>
-              Thư ký xử lý <span className="req">*</span>
+              Chọn người nhận <span className="req">*</span>
             </label>
-            <select value={thuKy} onChange={e => { setThuKy(e.target.value); setErrors(p => ({ ...p, thuKy: '' })) }} style={{ width: '100%' }}>
+            <select value={nguoiNhan} onChange={e => { setNguoiNhan(e.target.value); setErrors(p => ({ ...p, nguoiNhan: '' })) }} style={{ width: '100%' }}>
               <option value="">-- Tìm kiếm và chọn --</option>
               {THU_KY_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
-            {errors.thuKy && <div style={{ fontSize: '.75rem', color: '#dc2626', marginTop: 4 }}>{errors.thuKy}</div>}
+            {errors.nguoiNhan && <div style={{ fontSize: '.75rem', color: '#dc2626', marginTop: 4 }}>{errors.nguoiNhan}</div>}
           </div>
 
           {/* Hạn xử lý */}

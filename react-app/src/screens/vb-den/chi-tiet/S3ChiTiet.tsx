@@ -22,27 +22,27 @@ const FILES: FileItem[] = [
 
 const FLOW_STEPS: Record<VbStatus, FlowStep[]> = {
   'cho-chi-dao': [
-    { label: 'Tiếp nhận & Đóng dấu đến', sub: 'Nguyễn Thị Văn Thư · Văn thư', status: 'done', note: 'Đã đóng dấu #47', time: '25/03/2026 lúc 08:15' },
+    { label: 'Tiếp nhận văn bản', sub: 'Nguyễn Thị Văn Thư · Văn thư', status: 'done', note: '', time: '25/03/2026 lúc 08:15' },
     { label: 'Giám đốc — Ghi ý kiến chỉ đạo', sub: 'Lê Văn Giám Đốc · BGĐ', status: 'active', note: '⏳ Đang chờ · Hạn 28/03', time: 'Nhận lúc 08:15 · chưa xử lý' },
     { label: 'Thư ký điều phối', sub: 'Chưa xác định', status: 'pending', note: '— Chờ Giám đốc giao' },
     { label: 'Xử lý và phản hồi', sub: 'Chờ xác định', status: 'pending', note: '— Chưa bắt đầu' },
     { label: 'Hoàn thành & lưu trữ', sub: 'Đóng hồ sơ, lưu trữ', status: 'pending', note: '— Chưa bắt đầu' },
   ],
   'cho-dieu-phoi': [
-    { label: 'Tiếp nhận & Đóng dấu đến', sub: 'Nguyễn Thị Văn Thư · Văn thư', status: 'done', note: 'Đã đóng dấu #47', time: '25/03/2026 08:15' },
+    { label: 'Tiếp nhận văn bản', sub: 'Nguyễn Thị Văn Thư · Văn thư', status: 'done', note: '', time: '25/03/2026 08:15' },
     { label: 'Giám đốc — Ý kiến chỉ đạo', sub: 'Lê Văn Giám Đốc · BGĐ', status: 'done', note: '✓ Đã ghi chỉ đạo', time: '25/03/2026 09:45' },
     { label: 'Thư ký điều phối', sub: 'Trần Thị Thư Ký · BGĐ', status: 'active', note: '⏳ Chờ phân công · Hạn 28/03', time: 'Nhận lúc 09:45' },
     { label: 'Xử lý và phản hồi', sub: 'Chờ xác định', status: 'pending', note: '— Chờ thư ký phân công' },
   ],
   'cho-xu-ly': [
-    { label: 'Tiếp nhận & Đóng dấu đến', sub: 'Nguyễn Thị Văn Thư · Văn thư', status: 'done', note: 'Đã đóng dấu #47', time: '25/03/2026 08:15' },
+    { label: 'Tiếp nhận văn bản', sub: 'Nguyễn Thị Văn Thư · Văn thư', status: 'done', note: '', time: '25/03/2026 08:15' },
     { label: 'Giám đốc — Ý kiến chỉ đạo', sub: 'Lê Văn Giám Đốc · BGĐ', status: 'done', note: '✓ Đã chỉ đạo & giao P.KHTH', time: '25/03/2026 09:45' },
     { label: 'Thư ký — Đã điều phối', sub: 'Trần Thị Thư Ký · BGĐ', status: 'done', note: '✓ Giao P.KHTH + P.TCKT phối hợp', time: '25/03/2026 10:00' },
     { label: 'P. Kế hoạch TH — Xử lý', sub: 'Nguyễn Văn A · Trưởng phòng KHTH', status: 'active', note: '⏳ Đang xử lý · Hạn 28/03', time: 'Nhận lúc 10:00' },
     { label: 'Hoàn thành', sub: 'Đóng hồ sơ, lưu trữ', status: 'pending', note: '— Chờ P.KHTH xử lý xong' },
   ],
   'hoan-thanh': [
-    { label: 'Tiếp nhận & Đóng dấu đến', sub: 'Nguyễn Thị Văn Thư · Văn thư', status: 'done', note: 'Đã đóng dấu #47', time: '25/03/2026 08:15' },
+    { label: 'Tiếp nhận văn bản', sub: 'Nguyễn Thị Văn Thư · Văn thư', status: 'done', note: '', time: '25/03/2026 08:15' },
     { label: 'Giám đốc — Ý kiến chỉ đạo', sub: 'Lê Văn Giám Đốc · BGĐ', status: 'done', note: '✓ Đã chỉ đạo & giao P.KHTH', time: '25/03/2026 09:45' },
     { label: 'Thư ký — Đã điều phối', sub: 'Trần Thị Thư Ký · BGĐ', status: 'done', note: '✓ Giao P.KHTH chủ trì', time: '25/03/2026 10:00' },
     { label: 'P. Kế hoạch TH — Đã hoàn thành', sub: 'Nguyễn Văn A · Trưởng phòng KHTH', status: 'done', note: '✓ Hoàn thành · Đúng hạn', time: '27/03/2026 16:30' },
