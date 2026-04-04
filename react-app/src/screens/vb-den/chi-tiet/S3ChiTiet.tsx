@@ -209,7 +209,7 @@ export default function S3ChiTiet() {
   const status = (screenParams.status as VbStatus) ?? 'cho-chi-dao'
 
   const [selectedFile, setSelectedFile] = useState<FileItem>(FILES[0])
-  const [tab, setTab] = useState<'info' | 'files' | 'flow'>('info')
+  const [tab, setTab] = useState<'info' | 'history'>('info')
 
   // Modal open states
   const [openChiDao, setOpenChiDao] = useState(false)
@@ -227,12 +227,6 @@ export default function S3ChiTiet() {
   }
 
   const flowSteps = FLOW_STEPS[status]
-
-  const tabs: { key: 'info' | 'files' | 'flow'; label: string }[] = [
-    { key: 'info', label: '📋 Thông tin' },
-    { key: 'files', label: '📎 Tệp đính kèm' },
-    { key: 'flow', label: '🔄 Luồng xử lý' },
-  ]
 
   const breadcrumbSub = status === 'hoan-thanh'
     ? '45/CV-SYT · Hoàn thành'
@@ -262,11 +256,11 @@ export default function S3ChiTiet() {
           width: 650, minWidth: 650, maxWidth: 650,
           borderRight: '1px solid var(--border)',
           display: 'flex', flexDirection: 'column',
-          overflowY: 'auto',
+          overflow: 'hidden',
         }}>
           {/* Tiêu đề */}
-          <div style={{ padding: '16px 20px 12px', borderBottom: '1px solid var(--border)' }}>
-            <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--dark)', lineHeight: 1.4, marginBottom: 8 }}>
+          <div style={{ padding: '16px 20px 12px', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
+            <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--dark)', lineHeight: 1.4 }}>
               V/v báo cáo tình hình thực hiện kế hoạch KCB quý I/2026
             </div>
           </div>
@@ -274,7 +268,7 @@ export default function S3ChiTiet() {
           {/* Banner trạng thái */}
           {status === 'hoan-thanh' && (
             <div style={{
-              margin: '12px 20px', padding: '12px 16px',
+              margin: '12px 20px 0', padding: '12px 16px', flexShrink: 0,
               background: '#edfbf4', border: '1px solid #a7f3d0', borderRadius: 10,
               display: 'flex', alignItems: 'center', gap: 12,
             }}>
@@ -287,7 +281,7 @@ export default function S3ChiTiet() {
           )}
 
           {status === 'cho-xu-ly' && (
-            <div style={{ padding: '12px 20px', background: '#fff7ed', borderBottom: '1px solid #fed7aa' }}>
+            <div style={{ padding: '12px 20px', background: '#fff7ed', borderBottom: '1px solid #fed7aa', flexShrink: 0 }}>
               <div style={{ fontSize: '.72rem', fontWeight: 700, color: '#c2410c', textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>
                 📌 Thông tin xử lý
               </div>
@@ -304,9 +298,12 @@ export default function S3ChiTiet() {
             </div>
           )}
 
-          {/* Tabs */}
+          {/* Tab bar: Thông tin | Lịch sử xử lý */}
           <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', background: 'var(--bg)', flexShrink: 0 }}>
-            {tabs.map(t => (
+            {([
+              { key: 'info' as const, label: '📋 Thông tin' },
+              { key: 'history' as const, label: '🕐 Lịch sử xử lý' },
+            ]).map(t => (
               <div key={t.key} onClick={() => setTab(t.key)} style={{
                 flex: 1, textAlign: 'center', padding: '10px 0',
                 fontSize: '.8rem', fontWeight: 600, cursor: 'pointer',
@@ -320,99 +317,81 @@ export default function S3ChiTiet() {
 
           {/* Tab: Thông tin */}
           {tab === 'info' && (
-            <div style={{ padding: '12px 20px', flex: 1 }}>
-              <div className="info-section">
-                <div className="is-title">Văn bản gốc</div>
-                {[
-                  ['Số ký hiệu', '45/CV-SYT'],
-                  ['Loại văn bản', 'Công văn'],
-                  ['Nơi gửi', 'Sở Y tế TP.HCM'],
-                  ['Ngày ban hành', '24/03/2026'],
-                ].map(([l, v]) => (
-                  <div key={l} className="info-row">
-                    <div className="ir-l">{l}</div>
-                    <div className="ir-v" style={l === 'Số ký hiệu' ? { fontFamily: 'monospace', fontWeight: 700 } : {}}>{v}</div>
-                  </div>
-                ))}
-              </div>
-              <div className="info-section">
-                <div className="is-title">Thông tin tiếp nhận</div>
-                {[
-                  ['Sổ đến', 'Sổ công văn đến 2026'],
-                  ['Số đến', '#47'],
-                  ['Ngày đến', '25/03/2026 08:15'],
-                  ['Người tiếp nhận', 'Nguyễn Thị Văn Thư'],
-                  ['Hạn xử lý', '10/04/2026'],
-                  ['Mức khẩn', '🔴 Hỏa tốc'],
-                ].map(([l, v]) => (
-                  <div key={l} className="info-row">
-                    <div className="ir-l">{l}</div>
-                    <div className="ir-v" style={
-                      l === 'Hạn xử lý' ? { color: '#b91c1c', fontWeight: 600 } :
-                        l === 'Mức khẩn' ? { color: '#b91c1c' } :
-                          l === 'Số đến' ? { fontWeight: 700, color: '#d94f1e' } : {}
-                    }>{v}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Tab: Tệp đính kèm */}
-          {tab === 'files' && (
-            <div style={{ padding: '12px 20px', flex: 1 }}>
-              {(['main', 'attach'] as const).map(type => (
-                <div key={type}>
-                  <div style={{ fontSize: '.72rem', fontWeight: 700, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '.7px', margin: type === 'attach' ? '12px 0 8px' : '0 0 8px' }}>
-                    {type === 'main' ? 'Tệp chính' : 'Tệp đính kèm'}
-                  </div>
-                  {FILES.filter(f => f.type === type).map(f => (
-                    <div key={f.name} onClick={() => setSelectedFile(f)} style={{
-                      display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px',
-                      borderRadius: 8, cursor: 'pointer', marginBottom: 6, transition: 'all .15s',
-                      border: `1px solid ${selectedFile.name === f.name ? 'var(--orange)' : 'var(--border)'}`,
-                      background: selectedFile.name === f.name ? '#fff7ed' : '#fff',
-                    }}>
-                      <span style={{ fontSize: '1.3rem' }}>{f.name.endsWith('.xlsx') ? '📊' : '📄'}</span>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: '.8rem', fontWeight: 600, color: 'var(--dark)' }}>{f.name}</div>
-                        <div style={{ fontSize: '.7rem', color: 'var(--text3)' }}>{f.name.endsWith('.xlsx') ? 'Excel' : 'PDF'} · {f.size}</div>
-                      </div>
-                      <button onClick={e => e.stopPropagation()} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text3)', fontSize: '.8rem' }}>⬇</button>
+            <div style={{ overflowY: 'auto', flex: 1 }}>
+              <div style={{ padding: '12px 20px' }}>
+                <div className="info-section">
+                  <div className="is-title">Văn bản gốc</div>
+                  {[
+                    ['Số ký hiệu', '45/CV-SYT'],
+                    ['Loại văn bản', 'Công văn'],
+                    ['Nơi gửi', 'Sở Y tế TP.HCM'],
+                    ['Ngày ban hành', '24/03/2026'],
+                  ].map(([l, v]) => (
+                    <div key={l} className="info-row">
+                      <div className="ir-l">{l}</div>
+                      <div className="ir-v" style={l === 'Số ký hiệu' ? { fontFamily: 'monospace', fontWeight: 700 } : {}}>{v}</div>
                     </div>
                   ))}
                 </div>
-              ))}
+                <div className="info-section">
+                  <div className="is-title">Thông tin tiếp nhận</div>
+                  {[
+                    ['Sổ đến', 'Sổ công văn đến 2026'],
+                    ['Số đến', '#47'],
+                    ['Ngày đến', '25/03/2026 08:15'],
+                    ['Người tiếp nhận', 'Nguyễn Thị Văn Thư'],
+                    ['Hạn xử lý', '10/04/2026'],
+                    ['Mức khẩn', '🔴 Hỏa tốc'],
+                  ].map(([l, v]) => (
+                    <div key={l} className="info-row">
+                      <div className="ir-l">{l}</div>
+                      <div className="ir-v" style={
+                        l === 'Hạn xử lý' ? { color: '#b91c1c', fontWeight: 600 } :
+                          l === 'Mức khẩn' ? { color: '#b91c1c' } :
+                            l === 'Số đến' ? { fontWeight: 700, color: '#d94f1e' } : {}
+                      }>{v}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tệp đính kèm — luôn hiển thị dưới Thông tin */}
+              <div style={{ borderTop: '1px solid var(--border)', padding: '14px 20px' }}>
+                <div style={{ fontSize: '.72rem', fontWeight: 700, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 10 }}>
+                  📎 Tệp
+                </div>
+                {(['main', 'attach'] as const).map(type => (
+                  <div key={type}>
+                    <div style={{ fontSize: '.72rem', fontWeight: 700, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '.7px', margin: type === 'attach' ? '12px 0 8px' : '0 0 8px' }}>
+                      {type === 'main' ? 'Tệp chính' : 'Tệp đính kèm'}
+                    </div>
+                    {FILES.filter(f => f.type === type).map(f => (
+                      <div key={f.name} onClick={() => setSelectedFile(f)} style={{
+                        display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px',
+                        borderRadius: 8, cursor: 'pointer', marginBottom: 6, transition: 'all .15s',
+                        border: `1px solid ${selectedFile.name === f.name ? 'var(--orange)' : 'var(--border)'}`,
+                        background: selectedFile.name === f.name ? '#fff7ed' : '#fff',
+                      }}>
+                        <span style={{ fontSize: '1.3rem' }}>{f.name.endsWith('.xlsx') ? '📊' : '📄'}</span>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: '.8rem', fontWeight: 600, color: 'var(--dark)' }}>{f.name}</div>
+                          <div style={{ fontSize: '.7rem', color: 'var(--text3)' }}>{f.name.endsWith('.xlsx') ? 'Excel' : 'PDF'} · {f.size}</div>
+                        </div>
+                        <button onClick={e => e.stopPropagation()} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text3)', fontSize: '.8rem' }}>⬇</button>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
-          {/* Tab: Luồng xử lý */}
-          {tab === 'flow' && (
-            <div style={{ flex: 1, overflowY: 'auto' }}>
-              <div style={{
-                margin: '12px 20px', padding: '12px 16px',
-                background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: 10,
-              }}>
-                <div style={{ fontSize: '.72rem', fontWeight: 700, color: '#c2410c', textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>
-                  🔴 Dấu Đến
-                </div>
-                <div style={{ display: 'flex', gap: 24 }}>
-                  <div>
-                    <div style={{ fontSize: '.7rem', color: 'var(--text3)' }}>Số đến</div>
-                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#d94f1e' }}>#47</div>
-                  </div>
-                  <div>
-                    <div style={{ fontSize: '.7rem', color: 'var(--text3)' }}>Ngày tiếp nhận</div>
-                    <div style={{ fontSize: '.82rem', fontWeight: 600, color: 'var(--dark)' }}>25/03/2026 08:15</div>
-                  </div>
-                </div>
-              </div>
+          {/* Tab: Lịch sử xử lý */}
+          {tab === 'history' && (
+            <div style={{ overflowY: 'auto', flex: 1 }}>
               <Timeline steps={flowSteps} />
             </div>
           )}
-
-          {/* Timeline luôn hiển thị ở cuối khi không ở tab flow */}
-          {tab !== 'flow' && <Timeline steps={flowSteps} />}
         </div>
 
         {/* ===== CỘT PHẢI — PDF Viewer ===== */}

@@ -154,8 +154,10 @@ export default function S2TaoVbDen() {
 
   const [lanhdao, setLanhdao] = useState('')
   const [hanBuoc1, setHanBuoc1] = useState('')
+  const [chuaBietBuoc1, setChuaBietBuoc1] = useState(false)
   const [thuky, setThuky] = useState('')
   const [hanBuoc2, setHanBuoc2] = useState('')
+  const [chuaBietBuoc2, setChuaBietBuoc2] = useState(false)
 
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [showConfirmClose, setShowConfirmClose] = useState(false)
@@ -167,8 +169,8 @@ export default function S2TaoVbDen() {
 
   const handleSend = () => {
     const e: Record<string, string> = {}
-    if (!lanhdao) e.lanhdao = 'Vui lòng chọn Lãnh đạo chỉ đạo.'
-    if (!thuky) e.thuky = 'Vui lòng chọn Thư ký điều phối.'
+    if (!chuaBietBuoc1 && !lanhdao) e.lanhdao = 'Vui lòng chọn Lãnh đạo chỉ đạo.'
+    if (!chuaBietBuoc2 && !thuky) e.thuky = 'Vui lòng chọn Thư ký điều phối.'
     if (Object.keys(e).length) { setErrors(e); return }
     goScreen('s1')
   }
@@ -333,13 +335,24 @@ export default function S2TaoVbDen() {
 
             {/* Bước 1 */}
             <div style={{ border: '1px solid var(--border)', borderRadius: 10, padding: '14px 16px', marginBottom: 14, background: '#fafbfc' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                <StepBadge num={1} color="#fb923c" />
-                <span style={{ fontSize: '.85rem', fontWeight: 700, color: 'var(--dark)' }}>
-                  Bước 1: Lãnh đạo chỉ đạo <span className="req">*</span>
-                </span>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <StepBadge num={1} color="#fb923c" />
+                  <span style={{ fontSize: '.85rem', fontWeight: 700, color: 'var(--dark)' }}>
+                    Bước 1: Lãnh đạo chỉ đạo {!chuaBietBuoc1 && <span className="req">*</span>}
+                  </span>
+                </div>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: '.78rem', color: 'var(--text3)', userSelect: 'none' }}>
+                  <input
+                    type="checkbox"
+                    checked={chuaBietBuoc1}
+                    onChange={e => { setChuaBietBuoc1(e.target.checked); if (e.target.checked) { setLanhdao(''); setErrors(p => ({ ...p, lanhdao: '' })) } }}
+                    style={{ cursor: 'pointer' }}
+                  />
+                  Chưa xác định
+                </label>
               </div>
-              <div className="form-row" style={{ marginBottom: 0 }}>
+              <div className="form-row" style={{ marginBottom: 0, opacity: chuaBietBuoc1 ? 0.45 : 1, pointerEvents: chuaBietBuoc1 ? 'none' : 'auto' }}>
                 <div className="fg">
                   <label>Người nhận</label>
                   <select value={lanhdao} onChange={e => { setLanhdao(e.target.value); setErrors(p => ({ ...p, lanhdao: '' })) }}>
@@ -361,13 +374,24 @@ export default function S2TaoVbDen() {
 
             {/* Bước 2 */}
             <div style={{ border: '1px solid var(--border)', borderRadius: 10, padding: '14px 16px', background: '#fafbfc' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                <StepBadge num={2} color="#64748b" />
-                <span style={{ fontSize: '.85rem', fontWeight: 700, color: 'var(--dark)' }}>
-                  Bước 2: Thư ký điều phối <span className="req">*</span>
-                </span>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <StepBadge num={2} color="#64748b" />
+                  <span style={{ fontSize: '.85rem', fontWeight: 700, color: 'var(--dark)' }}>
+                    Bước 2: Thư ký điều phối {!chuaBietBuoc2 && <span className="req">*</span>}
+                  </span>
+                </div>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: '.78rem', color: 'var(--text3)', userSelect: 'none' }}>
+                  <input
+                    type="checkbox"
+                    checked={chuaBietBuoc2}
+                    onChange={e => { setChuaBietBuoc2(e.target.checked); if (e.target.checked) { setThuky(''); setErrors(p => ({ ...p, thuky: '' })) } }}
+                    style={{ cursor: 'pointer' }}
+                  />
+                  Chưa xác định
+                </label>
               </div>
-              <div className="form-row" style={{ marginBottom: 0 }}>
+              <div className="form-row" style={{ marginBottom: 0, opacity: chuaBietBuoc2 ? 0.45 : 1, pointerEvents: chuaBietBuoc2 ? 'none' : 'auto' }}>
                 <div className="fg">
                   <label>Người nhận</label>
                   <select value={thuky} onChange={e => { setThuky(e.target.value); setErrors(p => ({ ...p, thuky: '' })) }}>

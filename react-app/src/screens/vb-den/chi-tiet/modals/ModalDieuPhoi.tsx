@@ -12,7 +12,6 @@ interface AssigneeRow {
 
 interface SubmitData {
   assignees: AssigneeRow[]
-  ykienDieuPhoi: string
 }
 
 interface Props {
@@ -41,7 +40,6 @@ function makeRow(): AssigneeRow {
 
 export default function ModalDieuPhoi({ open, onClose, onSubmit, chiDaoInfo, defaultHanXuLy }: Props) {
   const [rows, setRows] = useState<AssigneeRow[]>([makeRow()])
-  const [ykienDieuPhoi, setYkienDieuPhoi] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   if (!open) return null
@@ -74,8 +72,8 @@ export default function ModalDieuPhoi({ open, onClose, onSubmit, chiDaoInfo, def
   const handleSubmit = () => {
     const e = validate()
     if (Object.keys(e).length) { setErrors(e); return }
-    onSubmit({ assignees: rows, ykienDieuPhoi })
-    setRows([makeRow()]); setYkienDieuPhoi(''); setErrors({})
+    onSubmit({ assignees: rows })
+    setRows([makeRow()]); setErrors({})
   }
 
   const canSubmit = rows.every(r => r.nguoiXuLy && r.hanXuLy)
@@ -200,19 +198,6 @@ export default function ModalDieuPhoi({ open, onClose, onSubmit, chiDaoInfo, def
             >
               + Thêm người xử lý
             </button>
-          </div>
-
-          {/* Ý kiến điều phối chung */}
-          <div className="fg">
-            <label style={{ fontSize: '.82rem', fontWeight: 600, color: 'var(--text2)', marginBottom: 6, display: 'block' }}>
-              Ý kiến điều phối
-            </label>
-            <textarea
-              value={ykienDieuPhoi}
-              onChange={e => setYkienDieuPhoi(e.target.value)}
-              placeholder="Nhập ý kiến điều phối (nếu có)..."
-              style={{ height: 80, resize: 'vertical', width: '100%', boxSizing: 'border-box' }}
-            />
           </div>
         </div>
 

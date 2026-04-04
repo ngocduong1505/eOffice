@@ -1,8 +1,13 @@
 import { useState } from 'react'
 import Topbar from '@/components/Topbar'
 import { useNavigation } from '@/hooks/useNavigation'
+import ModalChiDao from './chi-tiet/modals/ModalChiDao'
+import ModalDieuPhoi from './chi-tiet/modals/ModalDieuPhoi'
+import ModalUyQuyen from './chi-tiet/modals/ModalUyQuyen'
+import ModalChuyenXuLy from './chi-tiet/modals/ModalChuyenXuLy'
+import ModalHoanThanh from './chi-tiet/modals/ModalHoanThanh'
 
-type VbStatus = 'nhap' | 'cho-chi-dao' | 'cho-dieu-phoi' | 'cho-xu-ly' | 'hoan-thanh' | 'qua-han'
+type VbStatus = 'nhap' | 'cho-chi-dao' | 'cho-dieu-phoi' | 'cho-xu-ly' | 'dang-xu-ly' | 'hoan-thanh' | 'qua-han'
 type MucDo = 'hoa-toc' | 'khan' | 'thuong'
 
 interface VanBan {
@@ -26,6 +31,7 @@ const DATA: VanBan[] = [
   { id: 44, soKyHieu: '156/QĐ-BYT', trichYeu: 'Quyết định về việc điều chỉnh định mức thuốc', loaiVB: 'Quyết định', ngayVB: '20/03/2026', ngayDen: '21/03/2026 10:00', hanXuLy: '10/04/2026', donViBanHanh: 'Bộ Y tế', mucDo: 'thuong', status: 'hoan-thanh' },
   { id: 43, soKyHieu: '89/CV-CDC', trichYeu: 'Công văn hướng dẫn phòng chống dịch mùa hè 2026', loaiVB: 'Công văn', ngayVB: '18/03/2026', ngayDen: '19/03/2026 15:45', hanXuLy: '20/03/2026', donViBanHanh: 'CDC TP.HCM', mucDo: 'hoa-toc', status: 'qua-han', isOverdue: true },
   { id: 42, soKyHieu: '03/CV-SKHDT', trichYeu: 'Yêu cầu báo cáo tình hình thực hiện dự án đầu tư', loaiVB: 'Công văn', ngayVB: '15/03/2026', ngayDen: '16/03/2026 08:00', hanXuLy: '30/03/2026', donViBanHanh: 'Sở KH&ĐT', mucDo: 'khan', status: 'nhap' },
+  { id: 41, soKyHieu: '77/CV-UBND', trichYeu: 'Triển khai kế hoạch phòng chống thiên tai năm 2026', loaiVB: 'Công văn', ngayVB: '14/03/2026', ngayDen: '15/03/2026 10:00', hanXuLy: '05/04/2026', donViBanHanh: 'UBND TP.HCM', mucDo: 'thuong', status: 'dang-xu-ly' },
 ]
 
 // ─── Status config ─────────────────────────────────────────────────────────────
@@ -34,8 +40,155 @@ const STATUS_CONFIG: Record<VbStatus, { label: string; cls: string; actionLabel:
   'cho-chi-dao': { label: 'Chờ chỉ đạo', cls: 'stag st-direct', actionLabel: 'Chỉ đạo ngay', actionCls: 'ra ra-warn' },
   'cho-dieu-phoi': { label: 'Chờ điều phối', cls: 'stag st-coord', actionLabel: 'Điều phối ngay', actionCls: 'ra ra-warn' },
   'cho-xu-ly': { label: 'Chờ xử lý', cls: 'stag st-pending', actionLabel: 'Hoàn thành xử lý', actionCls: 'ra ra-p' },
+  'dang-xu-ly': { label: 'Đang xử lý', cls: 'stag st-coord', actionLabel: 'Xem chi tiết', actionCls: 'ra ra-m' },
   'hoan-thanh': { label: 'Hoàn thành', cls: 'stag st-done', actionLabel: 'Thêm vào hồ sơ', actionCls: 'ra ra-g' },
   'qua-han': { label: 'Quá hạn', cls: 'stag st-overdue', actionLabel: 'Xử lý khẩn', actionCls: 'ra ra-danger' },
+}
+
+// ─── Hạn xử lý filter ────────────────────────────────────────────────────────
+type HanPreset = 'all' | 'overdue' | 'today' | 'week' | 'month' | 'custom'
+
+const HAN_PRESETS: { key: HanPreset; label: string; desc: string; color?: string }[] = [
+  { key: 'all', label: 'Tất cả', desc: 'Không lọc theo hạn' },
+  { key: 'overdue', label: 'Quá hạn', desc: 'Hạn xử lý đã qua', color: '#dc2626' },
+  { key: 'today', label: 'Hôm nay', desc: 'Hạn trong ngày hôm nay', color: '#c2410c' },
+  { key: 'week', label: '7 ngày tới', desc: 'Hạn trong 7 ngày tới' },
+  { key: 'month', label: 'Tháng này', desc: 'Hạn trong tháng hiện tại' },
+  { key: 'custom', label: 'Tùy chỉnh', desc: 'Chọn khoảng ngày cụ thể' },
+]
+
+function HanXuLyFilter() {
+  const [open, setOpen] = useState(false)
+  const [preset, setPreset] = useState<HanPreset>('all')
+  const [fromDate, setFromDate] = useState('')
+  const [toDate, setToDate] = useState('')
+
+  const activePreset = HAN_PRESETS.find(p => p.key === preset)!
+
+  const triggerLabel = () => {
+    if (preset === 'all') return 'Hạn xử lý'
+    if (preset === 'custom' && (fromDate || toDate)) {
+      const parts = [fromDate, toDate].filter(Boolean)
+      return parts.length === 2 ? `${fromDate} → ${toDate}` : parts[0]
+    }
+    return activePreset.label
+  }
+
+  const isActive = preset !== 'all'
+
+  const handlePreset = (key: HanPreset) => {
+    setPreset(key)
+    if (key !== 'custom') { setFromDate(''); setToDate('') }
+  }
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <button
+        onClick={() => setOpen(p => !p)}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 6,
+          padding: '7px 12px', borderRadius: 7, cursor: 'pointer',
+          border: `1px solid ${isActive ? 'var(--orange)' : 'var(--border)'}`,
+          background: isActive ? '#fff7ed' : '#fff',
+          color: isActive ? 'var(--orange)' : 'var(--text2)',
+          fontSize: '.82rem', fontWeight: isActive ? 600 : 400,
+          whiteSpace: 'nowrap',
+        }}
+      >
+        <span style={{ fontSize: '.85rem' }}>📅</span>
+        <span>{triggerLabel()}</span>
+        {isActive && (
+          <span
+            onClick={e => { e.stopPropagation(); setPreset('all'); setFromDate(''); setToDate('') }}
+            style={{ marginLeft: 2, color: '#94a3b8', fontWeight: 400, fontSize: '.78rem' }}
+          >✕</span>
+        )}
+        {!isActive && <span style={{ color: '#94a3b8', fontSize: '.72rem' }}>▼</span>}
+      </button>
+
+      {open && (
+        <div
+          onMouseLeave={() => setOpen(false)}
+          style={{
+            position: 'absolute', top: 'calc(100% + 4px)', left: 0, zIndex: 300,
+            background: '#fff', border: '1px solid var(--border)', borderRadius: 10,
+            boxShadow: '0 8px 28px rgba(0,0,0,.13)', minWidth: 260, padding: '6px 0',
+          }}
+        >
+          {/* Header */}
+          <div style={{ padding: '8px 14px 6px', borderBottom: '1px solid var(--border)', marginBottom: 4 }}>
+            <div style={{ fontSize: '.72rem', fontWeight: 700, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '.6px' }}>
+              Lọc theo Hạn xử lý
+            </div>
+          </div>
+
+          {/* Preset options */}
+          {HAN_PRESETS.map(p => (
+            <div
+              key={p.key}
+              onClick={() => { handlePreset(p.key); if (p.key !== 'custom') setOpen(false) }}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: '9px 14px', cursor: 'pointer',
+                background: preset === p.key ? '#fff7ed' : 'transparent',
+              }}
+              onMouseEnter={e => { if (preset !== p.key) e.currentTarget.style.background = '#f8fafc' }}
+              onMouseLeave={e => { e.currentTarget.style.background = preset === p.key ? '#fff7ed' : 'transparent' }}
+            >
+              <div>
+                <div style={{ fontSize: '.82rem', fontWeight: preset === p.key ? 600 : 400, color: p.color ?? 'var(--dark)' }}>
+                  {p.label}
+                </div>
+                <div style={{ fontSize: '.72rem', color: 'var(--text3)', marginTop: 1 }}>{p.desc}</div>
+              </div>
+              {preset === p.key && <span style={{ color: 'var(--orange)', fontSize: '.8rem' }}>✓</span>}
+            </div>
+          ))}
+
+          {/* Custom range */}
+          {preset === 'custom' && (
+            <div style={{ borderTop: '1px solid var(--border)', padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div style={{ fontSize: '.75rem', fontWeight: 600, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '.5px' }}>
+                Khoảng ngày
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: '.7rem', color: 'var(--text3)', marginBottom: 3 }}>Từ ngày</div>
+                  <input
+                    type="date"
+                    value={fromDate}
+                    onChange={e => setFromDate(e.target.value)}
+                    style={{ width: '100%', boxSizing: 'border-box', fontSize: '.8rem' }}
+                  />
+                </div>
+                <span style={{ color: 'var(--text3)', fontSize: '.8rem', marginTop: 14 }}>→</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: '.7rem', color: 'var(--text3)', marginBottom: 3 }}>Đến ngày</div>
+                  <input
+                    type="date"
+                    value={toDate}
+                    min={fromDate}
+                    onChange={e => setToDate(e.target.value)}
+                    style={{ width: '100%', boxSizing: 'border-box', fontSize: '.8rem' }}
+                  />
+                </div>
+              </div>
+              <button
+                onClick={() => setOpen(false)}
+                style={{
+                  padding: '6px 0', background: 'var(--orange)', color: '#fff',
+                  border: 'none', borderRadius: 6, cursor: 'pointer',
+                  fontSize: '.8rem', fontWeight: 600, marginTop: 2,
+                }}
+              >
+                Áp dụng
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
 }
 
 // ─── Mức độ badge ─────────────────────────────────────────────────────────────
@@ -46,12 +199,20 @@ function MucDoBadge({ mucDo }: { mucDo: MucDo }) {
 }
 
 // ─── Row action menu ──────────────────────────────────────────────────────────
-function RowMenu({ status, onClose }: { status: VbStatus; onClose: () => void }) {
-  const items: { label: string; danger?: boolean }[] = [
-    { label: 'Ủy quyền' },
+function RowMenu({ status, onClose, onUyQuyen, onChuyenXuLy }: {
+  status: VbStatus
+  onClose: () => void
+  onUyQuyen: () => void
+  onChuyenXuLy: () => void
+}) {
+  const items: { label: string; danger?: boolean; action?: () => void }[] = [
+    { label: 'Ủy quyền', action: onUyQuyen },
     { label: 'Từ chối', danger: true },
     ...(status === 'cho-xu-ly'
-      ? [{ label: 'Chuyển tiếp xử lý' }, { label: 'Tạo văn bản đi' }]
+      ? [
+        { label: 'Chuyển tiếp xử lý', action: onChuyenXuLy },
+        { label: 'Tạo văn bản đi' },
+      ]
       : []),
     { label: 'Thêm vào hồ sơ' },
   ]
@@ -68,7 +229,7 @@ function RowMenu({ status, onClose }: { status: VbStatus; onClose: () => void })
           style={{ padding: '8px 16px', fontSize: '.82rem', cursor: 'pointer', color: item.danger ? '#dc2626' : 'var(--dark)' }}
           onMouseEnter={e => (e.currentTarget.style.background = '#f5f6fa')}
           onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-          onClick={onClose}
+          onClick={() => { item.action?.(); onClose() }}
         >
           {item.label}
         </div>
@@ -83,7 +244,24 @@ export default function S1DanhSach() {
   const [checked, setChecked] = useState<Set<number>>(new Set())
   const [allChecked, setAllChecked] = useState(false)
   const [openMenu, setOpenMenu] = useState<number | null>(null)
+  const [openChiDao, setOpenChiDao] = useState<number | null>(null)
+  const [openDieuPhoi, setOpenDieuPhoi] = useState<number | null>(null)
+  const [openUyQuyen, setOpenUyQuyen] = useState<number | null>(null)
+  const [openChuyenXuLy, setOpenChuyenXuLy] = useState<number | null>(null)
+  const [openHoanThanh, setOpenHoanThanh] = useState<number | null>(null)
   const [pageSize, setPageSize] = useState(10)
+
+  const getActionHandler = (row: VanBan) => {
+    switch (row.status) {
+      case 'nhap': return () => goScreen('s2')
+      case 'cho-chi-dao': return () => setOpenChiDao(row.id)
+      case 'cho-dieu-phoi': return () => setOpenDieuPhoi(row.id)
+      case 'cho-xu-ly': return () => setOpenHoanThanh(row.id)
+      case 'dang-xu-ly': return () => goScreen('s3', { status: row.status })
+      case 'qua-han': return () => setOpenHoanThanh(row.id)
+      default: return () => goScreen('s3', { status: row.status })
+    }
+  }
 
   const toggleAll = () => {
     if (allChecked) {
@@ -132,8 +310,7 @@ export default function S1DanhSach() {
           <option>Hoàn thành</option>
           <option>Quá hạn</option>
         </select>
-        <input type="date" className="fsel" style={{ color: '#3a3f52' }} title="Từ ngày" />
-        <input type="date" className="fsel" style={{ color: '#3a3f52' }} title="Đến ngày" />
+        <HanXuLyFilter />
 
         {hasChecked && (
           <button className="fbtn" style={{ background: '#1d4ed8', color: '#fff' }}>
@@ -201,7 +378,7 @@ export default function S1DanhSach() {
                         <button
                           className={cfg.actionCls}
                           style={{ flexShrink: 0, width: '110px', border: 'solid 1px #bfbfbf' }}
-                          onClick={() => goScreen('s3', { status: row.status })}
+                          onClick={getActionHandler(row)}
                         >
                           {cfg.actionLabel}
                         </button>
@@ -211,7 +388,12 @@ export default function S1DanhSach() {
                             onClick={() => setOpenMenu(openMenu === row.id ? null : row.id)}
                           >···</button>
                           {openMenu === row.id && (
-                            <RowMenu status={row.status} onClose={() => setOpenMenu(null)} />
+                            <RowMenu
+                              status={row.status}
+                              onClose={() => setOpenMenu(null)}
+                              onUyQuyen={() => { setOpenUyQuyen(row.id); setOpenMenu(null) }}
+                              onChuyenXuLy={() => { setOpenChuyenXuLy(row.id); setOpenMenu(null) }}
+                            />
                           )}
                         </div>
                       </div>
@@ -244,6 +426,31 @@ export default function S1DanhSach() {
           </div>
         </div>
       </div>
+      <ModalChiDao
+        open={openChiDao !== null}
+        onClose={() => setOpenChiDao(null)}
+        onSubmit={() => setOpenChiDao(null)}
+      />
+      <ModalDieuPhoi
+        open={openDieuPhoi !== null}
+        onClose={() => setOpenDieuPhoi(null)}
+        onSubmit={() => setOpenDieuPhoi(null)}
+      />
+      <ModalUyQuyen
+        open={openUyQuyen !== null}
+        onClose={() => setOpenUyQuyen(null)}
+        onSubmit={() => setOpenUyQuyen(null)}
+      />
+      <ModalChuyenXuLy
+        open={openChuyenXuLy !== null}
+        onClose={() => setOpenChuyenXuLy(null)}
+        onSubmit={() => setOpenChuyenXuLy(null)}
+      />
+      <ModalHoanThanh
+        open={openHoanThanh !== null}
+        onClose={() => setOpenHoanThanh(null)}
+        onSubmit={() => setOpenHoanThanh(null)}
+      />
     </div>
   )
 }
