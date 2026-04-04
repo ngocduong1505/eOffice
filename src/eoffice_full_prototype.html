@@ -1,0 +1,2414 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Văn phòng số – Văn bản Đến</title>
+<style>
+  :root { --fs:14px; --panel-w:480px; --orange:#ff6b35; --dark:#1a1a2e; --border:#e2e4ea; --bg:#f4f5f7; --text2:#5a6279; --text3:#9aa0b4; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ font-size:var(--fs); }
+  body{ font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); display:flex; height:100vh; overflow:hidden; color:var(--dark); }
+
+  /* ── NAV FLOW BAR ── */
+  .flow-nav{ position:fixed; bottom:20px; left:50%; transform:translateX(-50%); display:flex; gap:6px; background:#1a1a2e; padding:8px 12px; border-radius:40px; z-index:999; box-shadow:0 4px 20px rgba(0,0,0,.25); }
+  .fn-btn{ padding:6px 14px; border:none; border-radius:20px; font-size:.78rem; font-weight:600; cursor:pointer; color:#9aa0b4; background:transparent; transition:.15s; white-space:nowrap; }
+  .fn-btn:hover{ color:#fff; }
+  .fn-btn.on{ background:#ff6b35; color:#fff; }
+  .fn-sep{ width:1px; background:#ffffff20; margin:4px 0; }
+
+  /* ── SCREEN ── */
+  .screen{ display:none; width:100%; height:100%; }
+  .screen.on{ display:flex; }
+
+  /* ── SIDEBAR ── */
+  .sidebar{ width:230px; min-width:230px; background:#fff; border-right:1px solid var(--border); display:flex; flex-direction:column; z-index:20; }
+  .logo-row{ padding:16px 16px 12px; display:flex; align-items:center; gap:10px; border-bottom:1px solid #f0f1f4; }
+  .logo-box{ width:32px; height:32px; background:var(--orange); border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:.75rem; color:#fff; }
+  .logo-t{ font-size:1.05rem; font-weight:700; color:var(--dark); }
+  .logo-t span{ color:var(--orange); }
+  .new-btn{ margin:12px 12px 6px; padding:9px 0; background:var(--orange); border:none; border-radius:7px; color:#fff; font-size:.88rem; font-weight:600; cursor:pointer; }
+  .nav-g{ padding:4px 0; }
+  .nav-sec{ padding:10px 16px 3px; font-size:.68rem; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:1px; }
+  .ni{ display:flex; align-items:center; gap:8px; padding:8px 14px; font-size:.86rem; color:var(--text2); cursor:pointer; margin:1px 6px; border-radius:7px; transition:.1s; }
+  .ni:hover{ background:var(--bg); color:var(--dark); }
+  .ni.on{ background:#f0f1f4; color:var(--dark); font-weight:600; border-left:3px solid var(--orange); padding-left:11px; }
+  .ni.sub{ padding-left:22px; font-size:.82rem; }
+  .ni.sub.on{ padding-left:19px; }
+  .nbg{ margin-left:auto; font-size:.7rem; font-weight:700; padding:2px 6px; border-radius:4px; background:#f0f1f4; color:var(--text2); }
+  .nbg.u{ background:#fef0eb; color:#d94f1e; }
+  .nbg.r{ background:#fef2f2; color:#c62828; }
+
+  /* ── CONTENT WRAPPER ── */
+  .cw{ flex:1; display:flex; flex-direction:column; overflow:hidden; }
+  .topbar{ background:#fff; padding:0 20px; height:52px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); flex-shrink:0; }
+  .breadcrumb{ font-size:.85rem; color:var(--text3); display:flex; align-items:center; gap:5px; }
+  .breadcrumb .cur{ color:var(--dark); font-weight:600; }
+  .bc-sep{ color:#d0d4e0; }
+  .top-right{ display:flex; align-items:center; gap:9px; }
+  .notif{ position:relative; width:32px; height:32px; border:1px solid var(--border); border-radius:7px; background:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:.88rem; color:var(--text2); }
+  .ndot{ position:absolute; top:5px; right:5px; width:6px; height:6px; background:var(--orange); border-radius:50%; border:1.5px solid #fff; }
+  .user-pill{ display:flex; align-items:center; gap:7px; padding:4px 10px 4px 5px; border:1px solid var(--border); border-radius:20px; cursor:pointer; background:#fff; }
+  .uav{ width:28px; height:28px; background:var(--dark); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.7rem; font-weight:700; color:#fff; }
+  .uname{ font-size:.83rem; font-weight:600; color:#3a3f52; }
+
+  /* ── STAT STRIP ── */
+  .stat-strip{ display:flex; background:#fff; border-bottom:1px solid var(--border); flex-shrink:0; }
+  .si{ flex:1; padding:12px 18px; cursor:pointer; border-right:1px solid #f0f1f4; position:relative; }
+  .si:last-child{ border-right:none; }
+  .si:hover{ background:#fafbfc; }
+  .si.on{ background:#fafbfc; }
+  .si.on::after{ content:''; position:absolute; bottom:0; left:0; right:0; height:2px; background:var(--orange); }
+  .si-num{ font-size:1.4rem; font-weight:800; color:var(--dark); line-height:1; }
+  .si.on .si-num{ color:#d94f1e; }
+  .si-lbl{ font-size:.75rem; color:var(--text3); margin-top:2px; }
+
+  /* ── FILTER BAR ── */
+  .fbar{ display:flex; align-items:center; gap:8px; padding:10px 20px; background:var(--bg); border-bottom:1px solid var(--border); flex-shrink:0; flex-wrap:wrap; }
+  .sw{ display:flex; align-items:center; gap:6px; background:#fff; border:1px solid var(--border); border-radius:7px; padding:0 11px; height:36px; flex:1; max-width:280px; }
+  .sw input{ border:none; outline:none; font-size:.86rem; flex:1; background:transparent; }
+  .sw-ico{ color:#b0b8cc; font-size:.9rem; }
+  .fsel{ height:36px; padding:0 10px; border:1px solid var(--border); border-radius:7px; background:#fff; font-size:.84rem; color:#3a3f52; cursor:pointer; outline:none; }
+  .fbtn{ height:36px; padding:0 14px; border:1px solid var(--border); border-radius:7px; background:#fff; font-size:.84rem; color:#3a3f52; cursor:pointer; display:flex; align-items:center; gap:5px; }
+  .fbtn.primary{ background:var(--orange); color:#fff; border-color:var(--orange); font-weight:600; }
+  .fbtn.primary:hover{ background:#e85d2a; }
+
+  /* ── WORK AREA ── */
+  .work-area{ flex:1; display:flex; overflow:hidden; }
+  .content-pane{ flex:1; overflow-y:auto; padding:16px 20px 80px; }
+  .content-pane::-webkit-scrollbar{ width:5px; }
+  .content-pane::-webkit-scrollbar-thumb{ background:#d8dae2; border-radius:5px; }
+
+  /* ── TABLE ── */
+  .ltable{ width:100%; border-collapse:collapse; background:#fff; border-radius:10px; overflow:hidden; border:1px solid var(--border); }
+  .ltable thead tr{ background:var(--bg); }
+  .ltable th{ padding:10px 14px; text-align:left; font-size:.75rem; font-weight:700; color:var(--text2); text-transform:uppercase; letter-spacing:.5px; white-space:nowrap; border-bottom:2px solid var(--border); }
+  .ltable td{ padding:11px 14px; font-size:.86rem; color:#3a3f52; border-bottom:1px solid #f0f1f4; vertical-align:middle; }
+  .ltable tbody tr:last-child td{ border-bottom:none; }
+  .ltable tbody tr{ cursor:pointer; transition:.1s; }
+  .ltable tbody tr:hover{ background:#fafbfc; }
+  .ltable tbody tr.selected{ background:#f7f8fb; border-left:3px solid var(--orange); }
+
+  .lt-doc{ display:flex; align-items:center; gap:10px; }
+  .lt-thumb{ width:36px; height:46px; background:var(--bg); border:1px solid var(--border); border-radius:5px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; position:relative; flex-shrink:0; }
+  .lt-ext{ position:absolute; bottom:2px; right:2px; background:var(--dark); color:#fff; font-size:.55rem; padding:1px 3px; border-radius:2px; font-family:monospace; font-weight:700; }
+  .lt-name{ font-size:.86rem; font-weight:600; color:var(--dark); max-width:220px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .lt-sub{ font-size:.72rem; color:var(--text3); }
+
+  .row-act{ display:flex; gap:5px; }
+  .ra{ padding:5px 10px; border:none; border-radius:5px; font-size:.78rem; font-weight:600; cursor:pointer; white-space:nowrap; }
+  .ra-p{ background:var(--orange); color:#fff; }
+  .ra-g{ background:#f0f1f4; color:#3a3f52; }
+  .ra-m{ background:#fff; border:1px solid var(--border); color:var(--text3); padding:5px 8px; border-radius:5px; cursor:pointer; }
+
+  /* ── URGENCY BADGES ── */
+  .urg{ font-size:.7rem; font-weight:700; padding:2px 8px; border-radius:4px; }
+  .urg-hot{ background:#fef2f2; color:#b91c1c; border:1px solid #fca5a5; }
+  .urg-vurg{ background:#fff7ed; color:#c2410c; border:1px solid #fdba74; }
+  .urg-urg{ background:#fefce8; color:#854d0e; border:1px solid #fde68a; }
+  .urg-norm{ background:#f0f1f4; color:#5a6279; border:1px solid var(--border); }
+
+  /* ── STATUS ── */
+  .stag{ font-size:.72rem; font-weight:600; padding:3px 8px; border-radius:4px; white-space:nowrap; }
+  .st-new{ background:#eff6ff; color:#1d4ed8; }
+  .st-stamp{ background:#f0f1f4; color:#3a3f52; }
+  .st-direct{ background:#fef0eb; color:#c2410c; }
+  .st-process{ background:#fffbeb; color:#92400e; }
+  .st-done{ background:#edfbf4; color:#1a7a45; }
+  .st-overdue{ background:#fef2f2; color:#b91c1c; }
+
+  /* ── DETAIL PANEL ── */
+  .detail-panel{ width:0; min-width:0; overflow:hidden; background:#fff; border-left:1px solid var(--border); display:flex; flex-direction:column; transition:width .22s ease,min-width .22s ease; }
+  .detail-panel.open{ width:var(--panel-w); min-width:var(--panel-w); }
+  .dp-head{ padding:14px 16px; border-bottom:1px solid var(--border); flex-shrink:0; }
+  .dp-head-row{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:8px; }
+  .dp-title{ font-size:.95rem; font-weight:700; color:var(--dark); line-height:1.3; }
+  .dp-close{ width:28px; height:28px; border:1px solid var(--border); background:#fff; border-radius:6px; cursor:pointer; font-size:1rem; color:var(--text3); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .dp-close:hover{ background:var(--bg); }
+  .dp-chips{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+  .chip{ font-size:.75rem; padding:3px 9px; border-radius:4px; border:1px solid var(--border); color:var(--text2); background:#fff; }
+  .chip.hot{ background:#fef2f2; border-color:#fca5a5; color:#b91c1c; font-weight:700; }
+  .chip.s{ background:#f0f1f4; color:#3a3f52; font-weight:600; }
+  .chip.process{ background:#fef0eb; border-color:#fcd9c8; color:#c2410c; font-weight:600; }
+  .dp-btns{ display:flex; gap:7px; flex-wrap:wrap; }
+  .dp-btn{ padding:8px 14px; border-radius:7px; border:1px solid var(--border); font-size:.84rem; font-weight:600; cursor:pointer; background:#fff; }
+  .dp-btn:hover{ background:var(--bg); }
+  .dp-btn.primary{ background:var(--orange); border-color:var(--orange); color:#fff; }
+  .dp-btn.primary:hover{ background:#e85d2a; }
+  .dp-btn.danger{ background:#fef2f2; border-color:#fca5a5; color:#b91c1c; }
+
+  /* TABS */
+  .dp-tabs{ display:flex; border-bottom:1px solid var(--border); padding:0 16px; flex-shrink:0; }
+  .dptab{ padding:10px 12px; font-size:.82rem; color:var(--text3); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; transition:.1s; }
+  .dptab:hover{ color:#3a3f52; }
+  .dptab.on{ color:var(--dark); border-bottom-color:var(--orange); font-weight:700; }
+
+  .dp-body{ flex:1; overflow-y:auto; }
+  .dp-body::-webkit-scrollbar{ width:4px; }
+  .dp-body::-webkit-scrollbar-thumb{ background:#d8dae2; border-radius:4px; }
+  .tab-pane{ display:none; padding:16px; }
+  .tab-pane.on{ display:block; }
+
+  /* STAMP BLOCK */
+  .stamp-block{ background:#fef2f2; border:1.5px solid #fca5a5; border-radius:8px; padding:12px 14px; margin-bottom:14px; }
+  .stamp-title{ font-size:.7rem; font-weight:700; color:#b91c1c; text-transform:uppercase; letter-spacing:.8px; margin-bottom:8px; display:flex; align-items:center; gap:5px; }
+  .stamp-grid{ display:grid; grid-template-columns:1fr 1fr; gap:6px 12px; }
+  .sg-item label{ font-size:.68rem; color:#9aa0b4; text-transform:uppercase; letter-spacing:.5px; display:block; margin-bottom:2px; }
+  .sg-item .sv{ font-size:.84rem; color:#1a1a2e; font-weight:600; }
+  .sg-item .sv.big{ font-size:1.1rem; font-weight:800; color:#b91c1c; }
+
+  /* INFO ROWS */
+  .info-section{ margin-bottom:16px; }
+  .is-title{ font-size:.7rem; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid #f0f1f4; }
+  .info-row{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; font-size:.84rem; }
+  .ir-l{ color:var(--text3); flex-shrink:0; }
+  .ir-v{ color:#3a3f52; font-weight:500; text-align:right; max-width:220px; word-break:break-word; }
+  .ir-v.w{ color:#c2410c; }
+  .ir-v.g{ color:#1a7a45; }
+  .ir-v.r{ color:#b91c1c; font-weight:700; }
+
+  /* FLOW STEPS */
+  .flow-step{ display:flex; gap:10px; margin-bottom:16px; position:relative; }
+  .flow-step:not(:last-child)::after{ content:''; position:absolute; left:13px; top:28px; bottom:-10px; width:2px; background:#f0f1f4; }
+  .fs-dot{ width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.78rem; flex-shrink:0; border:2px solid var(--border); background:var(--bg); color:var(--text3); }
+  .fs-dot.done{ border-color:#a7f3d0; background:#edfbf4; color:#1a7a45; }
+  .fs-dot.active{ border-color:#fcd9c8; background:#fef0eb; color:#c2410c; }
+  .fs-dot.pending{ border-color:var(--border); background:#fff; color:var(--text3); }
+  .fs-info{ flex:1; padding-top:2px; }
+  .fs-label{ font-size:.86rem; font-weight:600; color:var(--dark); }
+  .fs-sub{ font-size:.75rem; color:var(--text3); margin-top:1px; }
+  .fs-status{ font-size:.73rem; margin-top:3px; }
+  .fss-done{ color:#1a7a45; }
+  .fss-active{ color:#c2410c; }
+  .fss-pend{ color:var(--text3); }
+  .fs-time{ font-size:.72rem; color:#b8bdc9; margin-top:2px; }
+  .fs-note{ background:#f7f8fb; border:1px solid var(--border); border-radius:6px; padding:8px 10px; margin-top:6px; font-size:.82rem; color:#5a6279; line-height:1.5; }
+  .fs-note-label{ font-size:.68rem; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px; }
+
+  /* DIRECTIVE INPUT */
+  .directive-box{ background:#fffbeb; border:1.5px solid #fde68a; border-radius:8px; padding:12px; margin-bottom:12px; }
+  .dir-title{ font-size:.75rem; font-weight:700; color:#92400e; margin-bottom:8px; }
+  .dir-ta{ width:100%; border:1px solid #fde68a; border-radius:6px; padding:8px 10px; font-size:.84rem; font-family:inherit; resize:vertical; min-height:72px; outline:none; background:#fff; }
+  .dir-ta:focus{ border-color:#f59e0b; }
+
+  /* ACTIVITY */
+  .act-item{ display:flex; gap:9px; margin-bottom:12px; position:relative; }
+  .act-item:not(:last-child)::before{ content:''; position:absolute; left:11px; top:22px; bottom:-6px; width:1px; background:#f0f1f4; }
+  .act-dot{ width:22px; height:22px; border-radius:50%; background:#f0f1f4; border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:.65rem; flex-shrink:0; color:var(--text2); }
+  .act-dot.c{ background:var(--dark); border-color:var(--dark); color:#fff; }
+  .act-dot.ok{ background:#edfbf4; border-color:#a7f3d0; color:#1a7a45; }
+  .act-dot.warn{ background:#fef0eb; border-color:#fcd9c8; color:#c2410c; }
+  .act-text{ font-size:.84rem; color:var(--text2); line-height:1.5; }
+  .act-text strong{ color:var(--dark); }
+  .act-time{ font-size:.72rem; color:#c0c5d0; display:block; margin-top:2px; }
+
+  /* DEADLINE */
+  .deadline-warn{ display:flex; align-items:center; gap:6px; background:#fef2f2; border:1px solid #fca5a5; border-radius:6px; padding:8px 12px; font-size:.82rem; color:#b91c1c; margin-bottom:10px; }
+
+  /* ══════════════════════════════════════ */
+  /* SCREEN 2 — TIẾP NHẬN (FORM) */
+  /* ══════════════════════════════════════ */
+  .receive-layout{ flex:1; display:flex; overflow:hidden; }
+  .form-pane{ flex:1; overflow-y:auto; padding:24px 32px 100px; }
+  .form-pane::-webkit-scrollbar{ width:5px; }
+  .form-pane::-webkit-scrollbar-thumb{ background:#d8dae2; border-radius:5px; }
+  .form-card{ background:#fff; border-radius:10px; border:1px solid var(--border); padding:24px; margin-bottom:16px; }
+  .fc-title{ font-size:.9rem; font-weight:700; color:var(--dark); margin-bottom:16px; display:flex; align-items:center; gap:7px; }
+  .fc-title span{ width:20px; height:20px; background:var(--orange); border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:.7rem; color:#fff; font-weight:800; }
+
+  .form-row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; }
+  .form-row.full{ grid-template-columns:1fr; }
+  .form-row.tri{ grid-template-columns:1fr 1fr 1fr; }
+  .fg{ display:flex; flex-direction:column; gap:4px; }
+  .fg label{ font-size:.75rem; font-weight:600; color:var(--text2); }
+  .fg label .req{ color:var(--orange); }
+  .fg input, .fg select, .fg textarea{ height:36px; padding:0 10px; border:1px solid var(--border); border-radius:7px; font-size:.86rem; font-family:inherit; outline:none; color:var(--dark); }
+  .fg textarea{ height:72px; padding:8px 10px; resize:vertical; }
+  .fg input:focus, .fg select:focus, .fg textarea:focus{ border-color:#9aa0b4; }
+  .fg input.auto{ background:#f7f8fb; color:#d94f1e; font-weight:700; font-size:.9rem; }
+  .fg .hint{ font-size:.72rem; color:var(--text3); margin-top:2px; }
+
+  .stamp-preview{ background:#fef2f2; border:2px dashed #fca5a5; border-radius:8px; padding:16px; display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .sp-title{ font-size:.7rem; font-weight:700; color:#9aa0b4; text-transform:uppercase; letter-spacing:.8px; }
+  .sp-stamp{ border:2px solid #b91c1c; border-radius:8px; padding:10px 16px; text-align:center; min-width:140px; }
+  .sp-org{ font-size:.62rem; font-weight:700; color:#b91c1c; text-transform:uppercase; letter-spacing:.5px; }
+  .sp-den{ font-size:1rem; font-weight:800; color:#b91c1c; margin:2px 0; }
+  .sp-num{ font-size:1.4rem; font-weight:900; color:#b91c1c; line-height:1; }
+  .sp-date{ font-size:.72rem; color:#b91c1c; margin-top:3px; }
+
+  .upload-area{ border:2px dashed var(--border); border-radius:10px; padding:28px; display:flex; flex-direction:column; align-items:center; gap:8px; cursor:pointer; transition:.15s; }
+  .upload-area:hover{ border-color:var(--orange); background:#fef7f4; }
+  .ua-ico{ font-size:2rem; opacity:.5; }
+  .ua-txt{ font-size:.86rem; color:var(--text2); }
+  .ua-hint{ font-size:.75rem; color:var(--text3); }
+  .upload-file-show{ display:flex; align-items:center; gap:10px; padding:12px 14px; background:#f7f8fb; border:1px solid var(--border); border-radius:8px; }
+  .ufs-ico{ font-size:1.4rem; }
+  .ufs-name{ font-size:.86rem; font-weight:600; color:var(--dark); }
+  .ufs-size{ font-size:.72rem; color:var(--text3); }
+  .ufs-del{ margin-left:auto; color:var(--text3); cursor:pointer; font-size:.9rem; }
+
+  .form-footer{ position:sticky; bottom:0; background:#fff; border-top:1px solid var(--border); padding:14px 32px; display:flex; gap:9px; justify-content:flex-end; }
+  .btn{ padding:9px 20px; border-radius:7px; border:1px solid var(--border); font-size:.88rem; font-weight:600; cursor:pointer; }
+  .btn-primary{ background:var(--orange); border-color:var(--orange); color:#fff; }
+  .btn-primary:hover{ background:#e85d2a; }
+  .btn-ghost{ background:#fff; color:#3a3f52; }
+  .btn-ghost:hover{ background:var(--bg); }
+
+  /* ══════════════════════════════════════ */
+  /* SCREEN 4 — CHUYỂN XỬ LÝ MODAL */
+  /* ══════════════════════════════════════ */
+  .modal-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:100; display:flex; align-items:center; justify-content:center; }
+  .modal{ background:#fff; border-radius:12px; width:480px; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,.2); }
+  .modal-head{ padding:20px 20px 14px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+  .modal-title{ font-size:1rem; font-weight:700; color:var(--dark); }
+  .modal-body{ padding:20px; }
+  .modal-foot{ padding:14px 20px; border-top:1px solid var(--border); display:flex; gap:8px; justify-content:flex-end; }
+
+  .routing-type{ display:flex; gap:8px; margin-bottom:16px; }
+  .rt-opt{ flex:1; padding:10px; border:2px solid var(--border); border-radius:8px; cursor:pointer; text-align:center; transition:.15s; }
+  .rt-opt:hover{ border-color:#9aa0b4; }
+  .rt-opt.on{ border-color:var(--orange); background:#fef7f4; }
+  .rt-ico{ font-size:1.2rem; margin-bottom:3px; }
+  .rt-lbl{ font-size:.78rem; font-weight:600; color:var(--dark); }
+  .rt-sub{ font-size:.68rem; color:var(--text3); }
+
+  .person-list{ border:1px solid var(--border); border-radius:8px; overflow:hidden; margin-bottom:12px; }
+  .person-item{ display:flex; align-items:center; gap:10px; padding:10px 12px; border-bottom:1px solid #f0f1f4; cursor:pointer; transition:.1s; }
+  .person-item:last-child{ border-bottom:none; }
+  .person-item:hover{ background:var(--bg); }
+  .person-item.on{ background:#fef7f4; }
+  .pi-av{ width:32px; height:32px; border-radius:50%; background:var(--dark); display:flex; align-items:center; justify-content:center; font-size:.72rem; font-weight:700; color:#fff; flex-shrink:0; }
+  .pi-av.orange{ background:var(--orange); }
+  .pi-name{ font-size:.86rem; font-weight:600; color:var(--dark); }
+  .pi-role{ font-size:.72rem; color:var(--text3); }
+  .pi-check{ margin-left:auto; color:var(--orange); display:none; }
+  .person-item.on .pi-check{ display:block; }
+
+  /* COMPLETED SCREEN */
+  .completed-banner{ background:linear-gradient(135deg,#edfbf4,#d1fae5); border:1px solid #a7f3d0; border-radius:10px; padding:20px; display:flex; align-items:center; gap:14px; margin-bottom:16px; }
+  .cb-ico{ font-size:2rem; }
+  .cb-text h3{ font-size:.95rem; font-weight:700; color:#065f46; margin-bottom:3px; }
+  .cb-text p{ font-size:.82rem; color:#047857; }
+
+  /* BREADCRUMB STEPPER */
+  .stepper{ display:flex; align-items:center; gap:0; margin-bottom:0; }
+  .step-item{ display:flex; align-items:center; gap:6px; font-size:.78rem; color:var(--text3); }
+  .step-item.done{ color:#1a7a45; }
+  .step-item.active{ color:var(--orange); font-weight:700; }
+  .step-num{ width:20px; height:20px; border-radius:50%; border:1.5px solid currentColor; display:flex; align-items:center; justify-content:center; font-size:.68rem; font-weight:700; }
+  .step-arrow{ color:#d0d4e0; margin:0 6px; font-size:.75rem; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════
+     SCREEN 1 — DANH SÁCH VĂN BẢN ĐẾN
+════════════════════════════════════════════════════ -->
+<div class="screen on" id="s1">
+  <div class="sidebar">
+    <div class="logo-row">
+      <div class="logo-box">E</div>
+      <div class="logo-t">Easy<span>Docs</span></div>
+    </div>
+    <button class="new-btn">+ Tiếp nhận văn bản</button>
+    <div class="nav-g">
+      <div class="nav-sec">Tài liệu</div>
+      <div class="ni">📄 Tài liệu của tôi</div>
+      <div class="ni">✉️ Chờ tôi ký <span class="nbg u">12</span></div>
+      <div class="ni">✅ Đã gửi</div>
+    </div>
+    <div class="nav-g">
+      <div class="nav-sec">Văn phòng số</div>
+      <div class="ni on sub">📥 Văn bản Đến <span class="nbg u">8</span></div>
+      <div class="ni sub">📤 Văn bản Đi</div>
+      <div class="ni sub">📒 Sổ đăng ký</div>
+      <div class="ni sub">🗂 Hồ sơ lưu trữ</div>
+      <div class="ni sub">⚙️ Cấu hình</div>
+    </div>
+    <div class="nav-g">
+      <div class="nav-sec">Hệ thống</div>
+      <div class="ni">🏢 Đơn vị</div>
+      <div class="ni">📊 Báo cáo</div>
+    </div>
+  </div>
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb">
+        <span>Văn phòng số</span>
+        <span class="bc-sep">›</span>
+        <span class="cur">Quản lý văn bản Đến</span>
+      </div>
+      <div class="top-right">
+        <div class="notif">🔔<div class="ndot"></div></div>
+        <div class="user-pill"><div class="uav">VT</div><div class="uname">Văn Thư</div></div>
+      </div>
+    </div>
+    <div class="stat-strip">
+      <div class="si on"><div class="si-num">47</div><div class="si-lbl">Tổng văn bản đến</div></div>
+      <div class="si"><div class="si-num" style="color:#1d4ed8">8</div><div class="si-lbl">Mới tiếp nhận</div></div>
+      <div class="si"><div class="si-num" style="color:#c2410c">14</div><div class="si-lbl">Đang xử lý</div></div>
+      <div class="si"><div class="si-num" style="color:#b91c1c">3</div><div class="si-lbl">Quá hạn</div></div>
+      <div class="si"><div class="si-num" style="color:#1a7a45">22</div><div class="si-lbl">Hoàn thành</div></div>
+    </div>
+    <div class="fbar">
+      <div class="sw"><span class="sw-ico">🔍</span><input placeholder="Tìm theo tên, số đến, nơi gửi..."></div>
+      <select class="fsel"><option>Tất cả mức khẩn</option><option>🔴 Hỏa tốc</option><option>🟠 Thượng khẩn</option><option>🟡 Khẩn</option><option>⚪ Thường</option></select>
+      <select class="fsel"><option>Tất cả trạng thái</option><option>Mới tiếp nhận</option><option>Đang xử lý</option><option>Hoàn thành</option></select>
+      <select class="fsel"><option>Tất cả đơn vị</option><option>Phòng KHTH</option><option>Phòng HCNS</option><option>BGĐ</option></select>
+      <input type="date" class="fsel" style="color:#3a3f52">
+      <button class="fbtn primary" onclick="goScreen('s2')">+ Tiếp nhận văn bản</button>
+    </div>
+    <div class="work-area">
+      <div class="content-pane">
+        <table class="ltable">
+          <thead>
+            <tr>
+              <th style="width:32px"><input type="checkbox"></th>
+              <th>Văn bản</th>
+              <th>Số đến</th>
+              <th>Mức khẩn</th>
+              <th>Đơn vị xử lý</th>
+              <th>Hạn xử lý</th>
+              <th>Trạng thái</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="selected" onclick="goScreen('s3')">
+              <td><input type="checkbox" checked></td>
+              <td>
+                <div class="lt-doc">
+                  <div class="lt-thumb">📄<span class="lt-ext">PDF</span></div>
+                  <div>
+                    <div class="lt-name">V/v báo cáo tình hình thực hiện kế hoạch KCB</div>
+                    <div class="lt-sub">45/CV-SYT · Sở Y tế TP.HCM · 24/03/2026</div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-weight:700;color:#d94f1e;font-size:.9rem">#47</td>
+              <td><span class="urg urg-hot">Hỏa tốc</span></td>
+              <td style="font-size:.82rem">P. Kế hoạch TH</td>
+              <td style="font-size:.82rem;color:#b91c1c;font-weight:600">28/03/2026 ⚠️</td>
+              <td><span class="stag st-process">Đang xử lý</span></td>
+              <td><div class="row-act"><button class="ra ra-p" onclick="goScreen('s3')">Xem</button><button class="ra ra-m">···</button></div></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td>
+                <div class="lt-doc">
+                  <div class="lt-thumb">📄<span class="lt-ext">PDF</span></div>
+                  <div>
+                    <div class="lt-name">Thông báo lịch kiểm tra công tác BHYT năm 2026</div>
+                    <div class="lt-sub">12/TB-BHXH · BHXH TP.HCM · 23/03/2026</div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-weight:700;color:#d94f1e;font-size:.9rem">#46</td>
+              <td><span class="urg urg-vurg">Thượng khẩn</span></td>
+              <td style="font-size:.82rem">BGĐ</td>
+              <td style="font-size:.82rem;color:#c2410c">25/03/2026</td>
+              <td><span class="stag st-direct">Chờ chỉ đạo</span></td>
+              <td><div class="row-act"><button class="ra ra-p">Xem</button><button class="ra ra-m">···</button></div></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td>
+                <div class="lt-doc">
+                  <div class="lt-thumb">📝<span class="lt-ext">DOC</span></div>
+                  <div>
+                    <div class="lt-name">Kế hoạch triển khai hệ thống HIS giai đoạn 2</div>
+                    <div class="lt-sub">08/KH-STTTT · Sở TT&TT · 22/03/2026</div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-weight:700;color:#d94f1e;font-size:.9rem">#45</td>
+              <td><span class="urg urg-urg">Khẩn</span></td>
+              <td style="font-size:.82rem">P. CNTT</td>
+              <td style="font-size:.82rem;color:#5a6279">01/04/2026</td>
+              <td><span class="stag st-stamp">Đã đóng dấu</span></td>
+              <td><div class="row-act"><button class="ra ra-p">Xem</button><button class="ra ra-m">···</button></div></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td>
+                <div class="lt-doc">
+                  <div class="lt-thumb">📄<span class="lt-ext">PDF</span></div>
+                  <div>
+                    <div class="lt-name">Quyết định về việc điều chỉnh định mức thuốc</div>
+                    <div class="lt-sub">156/QĐ-BYT · Bộ Y tế · 20/03/2026</div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-weight:700;color:#d94f1e;font-size:.9rem">#44</td>
+              <td><span class="urg urg-norm">Thường</span></td>
+              <td style="font-size:.82rem">P. Dược</td>
+              <td style="font-size:.82rem;color:#1a7a45">10/04/2026</td>
+              <td><span class="stag st-done">Hoàn thành</span></td>
+              <td><div class="row-act"><button class="ra ra-g">Xem</button><button class="ra ra-m">···</button></div></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td>
+                <div class="lt-doc">
+                  <div class="lt-thumb">📄<span class="lt-ext">PDF</span></div>
+                  <div>
+                    <div class="lt-name">Công văn hướng dẫn phòng chống dịch mùa hè 2026</div>
+                    <div class="lt-sub">89/CV-CDC · CDC TP.HCM · 18/03/2026</div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-weight:700;color:#d94f1e;font-size:.9rem">#43</td>
+              <td><span class="urg urg-norm">Thường</span></td>
+              <td style="font-size:.82rem">P. KHTH</td>
+              <td style="font-size:.82rem;color:#b91c1c;font-weight:600">20/03/2026 ⚠️</td>
+              <td><span class="stag st-overdue">Quá hạn</span></td>
+              <td><div class="row-act"><button class="ra ra-p">Xem</button><button class="ra ra-m">···</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SCREEN 2 — TIẾP NHẬN VĂN BẢN ĐẾN
+════════════════════════════════════════════════════ -->
+<div class="screen" id="s2">
+  <div class="sidebar">
+    <div class="logo-row"><div class="logo-box">E</div><div class="logo-t">Easy<span>Docs</span></div></div>
+    <button class="new-btn">+ Tiếp nhận văn bản</button>
+    <div class="nav-g">
+      <div class="nav-sec">Văn phòng số</div>
+      <div class="ni on sub">📥 Văn bản Đến <span class="nbg u">8</span></div>
+      <div class="ni sub">📤 Văn bản Đi</div>
+      <div class="ni sub">📒 Sổ đăng ký</div>
+    </div>
+  </div>
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb">
+        <span>Văn phòng số</span><span class="bc-sep">›</span>
+        <span style="cursor:pointer;color:var(--text3)" onclick="goScreen('s1')">Văn bản Đến</span>
+        <span class="bc-sep">›</span>
+        <span class="cur">Tiếp nhận văn bản mới</span>
+      </div>
+      <div class="top-right">
+        <div class="notif">🔔<div class="ndot"></div></div>
+        <div class="user-pill"><div class="uav">VT</div><div class="uname">Văn Thư</div></div>
+      </div>
+    </div>
+    <div class="receive-layout">
+      <div class="form-pane">
+
+        <!-- Stepper -->
+        <div style="display:flex;align-items:center;margin-bottom:20px;gap:6px">
+          <div class="stepper">
+            <div class="step-item active"><div class="step-num">1</div> Thông tin văn bản</div>
+            <span class="step-arrow">›</span>
+            <div class="step-item"><div class="step-num">2</div> Đóng dấu đến</div>
+            <span class="step-arrow">›</span>
+            <div class="step-item"><div class="step-num">3</div> Thiết lập xử lý</div>
+          </div>
+        </div>
+
+        <!-- Upload file -->
+        <div class="form-card">
+          <div class="fc-title"><span>1</span> Tải lên văn bản</div>
+          <div class="upload-file-show">
+            <div class="ufs-ico">📄</div>
+            <div>
+              <div class="ufs-name">45_CV_SYT_KHCB_2026.pdf</div>
+              <div class="ufs-size">PDF · 2.4 MB · Đã tải lên</div>
+            </div>
+            <div class="ufs-del">✕</div>
+          </div>
+        </div>
+
+        <!-- Thông tin văn bản gốc -->
+        <div class="form-card">
+          <div class="fc-title"><span>2</span> Thông tin văn bản gốc</div>
+          <div class="form-row">
+            <div class="fg">
+              <label>Loại văn bản <span class="req">*</span></label>
+              <select><option>Công văn</option><option>Quyết định</option><option>Thông báo</option><option>Chỉ thị</option></select>
+            </div>
+            <div class="fg">
+              <label>Số ký hiệu gốc <span class="req">*</span></label>
+              <input type="text" value="45/CV-SYT" placeholder="VD: 45/CV-SYT">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="fg">
+              <label>Nơi gửi <span class="req">*</span></label>
+              <input type="text" value="Sở Y tế TP.HCM">
+            </div>
+            <div class="fg">
+              <label>Ngày ban hành gốc <span class="req">*</span></label>
+              <input type="date" value="2026-03-24">
+            </div>
+          </div>
+          <div class="form-row full">
+            <div class="fg">
+              <label>Trích yếu nội dung <span class="req">*</span></label>
+              <textarea>V/v báo cáo tình hình thực hiện kế hoạch khám chữa bệnh quý I/2026</textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dấu đến & Phân loại -->
+        <div class="form-card">
+          <div class="fc-title"><span>3</span> Đóng dấu đến & Phân loại</div>
+          <div class="form-row tri">
+            <div class="fg">
+              <label>Số đến (tự động)</label>
+              <input class="auto" value="#47" readonly>
+              <div class="hint">Tự động cấp liên tiếp trong năm</div>
+            </div>
+            <div class="fg">
+              <label>Ngày giờ tiếp nhận</label>
+              <input class="auto" value="25/03/2026 08:15" readonly>
+            </div>
+            <div class="fg">
+              <label>Người tiếp nhận</label>
+              <input class="auto" value="Nguyễn Thị Văn Thư" readonly>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="fg">
+              <label>Mức độ khẩn <span class="req">*</span></label>
+              <select>
+                <option>🔴 Hỏa tốc — xử lý ngay</option>
+                <option>🟠 Thượng khẩn — trong ngày</option>
+                <option>🟡 Khẩn — trong 2 ngày</option>
+                <option selected>⚪ Thường — trong 5 ngày</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label>Phân loại bảo mật</label>
+              <select><option selected>Thường (không mật)</option><option>Mật</option><option>Tối mật</option></select>
+            </div>
+          </div>
+          <!-- Stamp preview -->
+          <div style="margin-top:4px">
+            <div class="stamp-preview">
+              <div class="sp-title">Dấu đến sẽ được tạo</div>
+              <div class="sp-stamp">
+                <div class="sp-org">Bệnh viện XYZ</div>
+                <div class="sp-den">ĐẾN</div>
+                <div class="sp-num">47</div>
+                <div class="sp-date">Ngày 25/03/2026 lúc 08:15</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Thiết lập xử lý -->
+        <div class="form-card">
+          <div class="fc-title"><span>4</span> Thiết lập luồng xử lý</div>
+          <div class="form-row">
+            <div class="fg">
+              <label>Đơn vị chủ trì <span class="req">*</span></label>
+              <select><option>BGĐ — Chỉ đạo trước</option><option>P. Kế hoạch TH</option><option>P. Tài chính KT</option></select>
+            </div>
+            <div class="fg">
+              <label>Hạn xử lý <span class="req">*</span></label>
+              <input type="date" value="2026-03-28">
+            </div>
+          </div>
+          <div class="form-row full">
+            <div class="fg">
+              <label>Ghi chú tiếp nhận</label>
+              <textarea placeholder="Ghi chú nội bộ khi tiếp nhận..."></textarea>
+            </div>
+          </div>
+          <!-- Luồng xử lý preview -->
+          <div style="background:#f7f8fb;border:1px solid var(--border);border-radius:8px;padding:12px;margin-top:4px">
+            <div style="font-size:.72rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Luồng xử lý sẽ được tạo</div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+                <div style="width:36px;height:36px;border-radius:50%;background:#fef0eb;border:2px solid #fcd9c8;display:flex;align-items:center;justify-content:center;font-size:.8rem">👤</div>
+                <div style="font-size:.7rem;color:#c2410c;font-weight:600;text-align:center;max-width:64px">BGĐ<br>Chỉ đạo</div>
+              </div>
+              <div style="color:#d0d4e0;font-size:1.2rem">→</div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+                <div style="width:36px;height:36px;border-radius:50%;background:#f0f1f4;border:2px dashed #d0d4e0;display:flex;align-items:center;justify-content:center;font-size:.8rem">?</div>
+                <div style="font-size:.7rem;color:var(--text3);text-align:center;max-width:64px">BGĐ chọn<br>khi chỉ đạo</div>
+              </div>
+              <div style="color:#d0d4e0;font-size:1.2rem">→</div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+                <div style="width:36px;height:36px;border-radius:50%;background:#f0f1f4;border:2px dashed #d0d4e0;display:flex;align-items:center;justify-content:center;font-size:.8rem">?</div>
+                <div style="font-size:.7rem;color:var(--text3);text-align:center;max-width:64px">Xử lý nội<br>bộ</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="form-footer">
+      <button class="btn btn-ghost" onclick="goScreen('s1')">Hủy</button>
+      <button class="btn btn-ghost">Lưu nháp</button>
+      <button class="btn btn-primary" onclick="goScreen('s3')">Lưu & Đóng dấu đến →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SCREEN 3 — CHI TIẾT VB ĐẾN · BGĐ ĐANG CHỈ ĐẠO
+════════════════════════════════════════════════════ -->
+<div class="screen" id="s3">
+  <div class="sidebar">
+    <div class="logo-row"><div class="logo-box">E</div><div class="logo-t">Easy<span>Docs</span></div></div>
+    <button class="new-btn">+ Tiếp nhận văn bản</button>
+    <div class="nav-g">
+      <div class="nav-sec">Văn phòng số</div>
+      <div class="ni on sub">📥 Văn bản Đến <span class="nbg u">8</span></div>
+      <div class="ni sub">📤 Văn bản Đi</div>
+      <div class="ni sub">📒 Sổ đăng ký</div>
+    </div>
+  </div>
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb">
+        <span style="cursor:pointer" onclick="goScreen('s1')">Văn bản Đến</span>
+        <span class="bc-sep">›</span>
+        <span class="cur">45/CV-SYT · Sở Y tế TP.HCM</span>
+      </div>
+      <div class="top-right">
+        <div class="notif">🔔<div class="ndot"></div></div>
+        <div class="user-pill"><div class="uav" style="background:#c2410c">GĐ</div><div class="uname">Giám đốc</div></div>
+      </div>
+    </div>
+    <div class="work-area">
+      <!-- List -->
+      <div class="content-pane" style="max-width:420px;min-width:320px;border-right:1px solid var(--border);padding:12px">
+        <div style="font-size:.75rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Danh sách · 5 văn bản</div>
+        <div style="background:#fef7f4;border:1px solid #fcd9c8;border-radius:8px;padding:10px 12px;margin-bottom:6px;cursor:pointer;border-left:3px solid var(--orange)">
+          <div style="font-size:.82rem;font-weight:600;color:var(--dark)">V/v báo cáo tình hình KCB</div>
+          <div style="font-size:.72rem;color:var(--text3);margin-top:2px">45/CV-SYT · #47 · <span class="urg urg-hot" style="font-size:.65rem">Hỏa tốc</span></div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:6px;cursor:pointer">
+          <div style="font-size:.82rem;font-weight:600;color:var(--dark)">Thông báo kiểm tra BHYT</div>
+          <div style="font-size:.72rem;color:var(--text3);margin-top:2px">12/TB-BHXH · #46 · <span class="urg urg-vurg" style="font-size:.65rem">Thượng khẩn</span></div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:6px;cursor:pointer">
+          <div style="font-size:.82rem;font-weight:600;color:var(--dark)">Kế hoạch HIS giai đoạn 2</div>
+          <div style="font-size:.72rem;color:var(--text3);margin-top:2px">08/KH-STTTT · #45 · <span class="urg urg-urg" style="font-size:.65rem">Khẩn</span></div>
+        </div>
+      </div>
+
+      <!-- Detail Panel -->
+      <div class="detail-panel open" style="width:var(--panel-w);min-width:var(--panel-w)">
+        <div class="dp-head">
+          <div class="dp-head-row">
+            <div class="dp-title">V/v báo cáo tình hình thực hiện kế hoạch KCB quý I/2026</div>
+            <div class="dp-close" onclick="goScreen('s1')">✕</div>
+          </div>
+          <div class="dp-chips">
+            <span class="chip hot">🔴 Hỏa tốc</span>
+            <span class="chip process">⏳ Chờ chỉ đạo BGĐ</span>
+            <span class="chip s">Đến #47</span>
+            <span class="chip">Công văn</span>
+          </div>
+          <div class="deadline-warn">⚠️ Hạn xử lý: <strong>28/03/2026</strong> · còn 3 ngày</div>
+          <div class="dp-btns">
+            <button class="dp-btn primary" onclick="goScreen('s4')">✏️ Ghi ý kiến chỉ đạo</button>
+            <button class="dp-btn">📎 Tải xuống</button>
+            <button class="dp-btn danger">↩ Trả lại</button>
+          </div>
+        </div>
+        <div class="dp-tabs">
+          <div class="dptab on" onclick="switchTab(this,'tp-flow')">Luồng xử lý</div>
+          <div class="dptab" onclick="switchTab(this,'tp-info')">Thông tin</div>
+          <div class="dptab" onclick="switchTab(this,'tp-act')">Lịch sử</div>
+        </div>
+        <div class="dp-body">
+          <!-- Flow Tab -->
+          <div id="tp-flow" class="tab-pane on">
+            <!-- Stamp block -->
+            <div class="stamp-block">
+              <div class="stamp-title">🔴 Dấu Đến</div>
+              <div class="stamp-grid">
+                <div class="sg-item"><label>Số đến</label><div class="sv big">#47</div></div>
+                <div class="sg-item"><label>Ngày tiếp nhận</label><div class="sv">25/03/2026 08:15</div></div>
+                <div class="sg-item"><label>Người tiếp nhận</label><div class="sv">Nguyễn Thị Văn Thư</div></div>
+                <div class="sg-item"><label>Mức khẩn</label><div class="sv" style="color:#b91c1c">Hỏa tốc</div></div>
+              </div>
+            </div>
+
+            <!-- Flow steps -->
+            <div style="padding:0 2px">
+              <div class="flow-step">
+                <div class="fs-dot done">✓</div>
+                <div class="fs-info">
+                  <div class="fs-label">Tiếp nhận & Đóng dấu đến</div>
+                  <div class="fs-sub">Nguyễn Thị Văn Thư · Văn thư</div>
+                  <div class="fs-status fss-done">✓ Hoàn thành · Đã đóng dấu #47</div>
+                  <div class="fs-time">25/03/2026 lúc 08:15</div>
+                </div>
+              </div>
+              <div class="flow-step">
+                <div class="fs-dot active">!</div>
+                <div class="fs-info">
+                  <div class="fs-label">Giám đốc — Ghi ý kiến chỉ đạo</div>
+                  <div class="fs-sub">Lê Văn Giám Đốc · BGĐ</div>
+                  <div class="fs-status fss-active">⏳ Đang chờ · Hạn 28/03</div>
+                  <div class="fs-time">Nhận lúc 08:15 · chưa xử lý</div>
+                </div>
+              </div>
+              <div class="flow-step">
+                <div class="fs-dot pending">→</div>
+                <div class="fs-info">
+                  <div class="fs-label">Đơn vị xử lý</div>
+                  <div class="fs-sub" style="font-style:italic">Chưa xác định · BGĐ sẽ chỉ định khi chỉ đạo</div>
+                  <div class="fs-status fss-pend">— Chờ GĐ giao</div>
+                </div>
+              </div>
+              <div class="flow-step">
+                <div class="fs-dot pending">→</div>
+                <div class="fs-info">
+                  <div class="fs-label">Xử lý và phản hồi</div>
+                  <div class="fs-sub" style="font-style:italic">Chờ xác định</div>
+                  <div class="fs-status fss-pend">— Chưa bắt đầu</div>
+                </div>
+              </div>
+              <div class="flow-step">
+                <div class="fs-dot pending">✓</div>
+                <div class="fs-info">
+                  <div class="fs-label">Hoàn thành</div>
+                  <div class="fs-sub">Đóng hồ sơ, lưu trữ</div>
+                  <div class="fs-status fss-pend">— Chưa bắt đầu</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Info Tab -->
+          <div id="tp-info" class="tab-pane">
+            <div class="info-section">
+              <div class="is-title">Văn bản gốc</div>
+              <div class="info-row"><div class="ir-l">Số ký hiệu</div><div class="ir-v" style="font-family:monospace;font-weight:700">45/CV-SYT</div></div>
+              <div class="info-row"><div class="ir-l">Loại văn bản</div><div class="ir-v">Công văn</div></div>
+              <div class="info-row"><div class="ir-l">Nơi gửi</div><div class="ir-v">Sở Y tế TP.HCM</div></div>
+              <div class="info-row"><div class="ir-l">Ngày ban hành</div><div class="ir-v">24/03/2026</div></div>
+            </div>
+            <div class="info-section">
+              <div class="is-title">Tiếp nhận</div>
+              <div class="info-row"><div class="ir-l">Số đến</div><div class="ir-v r">#47</div></div>
+              <div class="info-row"><div class="ir-l">Ngày đến</div><div class="ir-v">25/03/2026 08:15</div></div>
+              <div class="info-row"><div class="ir-l">Người tiếp nhận</div><div class="ir-v">Nguyễn Thị Văn Thư</div></div>
+              <div class="info-row"><div class="ir-l">Hạn xử lý</div><div class="ir-v w">28/03/2026</div></div>
+              <div class="info-row"><div class="ir-l">Mức khẩn</div><div class="ir-v r">🔴 Hỏa tốc</div></div>
+            </div>
+          </div>
+
+          <!-- Activity Tab -->
+          <div id="tp-act" class="tab-pane">
+            <div class="act-item">
+              <div class="act-dot c">✓</div>
+              <div>
+                <div class="act-text"><strong>Văn Thư</strong> đã tiếp nhận và đóng dấu đến <strong>#47</strong></div>
+                <span class="act-time">25/03/2026 lúc 08:15</span>
+              </div>
+            </div>
+            <div class="act-item">
+              <div class="act-dot warn">!</div>
+              <div>
+                <div class="act-text">Hệ thống gửi thông báo đến <strong>Giám đốc</strong> — yêu cầu chỉ đạo (Hỏa tốc)</div>
+                <span class="act-time">25/03/2026 lúc 08:15</span>
+              </div>
+            </div>
+            <div class="act-item">
+              <div class="act-dot">👁</div>
+              <div>
+                <div class="act-text"><strong>Giám đốc</strong> đã xem văn bản</div>
+                <span class="act-time">25/03/2026 lúc 09:02</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SCREEN 4 — GHI Ý KIẾN CHỈ ĐẠO + CHUYỂN XỬ LÝ
+════════════════════════════════════════════════════ -->
+<div class="screen" id="s4">
+  <div class="sidebar">
+    <div class="logo-row"><div class="logo-box">E</div><div class="logo-t">Easy<span>Docs</span></div></div>
+    <button class="new-btn">+ Tiếp nhận văn bản</button>
+    <div class="nav-g">
+      <div class="nav-sec">Văn phòng số</div>
+      <div class="ni on sub">📥 Văn bản Đến <span class="nbg u">8</span></div>
+    </div>
+  </div>
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb">
+        <span style="cursor:pointer" onclick="goScreen('s1')">Văn bản Đến</span><span class="bc-sep">›</span>
+        <span style="cursor:pointer" onclick="goScreen('s3')">45/CV-SYT</span><span class="bc-sep">›</span>
+        <span class="cur">Ghi ý kiến chỉ đạo</span>
+      </div>
+      <div class="top-right">
+        <div class="user-pill"><div class="uav" style="background:#c2410c">GĐ</div><div class="uname">Giám đốc</div></div>
+      </div>
+    </div>
+    <div class="work-area">
+      <div class="content-pane" style="max-width:640px">
+
+        <!-- Document header card -->
+        <div class="form-card" style="border-left:3px solid #b91c1c;padding:14px 18px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <div style="font-size:1.4rem">📄</div>
+            <div>
+              <div style="font-size:.88rem;font-weight:700;color:var(--dark)">V/v báo cáo tình hình thực hiện kế hoạch KCB quý I/2026</div>
+              <div style="font-size:.75rem;color:var(--text3);margin-top:2px">45/CV-SYT · Sở Y tế TP.HCM · 24/03/2026 · Đến <strong style="color:#b91c1c">#47</strong></div>
+            </div>
+            <span class="urg urg-hot" style="margin-left:auto">Hỏa tốc</span>
+          </div>
+          <div style="font-size:.82rem;color:#5a6279;background:#f7f8fb;padding:8px 10px;border-radius:6px">
+            📎 45_CV_SYT_KHCB_2026.pdf · <span style="color:var(--orange);cursor:pointer">Xem toàn màn hình</span>
+          </div>
+        </div>
+
+        <!-- Ý kiến chỉ đạo -->
+        <div class="form-card">
+          <div class="fc-title"><span>1</span> Ý kiến chỉ đạo</div>
+          <div class="directive-box">
+            <div class="dir-title">✏️ Ý kiến của Giám đốc</div>
+            <textarea class="dir-ta" placeholder="Nhập ý kiến chỉ đạo giải quyết...">Giao Phòng Kế hoạch Tổng hợp chủ trì, phối hợp với Phòng Tài chính Kế toán tổng hợp số liệu và soạn thảo báo cáo gửi Sở Y tế trước ngày 28/03/2026. Báo cáo cần đầy đủ các chỉ số theo mẫu hướng dẫn của Sở.</textarea>
+          </div>
+        </div>
+
+        <!-- Thiết lập chuyển xử lý -->
+        <div class="form-card">
+          <div class="fc-title"><span>2</span> Giao xử lý</div>
+
+          <div style="margin-bottom:14px">
+            <div class="routing-type">
+              <div class="rt-opt on">
+                <div class="rt-ico">🏢</div>
+                <div class="rt-lbl">Chọn phòng ban</div>
+                <div class="rt-sub">Trưởng phòng phân công</div>
+              </div>
+              <div class="rt-opt">
+                <div class="rt-ico">👤</div>
+                <div class="rt-lbl">Chọn người cụ thể</div>
+                <div class="rt-sub">Giao trực tiếp</div>
+              </div>
+              <div class="rt-opt">
+                <div class="rt-ico">👥</div>
+                <div class="rt-lbl">Nhiều đơn vị</div>
+                <div class="rt-sub">Phối hợp xử lý</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-bottom:12px">
+            <div style="font-size:.75rem;font-weight:600;color:var(--text2);margin-bottom:6px">Đơn vị chủ trì <span style="color:var(--orange)">*</span></div>
+            <div class="person-list">
+              <div class="person-item on">
+                <div class="pi-av orange">KH</div>
+                <div><div class="pi-name">Phòng Kế hoạch Tổng hợp</div><div class="pi-role">5 thành viên · Trưởng phòng: Nguyễn Văn A</div></div>
+                <div class="pi-check">✓</div>
+              </div>
+              <div class="person-item">
+                <div class="pi-av">TC</div>
+                <div><div class="pi-name">Phòng Tài chính Kế toán</div><div class="pi-role">4 thành viên · Trưởng phòng: Trần Thị B</div></div>
+                <div class="pi-check">✓</div>
+              </div>
+              <div class="person-item">
+                <div class="pi-av">HC</div>
+                <div><div class="pi-name">Phòng Hành chính Nhân sự</div><div class="pi-role">3 thành viên</div></div>
+                <div class="pi-check">✓</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="fg">
+              <label>Đơn vị phối hợp</label>
+              <select><option>Phòng Tài chính Kế toán</option><option>Phòng CNTT</option></select>
+            </div>
+            <div class="fg">
+              <label>Hạn xử lý <span class="req">*</span></label>
+              <input type="date" value="2026-03-28">
+              <div class="hint" style="color:#b91c1c">⚠️ Văn bản Hỏa tốc — hạn ngắn</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="form-footer">
+      <button class="btn btn-ghost" onclick="goScreen('s3')">← Quay lại</button>
+      <button class="btn btn-ghost">Lưu nháp</button>
+      <button class="btn btn-primary" onclick="goScreen('s5')">Lưu & Giao xử lý →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SCREEN 5 — ĐANG XỬ LÝ (Phòng KHTH nhận task)
+════════════════════════════════════════════════════ -->
+<div class="screen" id="s5">
+  <div class="sidebar">
+    <div class="logo-row"><div class="logo-box">E</div><div class="logo-t">Easy<span>Docs</span></div></div>
+    <button class="new-btn">+ Tiếp nhận văn bản</button>
+    <div class="nav-g">
+      <div class="nav-sec">Văn phòng số</div>
+      <div class="ni on sub">📥 Văn bản Đến <span class="nbg u">7</span></div>
+    </div>
+  </div>
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb">
+        <span style="cursor:pointer" onclick="goScreen('s1')">Văn bản Đến</span><span class="bc-sep">›</span>
+        <span class="cur">45/CV-SYT · Đang xử lý</span>
+      </div>
+      <div class="top-right">
+        <div class="user-pill"><div class="uav" style="background:#1d4ed8">KH</div><div class="uname">Trưởng P.KHTH</div></div>
+      </div>
+    </div>
+    <div class="work-area">
+      <div class="content-pane" style="max-width:420px;min-width:320px;border-right:1px solid var(--border);padding:12px">
+        <div style="font-size:.75rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Danh sách</div>
+        <div style="background:#fef7f4;border:1px solid #fcd9c8;border-radius:8px;padding:10px 12px;cursor:pointer;border-left:3px solid var(--orange)">
+          <div style="font-size:.82rem;font-weight:600;color:var(--dark)">V/v báo cáo tình hình KCB</div>
+          <div style="font-size:.72rem;color:var(--text3);margin-top:2px">45/CV-SYT · #47 · <span class="stag st-process" style="font-size:.65rem">Đang xử lý</span></div>
+        </div>
+      </div>
+
+      <div class="detail-panel open" style="width:var(--panel-w);min-width:var(--panel-w)">
+        <div class="dp-head">
+          <div class="dp-head-row">
+            <div class="dp-title">V/v báo cáo tình hình thực hiện kế hoạch KCB quý I/2026</div>
+            <div class="dp-close" onclick="goScreen('s1')">✕</div>
+          </div>
+          <div class="dp-chips">
+            <span class="chip hot">🔴 Hỏa tốc</span>
+            <span class="chip process">🔄 Đang xử lý</span>
+            <span class="chip s">Đến #47</span>
+          </div>
+          <div class="deadline-warn">⚠️ Hạn xử lý: <strong>28/03/2026</strong> · còn 3 ngày</div>
+          <div class="dp-btns">
+            <button class="dp-btn primary" onclick="goScreen('s6')">✓ Hoàn thành xử lý</button>
+            <button class="dp-btn" onclick="goScreen('s4')">↪ Chuyển tiếp</button>
+            <button class="dp-btn">📎 Tải xuống</button>
+          </div>
+        </div>
+        <div class="dp-tabs">
+          <div class="dptab on" onclick="switchTab(this,'tp5-flow')">Luồng xử lý</div>
+          <div class="dptab" onclick="switchTab(this,'tp5-info')">Thông tin</div>
+          <div class="dptab" onclick="switchTab(this,'tp5-act')">Lịch sử</div>
+        </div>
+        <div class="dp-body">
+          <div id="tp5-flow" class="tab-pane on">
+            <div class="stamp-block">
+              <div class="stamp-title">🔴 Dấu Đến</div>
+              <div class="stamp-grid">
+                <div class="sg-item"><label>Số đến</label><div class="sv big">#47</div></div>
+                <div class="sg-item"><label>Ngày tiếp nhận</label><div class="sv">25/03/2026 08:15</div></div>
+              </div>
+            </div>
+
+            <div style="padding:0 2px">
+              <div class="flow-step">
+                <div class="fs-dot done">✓</div>
+                <div class="fs-info">
+                  <div class="fs-label">Tiếp nhận & Đóng dấu đến</div>
+                  <div class="fs-sub">Nguyễn Thị Văn Thư</div>
+                  <div class="fs-status fss-done">✓ Đã đóng dấu #47</div>
+                  <div class="fs-time">25/03 08:15</div>
+                </div>
+              </div>
+              <div class="flow-step">
+                <div class="fs-dot done">✓</div>
+                <div class="fs-info">
+                  <div class="fs-label">Giám đốc — Ý kiến chỉ đạo</div>
+                  <div class="fs-sub">Lê Văn Giám Đốc</div>
+                  <div class="fs-status fss-done">✓ Đã ghi chỉ đạo & giao P.KHTH</div>
+                  <div class="fs-time">25/03 09:45</div>
+                  <div class="fs-note">
+                    <div class="fs-note-label">Ý kiến chỉ đạo</div>
+                    Giao Phòng KHTH chủ trì, phối hợp P.TCKT tổng hợp số liệu và soạn thảo báo cáo gửi Sở Y tế trước 28/03/2026.
+                  </div>
+                </div>
+              </div>
+              <div class="flow-step">
+                <div class="fs-dot active">!</div>
+                <div class="fs-info">
+                  <div class="fs-label">P. Kế hoạch TH — Xử lý</div>
+                  <div class="fs-sub">Nguyễn Văn A · Trưởng phòng KHTH</div>
+                  <div class="fs-status fss-active">⏳ Đang xử lý · Hạn 28/03</div>
+                  <div class="fs-time">Nhận lúc 09:45</div>
+                </div>
+              </div>
+              <div class="flow-step">
+                <div class="fs-dot pending">✓</div>
+                <div class="fs-info">
+                  <div class="fs-label">Hoàn thành</div>
+                  <div class="fs-status fss-pend">— Chờ P.KHTH xử lý xong</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="tp5-info" class="tab-pane">
+            <div class="info-section">
+              <div class="is-title">Thông tin xử lý</div>
+              <div class="info-row"><div class="ir-l">Đơn vị chủ trì</div><div class="ir-v g">P. Kế hoạch TH</div></div>
+              <div class="info-row"><div class="ir-l">Đơn vị phối hợp</div><div class="ir-v">P. Tài chính KT</div></div>
+              <div class="info-row"><div class="ir-l">Hạn xử lý</div><div class="ir-v w">28/03/2026</div></div>
+              <div class="info-row"><div class="ir-l">Người giao</div><div class="ir-v">Lê Văn Giám Đốc</div></div>
+            </div>
+          </div>
+          <div id="tp5-act" class="tab-pane">
+            <div class="act-item"><div class="act-dot c">✓</div><div><div class="act-text"><strong>Văn Thư</strong> tiếp nhận, đóng dấu đến <strong>#47</strong></div><span class="act-time">25/03 08:15</span></div></div>
+            <div class="act-item"><div class="act-dot ok">✓</div><div><div class="act-text"><strong>Giám đốc</strong> ghi ý kiến chỉ đạo, giao <strong>P.KHTH</strong> xử lý</div><span class="act-time">25/03 09:45</span></div></div>
+            <div class="act-item"><div class="act-dot warn">!</div><div><div class="act-text">Thông báo đến <strong>Trưởng P.KHTH</strong> — văn bản Hỏa tốc</div><span class="act-time">25/03 09:45</span></div></div>
+            <div class="act-item"><div class="act-dot">👁</div><div><div class="act-text"><strong>Trưởng P.KHTH</strong> đã xem văn bản</div><span class="act-time">25/03 10:02</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SCREEN 6 — HOÀN THÀNH XỬ LÝ
+════════════════════════════════════════════════════ -->
+<div class="screen" id="s6">
+  <div class="sidebar">
+    <div class="logo-row"><div class="logo-box">E</div><div class="logo-t">Easy<span>Docs</span></div></div>
+    <button class="new-btn">+ Tiếp nhận văn bản</button>
+    <div class="nav-g">
+      <div class="nav-sec">Văn phòng số</div>
+      <div class="ni on sub">📥 Văn bản Đến <span class="nbg">6</span></div>
+    </div>
+  </div>
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb">
+        <span style="cursor:pointer" onclick="goScreen('s1')">Văn bản Đến</span><span class="bc-sep">›</span>
+        <span class="cur">45/CV-SYT · Hoàn thành</span>
+      </div>
+      <div class="top-right">
+        <div class="user-pill"><div class="uav" style="background:#1d4ed8">KH</div><div class="uname">Trưởng P.KHTH</div></div>
+      </div>
+    </div>
+    <div class="work-area">
+      <div class="content-pane" style="max-width:420px;min-width:320px;border-right:1px solid var(--border);padding:12px">
+        <div style="font-size:.75rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Danh sách</div>
+        <div style="background:#edfbf4;border:1px solid #a7f3d0;border-radius:8px;padding:10px 12px;cursor:pointer;border-left:3px solid #1a7a45">
+          <div style="font-size:.82rem;font-weight:600;color:var(--dark)">V/v báo cáo tình hình KCB</div>
+          <div style="font-size:.72rem;color:var(--text3);margin-top:2px">45/CV-SYT · #47 · <span class="stag st-done" style="font-size:.65rem">Hoàn thành</span></div>
+        </div>
+      </div>
+
+      <div class="detail-panel open" style="width:var(--panel-w);min-width:var(--panel-w)">
+        <div class="dp-head">
+          <div class="dp-head-row">
+            <div class="dp-title">V/v báo cáo tình hình thực hiện kế hoạch KCB quý I/2026</div>
+            <div class="dp-close" onclick="goScreen('s1')">✕</div>
+          </div>
+          <div class="dp-chips">
+            <span class="chip" style="background:#edfbf4;border-color:#a7f3d0;color:#1a7a45;font-weight:700">✓ Hoàn thành</span>
+            <span class="chip s">Đến #47</span>
+            <span class="chip">Công văn</span>
+          </div>
+          <div class="completed-banner">
+            <div class="cb-ico">✅</div>
+            <div class="cb-text">
+              <h3>Đã xử lý hoàn thành</h3>
+              <p>P.KHTH hoàn thành xử lý lúc 27/03/2026 · Đúng hạn</p>
+            </div>
+          </div>
+          <div class="dp-btns">
+            <button class="dp-btn">📂 Thêm vào hồ sơ</button>
+            <button class="dp-btn">📎 Tải xuống</button>
+            <button class="dp-btn">📋 Xem sổ đăng ký</button>
+          </div>
+        </div>
+        <div class="dp-tabs">
+          <div class="dptab on" onclick="switchTab(this,'tp6-flow')">Luồng xử lý</div>
+          <div class="dptab" onclick="switchTab(this,'tp6-act')">Lịch sử đầy đủ</div>
+        </div>
+        <div class="dp-body">
+          <div id="tp6-flow" class="tab-pane on">
+            <div class="stamp-block">
+              <div class="stamp-title">🔴 Dấu Đến</div>
+              <div class="stamp-grid">
+                <div class="sg-item"><label>Số đến</label><div class="sv big">#47</div></div>
+                <div class="sg-item"><label>Ngày tiếp nhận</label><div class="sv">25/03/2026 08:15</div></div>
+              </div>
+            </div>
+
+            <div style="padding:0 2px">
+              <div class="flow-step">
+                <div class="fs-dot done">✓</div>
+                <div class="fs-info">
+                  <div class="fs-label">Tiếp nhận & Đóng dấu đến</div>
+                  <div class="fs-sub">Nguyễn Thị Văn Thư</div>
+                  <div class="fs-status fss-done">✓ Đóng dấu #47</div>
+                  <div class="fs-time">25/03 08:15</div>
+                </div>
+              </div>
+              <div class="flow-step">
+                <div class="fs-dot done">✓</div>
+                <div class="fs-info">
+                  <div class="fs-label">Giám đốc — Ý kiến chỉ đạo</div>
+                  <div class="fs-sub">Lê Văn Giám Đốc</div>
+                  <div class="fs-status fss-done">✓ Đã chỉ đạo & giao P.KHTH</div>
+                  <div class="fs-time">25/03 09:45</div>
+                  <div class="fs-note">
+                    <div class="fs-note-label">Ý kiến chỉ đạo</div>
+                    Giao Phòng KHTH chủ trì, phối hợp P.TCKT tổng hợp số liệu và soạn thảo báo cáo gửi Sở Y tế trước 28/03/2026.
+                  </div>
+                </div>
+              </div>
+              <div class="flow-step">
+                <div class="fs-dot done">✓</div>
+                <div class="fs-info">
+                  <div class="fs-label">P. Kế hoạch TH — Xử lý</div>
+                  <div class="fs-sub">Nguyễn Văn A · Trưởng phòng KHTH</div>
+                  <div class="fs-status fss-done">✓ Hoàn thành · Đúng hạn</div>
+                  <div class="fs-time">27/03 16:30</div>
+                  <div class="fs-note">
+                    <div class="fs-note-label">Kết quả xử lý</div>
+                    Đã soạn thảo báo cáo KCB Q1/2026 (VB Đi số 48/BC-BV). Đã gửi Sở Y tế qua hệ thống và bưu điện.
+                  </div>
+                </div>
+              </div>
+              <div class="flow-step">
+                <div class="fs-dot done">✓</div>
+                <div class="fs-info">
+                  <div class="fs-label">Hoàn thành</div>
+                  <div class="fs-status fss-done">✓ Đã lưu vào hồ sơ công việc</div>
+                  <div class="fs-time">27/03 16:30</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="tp6-act" class="tab-pane">
+            <div class="act-item"><div class="act-dot c">✓</div><div><div class="act-text"><strong>Văn Thư</strong> tiếp nhận, đóng dấu đến <strong>#47</strong></div><span class="act-time">25/03 08:15</span></div></div>
+            <div class="act-item"><div class="act-dot ok">✓</div><div><div class="act-text"><strong>Giám đốc</strong> ghi ý kiến chỉ đạo, giao <strong>P.KHTH</strong></div><span class="act-time">25/03 09:45</span></div></div>
+            <div class="act-item"><div class="act-dot">👁</div><div><div class="act-text"><strong>Trưởng P.KHTH</strong> xem và nhận xử lý</div><span class="act-time">25/03 10:02</span></div></div>
+            <div class="act-item"><div class="act-dot">📝</div><div><div class="act-text"><strong>P.KHTH</strong> tạo VB Đi <strong>48/BC-BV</strong> để phản hồi</div><span class="act-time">27/03 14:00</span></div></div>
+            <div class="act-item"><div class="act-dot ok">✓</div><div><div class="act-text"><strong>Trưởng P.KHTH</strong> đánh dấu hoàn thành xử lý</div><span class="act-time">27/03 16:30</span></div></div>
+            <div class="act-item"><div class="act-dot c">📂</div><div><div class="act-text">Hệ thống tự động lưu vào <strong>Hồ sơ VB Đến T3/2026</strong></div><span class="act-time">27/03 16:30</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════ SCREEN 7 — THƯ KÝ THIẾT LẬP LUỒNG ════════════════════════════ -->
+<div class="screen" id="s7">
+  <div class="sidebar">
+    <div class="logo-row"><div class="logo-box">E</div><div class="logo-t">Easy<span>Docs</span></div></div>
+    <button class="new-btn">+ Tạo mới</button>
+    <div class="nav-g"><div class="nav-sec">Văn phòng số</div>
+      <div class="ni sub on">📥 Văn bản Đến <span class="nbg u">8</span></div>
+      <div class="ni sub">📤 Văn bản Đi </div>
+      <div class="ni sub">📋 Văn bản Nội bộ </div>
+      <div class="ni sub">📒 Sổ đăng ký </div>
+      <div class="ni sub">🗂 Hồ sơ lưu trữ </div>
+      <div class="ni sub">📊 Báo cáo </div>
+      <div class="ni sub">⚙️ Cấu hình </div>
+    </div></div>
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb"><span>Văn bản Đến</span><span class="bc-sep">›</span><span>#47 · 45/CV-SYT</span><span class="bc-sep">›</span><span class="cur">Thiết lập luồng xử lý</span></div>
+      <div class="top-right"><div class="notif">🔔<div class="ndot"></div></div>
+      <div class="user-pill"><div class="uav">TK</div><div class="uname">Thư Ký</div></div></div>
+    </div>
+    <div class="work-area"><div class="content-pane" style="max-width:640px">
+      <div class="form-card" style="border-left:3px solid #c2410c;padding:14px 18px;margin-bottom:12px">
+        <div style="font-size:.7rem;font-weight:700;color:#9aa0b4;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Ý kiến chỉ đạo của Giám đốc</div>
+        <div style="font-size:.86rem;color:#3a3f52;line-height:1.6;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:10px 12px">
+          Giao Phòng Kế hoạch Tổng hợp chủ trì, phối hợp Phòng Tài chính Kế toán tổng hợp số liệu và soạn thảo báo cáo gửi Sở Y tế trước 28/03/2026.
+        </div>
+        <div style="font-size:.72rem;color:#92400e;margin-top:6px">— Lê Văn Giám Đốc · 25/03/2026 09:45</div>
+      </div>
+      <div class="form-card">
+        <div class="fc-title"><span>1</span> Chọn đơn vị / người xử lý chính</div>
+        <div class="routing-type">
+          <div class="rt-opt on"><div class="rt-ico">🏢</div><div class="rt-lbl">Phòng ban</div><div class="rt-sub">Trưởng phòng phân công</div></div>
+          <div class="rt-opt"><div class="rt-ico">👤</div><div class="rt-lbl">Cá nhân cụ thể</div><div class="rt-sub">Giao trực tiếp</div></div>
+        </div>
+        <div class="person-list">
+          <div class="person-item on"><div class="pi-av orange">KH</div><div><div class="pi-name">Phòng Kế hoạch Tổng hợp</div><div class="pi-role">Chủ trì · Trưởng phòng: Nguyễn Văn A</div></div><div class="pi-check">✓</div></div>
+          <div class="person-item"><div class="pi-av">TC</div><div><div class="pi-name">Phòng Tài chính Kế toán</div><div class="pi-role">Phối hợp</div></div><div class="pi-check">✓</div></div>
+          <div class="person-item"><div class="pi-av">IT</div><div><div class="pi-name">Phòng CNTT</div><div class="pi-role">Hỗ trợ kỹ thuật</div></div><div class="pi-check">✓</div></div>
+        </div>
+        <button style="font-size:.82rem;color:var(--orange);background:none;border:1px dashed #fcd9c8;border-radius:6px;padding:6px 14px;cursor:pointer;width:100%">+ Thêm đơn vị phối hợp</button>
+      </div>
+      <div class="form-card">
+        <div class="fc-title"><span>2</span> Thời hạn xử lý</div>
+        <div class="form-row">
+          <div class="fg"><label>Hạn xử lý <span class="req">*</span></label><input type="date" value="2026-03-28"><div class="hint" style="color:#b91c1c">⚠️ Đã có hạn theo VB: 28/03/2026</div></div>
+          <div class="fg"><label>Ghi chú cho người nhận</label><input placeholder="VD: Ưu tiên xử lý trước các công việc khác"></div>
+        </div>
+      </div>
+    </div></div>
+    <div class="form-footer">
+      <button class="btn btn-ghost" onclick="goScreen('s4')">← Quay lại</button>
+      <button class="btn btn-primary" onclick="goScreen('s5')">Kích hoạt luồng xử lý →</button>
+    </div>
+  </div>
+</div>
+<!-- ════════════════════════════ SCREEN 8 — DANH SÁCH VB ĐI ════════════════════════════ -->
+<div class="screen" id="s8">
+  <div class="sidebar">
+    <div class="logo-row"><div class="logo-box">E</div><div class="logo-t">Easy<span>Docs</span></div></div>
+    <button class="new-btn">+ Tạo mới</button>
+    <div class="nav-g"><div class="nav-sec">Văn phòng số</div>
+      <div class="ni sub">📥 Văn bản Đến <span class="nbg u">8</span></div>
+      <div class="ni sub on">📤 Văn bản Đi </div>
+      <div class="ni sub">📋 Văn bản Nội bộ </div>
+      <div class="ni sub">📒 Sổ đăng ký </div>
+      <div class="ni sub">🗂 Hồ sơ lưu trữ </div>
+      <div class="ni sub">📊 Báo cáo </div>
+      <div class="ni sub">⚙️ Cấu hình </div>
+    </div></div>
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb"><span>Văn phòng số</span><span class="bc-sep">›</span><span class="cur">Văn bản Đi</span></div>
+      <div class="top-right"><div class="notif">🔔<div class="ndot"></div></div>
+      <div class="user-pill"><div class="uav">VT</div><div class="uname">Văn Thư</div></div></div>
+    </div>
+    <div class="stat-strip">
+      <div class="si on"><div class="si-num">3</div><div class="si-lbl">Đang soạn</div></div>
+      <div class="si"><div class="si-num" style="color:#c2410c">5</div><div class="si-lbl">Đang duyệt</div></div>
+      <div class="si"><div class="si-num" style="color:#854d0e">2</div><div class="si-lbl">Chờ ký</div></div>
+      <div class="si"><div class="si-num" style="color:#1d4ed8">4</div><div class="si-lbl">Chờ ban hành</div></div>
+      <div class="si"><div class="si-num" style="color:#1a7a45">47</div><div class="si-lbl">Đã ban hành</div></div>
+    </div>
+    <div class="fbar">
+      <div class="sw"><span class="sw-ico">🔍</span><input placeholder="Tìm tên VB, số ký hiệu..."></div>
+      <select class="fsel"><option>Tất cả loại VB</option><option>Công văn</option><option>Quyết định</option><option>Thông báo</option></select>
+      <select class="fsel"><option>Tất cả trạng thái</option><option>Đang soạn</option><option>Đang duyệt</option><option>Chờ ký</option><option>Chờ ban hành</option><option>Đã ban hành</option></select>
+      <button class="fbtn primary" onclick="goScreen('s9')">+ Soạn VB mới</button>
+    </div>
+    <div class="work-area"><div class="content-pane">
+      <table class="ltable">
+        <thead><tr>
+          <th style="width:32px"><input type="checkbox"></th>
+          <th>Văn bản</th><th>Số ký hiệu</th><th>Loại</th><th>Người soạn</th><th>Hạn</th><th>Trạng thái</th><th>Thao tác</th>
+        </tr></thead>
+        <tbody>
+          <tr onclick="goScreen('s10')"><td><input type="checkbox"></td>
+            <td><div class="lt-doc"><div class="lt-thumb">📝<span class="lt-ext">DOC</span></div><div><div class="lt-name">Báo cáo công tác KCB quý I/2026</div><div class="lt-sub">P. Kế hoạch TH · 27/03/2026</div></div></div></td>
+            <td style="font-size:.82rem;color:#9aa0b4;font-style:italic">Chưa cấp</td><td style="font-size:.82rem">Báo cáo</td>
+            <td style="font-size:.82rem">Nguyễn Văn A</td><td style="font-size:.82rem;color:#c2410c">28/03/2026</td>
+            <td><span class="stag" style="background:#fef0eb;color:#c2410c">Đang duyệt 2/3</span></td>
+            <td><div class="row-act"><button class="ra ra-p" onclick="goScreen('s10')">Xem</button></div></td>
+          </tr>
+          <tr onclick="goScreen('s11')"><td><input type="checkbox"></td>
+            <td><div class="lt-doc"><div class="lt-thumb">📄<span class="lt-ext">DOC</span></div><div><div class="lt-name">Công văn đề nghị cung cấp vật tư y tế</div><div class="lt-sub">P. HCNS · 26/03/2026</div></div></div></td>
+            <td style="font-size:.82rem;color:#9aa0b4;font-style:italic">Chưa cấp</td><td style="font-size:.82rem">Công văn</td>
+            <td style="font-size:.82rem">Trần Thị C</td><td style="font-size:.82rem;color:#854d0e">30/03/2026</td>
+            <td><span class="stag" style="background:#fefce8;color:#854d0e">Chờ GĐ ký</span></td>
+            <td><div class="row-act"><button class="ra ra-p" onclick="goScreen('s11')">Xem</button></div></td>
+          </tr>
+          <tr onclick="goScreen('s12')"><td><input type="checkbox"></td>
+            <td><div class="lt-doc"><div class="lt-thumb">📄<span class="lt-ext">PDF</span></div><div><div class="lt-name">Quyết định thành lập tổ công tác phòng chống dịch</div><div class="lt-sub">BGĐ · 25/03/2026</div></div></div></td>
+            <td style="font-size:.82rem;color:#9aa0b4;font-style:italic">Chưa cấp</td><td style="font-size:.82rem">Quyết định</td>
+            <td style="font-size:.82rem">Lê Thị D</td><td style="font-size:.82rem">31/03/2026</td>
+            <td><span class="stag" style="background:#eff6ff;color:#1d4ed8">Chờ ban hành</span></td>
+            <td><div class="row-act"><button class="ra ra-p" onclick="goScreen('s12')">Cấp số</button></div></td>
+          </tr>
+          <tr onclick="goScreen('s13')"><td><input type="checkbox"></td>
+            <td><div class="lt-doc"><div class="lt-thumb">📄<span class="lt-ext">PDF</span></div><div><div class="lt-name">Công văn phản hồi kết quả kiểm tra BHYT</div><div class="lt-sub">P. KHTH · 20/03/2026</div></div></div></td>
+            <td style="font-weight:700;color:#1a7a45;font-size:.88rem">46/CV-BV</td><td style="font-size:.82rem">Công văn</td>
+            <td style="font-size:.82rem">Nguyễn Văn A</td><td style="font-size:.82rem">22/03/2026</td>
+            <td><span class="stag st-done">Đã ban hành</span></td>
+            <td><div class="row-act"><button class="ra ra-g" onclick="goScreen('s13')">Xem</button></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div></div>
+  </div>
+</div>
+<!-- ════════════════════════════ SCREEN 9 — SOẠN THẢO VB ĐI ════════════════════════════ -->
+<div class="screen" id="s9">
+  <div class="sidebar">
+    <div class="logo-row"><div class="logo-box">E</div><div class="logo-t">Easy<span>Docs</span></div></div>
+    <button class="new-btn">+ Tạo mới</button>
+    <div class="nav-g"><div class="nav-sec">Văn phòng số</div>
+      <div class="ni sub">📥 Văn bản Đến <span class="nbg u">8</span></div>
+      <div class="ni sub on">📤 Văn bản Đi </div>
+      <div class="ni sub">📋 Văn bản Nội bộ </div>
+      <div class="ni sub">📒 Sổ đăng ký </div>
+      <div class="ni sub">🗂 Hồ sơ lưu trữ </div>
+      <div class="ni sub">📊 Báo cáo </div>
+      <div class="ni sub">⚙️ Cấu hình </div>
+    </div></div>
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb"><span>Văn bản Đi</span><span class="bc-sep">›</span><span class="cur">Soạn VB mới</span></div>
+      <div class="top-right"><div class="notif">🔔<div class="ndot"></div></div>
+      <div class="user-pill"><div class="uav">VT</div><div class="uname">Văn Thư</div></div></div>
+    </div>
+    <div class="work-area"><div class="form-pane">
+      <div class="form-card">
+        <div class="fc-title"><span>1</span> Thông tin văn bản</div>
+        <div class="form-row full"><div class="fg"><label>Tên văn bản <span class="req">*</span></label><input placeholder="Nhập tên văn bản..."></div></div>
+        <div class="form-row full"><div class="fg"><label>Trích yếu nội dung <span class="req">*</span></label><textarea placeholder="Tóm tắt nội dung chính của văn bản..."></textarea></div></div>
+        <div class="form-row tri">
+          <div class="fg"><label>Loại VB <span class="req">*</span></label><select><option>Công văn</option><option>Tờ trình</option><option>Quyết định</option><option>Thông báo</option><option>Báo cáo</option></select></div>
+          <div class="fg"><label>Mức khẩn</label><select><option>Thường</option><option>Khẩn</option><option>Thượng khẩn</option><option>Hỏa tốc</option></select></div>
+          <div class="fg"><label>Mức mật</label><select><option>Thường</option><option>Mật</option><option>Tối mật</option><option>Tuyệt mật</option></select></div>
+        </div>
+        <div class="form-row">
+          <div class="fg"><label>Sổ đi</label><select><option>Sổ VB Đi 2026 (hiện tại: 47)</option></select></div>
+          <div class="fg"><label>Hạn xử lý</label><input type="date"></div>
+        </div>
+        <div class="form-row">
+          <div class="fg"><label>Số ký hiệu</label><input class="auto" value="Tự động cấp khi ban hành" disabled></div>
+          <div class="fg"><label>Ngày ban hành</label><input class="auto" value="Tự động khi ban hành" disabled></div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="fc-title"><span>2</span> Tệp đính kèm</div>
+        <div class="fg" style="margin-bottom:10px"><label>Tệp chính <span class="req">*</span></label>
+          <div class="upload-area"><div class="ua-ico">📄</div><div class="ua-txt">Kéo thả hoặc click để tải lên tệp Word/PDF</div><div class="ua-hint">Hỗ trợ: .docx, .doc, .pdf — Tối đa 50MB</div></div>
+        </div>
+        <div class="fg"><label>Tệp đính kèm (phụ lục)</label>
+          <div class="upload-area" style="padding:16px"><div class="ua-txt" style="font-size:.82rem">+ Thêm tệp đính kèm</div></div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="fc-title"><span>3</span> Luồng duyệt nội dung</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;background:#eff6ff;border-radius:6px;padding:8px 10px">
+          <span style="font-size:.82rem;color:#1d4ed8">ℹ️ Duyệt SONG SONG — tất cả người duyệt nhận thông báo cùng lúc</span>
+        </div>
+        <div class="person-list">
+          <div class="person-item"><div class="pi-av orange">PG</div><div><div class="pi-name">Nguyễn Văn Phó GĐ</div><div class="pi-role">Phó Giám đốc · BGĐ</div></div><button style="margin-left:auto;background:none;border:none;color:#9aa0b4;cursor:pointer">✕</button></div>
+          <div class="person-item"><div class="pi-av">KH</div><div><div class="pi-name">Trần Thị Trưởng KHTH</div><div class="pi-role">Trưởng phòng · P. KHTH</div></div><button style="margin-left:auto;background:none;border:none;color:#9aa0b4;cursor:pointer">✕</button></div>
+        </div>
+        <button style="font-size:.82rem;color:var(--orange);background:none;border:1px dashed #fcd9c8;border-radius:6px;padding:6px 14px;cursor:pointer;width:100%">+ Thêm người duyệt</button>
+      </div>
+      <div class="form-card">
+        <div class="fc-title"><span>4</span> Người ký</div>
+        <div class="person-list">
+          <div class="person-item on"><div class="pi-av" style="background:#c2410c">GĐ</div><div><div class="pi-name">Lê Văn Giám Đốc</div><div class="pi-role">Giám đốc · BGĐ · Ký số USB Token</div></div><div class="pi-check">✓</div></div>
+        </div>
+      </div>
+    </div></div>
+    <div class="form-footer">
+      <button class="btn btn-ghost" onclick="goScreen('s8')">← Hủy</button>
+      <button class="btn btn-ghost">💾 Lưu nháp</button>
+      <button class="btn btn-primary" onclick="goScreen('s10')">Gửi duyệt →</button>
+    </div>
+  </div>
+</div>
+<!-- ════════════════════════════ SCREEN 10 — ĐANG DUYỆT NỘI DUNG (SONG SONG) ════════════════════════════ -->
+<div class="screen" id="s10">
+  <div class="sidebar">
+    <div class="logo-row"><div class="logo-box">E</div><div class="logo-t">Easy<span>Docs</span></div></div>
+    <button class="new-btn">+ Tạo mới</button>
+    <div class="nav-g"><div class="nav-sec">Văn phòng số</div>
+      <div class="ni sub">📥 Văn bản Đến <span class="nbg u">8</span></div>
+      <div class="ni sub on">📤 Văn bản Đi </div>
+      <div class="ni sub">📋 Văn bản Nội bộ </div>
+      <div class="ni sub">📒 Sổ đăng ký </div>
+      <div class="ni sub">🗂 Hồ sơ lưu trữ </div>
+      <div class="ni sub">📊 Báo cáo </div>
+      <div class="ni sub">⚙️ Cấu hình </div>
+    </div></div>
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb"><span>Văn bản Đi</span><span class="bc-sep">›</span><span>Báo cáo KCB Q1/2026</span><span class="bc-sep">›</span><span class="cur">Duyệt nội dung</span></div>
+      <div class="top-right"><div class="notif">🔔<div class="ndot"></div></div>
+      <div class="user-pill"><div class="uav">KH</div><div class="uname">Trưởng P.KHTH</div></div></div>
+    </div>
+    <div class="work-area">
+      <div class="content-pane" style="max-width:420px;border-right:1px solid var(--border)">
+        <div class="form-card" style="padding:14px">
+          <div style="font-size:.75rem;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:8px">Thông tin VB</div>
+          <div style="font-size:.88rem;font-weight:700;color:var(--dark);margin-bottom:6px">Báo cáo công tác KCB quý I/2026</div>
+          <div style="font-size:.75rem;color:var(--text3);margin-bottom:8px">P. Kế hoạch TH · Báo cáo · 27/03/2026</div>
+          <span class="stag" style="background:#fef0eb;color:#c2410c">Đang duyệt nội dung</span>
+          <div style="margin-top:12px;background:#f7f8fb;border:1px solid var(--border);border-radius:6px;padding:12px;display:flex;align-items:center;gap:10px">
+            <div style="font-size:2rem">📄</div>
+            <div><div style="font-size:.84rem;font-weight:600">BaoCao_KCB_Q1_2026.docx</div><div style="font-size:.72rem;color:var(--text3)">2.4 MB · Tải xuống</div></div>
+          </div>
+        </div>
+        <div class="form-card" style="padding:14px;border:1.5px solid var(--orange)">
+          <div style="font-size:.75rem;font-weight:700;color:#c2410c;text-transform:uppercase;margin-bottom:10px">Hành động của bạn</div>
+          <textarea class="dir-ta" placeholder="Ghi chú hoặc yêu cầu chỉnh sửa (nếu có)..."></textarea>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button class="btn btn-primary" style="flex:1;background:#1a7a45;border-color:#1a7a45" onclick="goScreen('s8')">✓ Đồng ý duyệt</button>
+            <button class="btn" style="flex:1;background:#fef2f2;border-color:#fca5a5;color:#b91c1c" onclick="goScreen('s8')">✕ Từ chối</button>
+          </div>
+          <button class="btn btn-ghost" style="width:100%;margin-top:6px">📝 Yêu cầu chỉnh sửa</button>
+        </div>
+      </div>
+      <div class="detail-panel open" style="width:var(--panel-w);min-width:var(--panel-w)">
+        <div class="dp-head">
+          <div class="dp-head-row"><div class="dp-title">Tiến độ duyệt nội dung</div></div>
+          <div style="background:#f7f8fb;border-radius:8px;padding:10px 12px;margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;font-size:.8rem;color:var(--text2);margin-bottom:6px"><span>Đã duyệt</span><span style="font-weight:700;color:#c2410c">2 / 3 người</span></div>
+            <div style="height:6px;background:#f0f1f4;border-radius:3px"><div style="height:6px;width:66%;background:#f59e0b;border-radius:3px"></div></div>
+            <div style="font-size:.72rem;color:#92400e;margin-top:5px">Chờ 1 người nữa đồng ý để chuyển sang Trình ký</div>
+          </div>
+          <div class="dp-btns">
+            <button class="dp-btn">📎 Tải VB</button>
+            <button class="dp-btn danger" onclick="goScreen('s8')">✕ Thu hồi VB</button>
+          </div>
+        </div>
+        <div class="dp-body" style="padding:16px">
+          <div class="is-title">Danh sách người duyệt</div>
+          <div class="flow-step">
+            <div class="fs-dot done">✓</div>
+            <div class="fs-info"><div class="fs-label">Nguyễn Văn Phó GĐ</div><div class="fs-sub">Phó Giám đốc</div>
+              <div class="fs-status fss-done">✓ Đồng ý duyệt</div><div class="fs-time">27/03 09:15</div>
+              <div class="fs-note"><div class="fs-note-label">Ghi chú</div>Nội dung đầy đủ, số liệu khớp với báo cáo nội bộ.</div></div>
+          </div>
+          <div class="flow-step">
+            <div class="fs-dot done">✓</div>
+            <div class="fs-info"><div class="fs-label">Trần Thị Trưởng P.KHTH</div><div class="fs-sub">Trưởng phòng KHTH</div>
+              <div class="fs-status fss-done">✓ Đồng ý duyệt</div><div class="fs-time">27/03 10:30</div></div>
+          </div>
+          <div class="flow-step">
+            <div class="fs-dot active">⏳</div>
+            <div class="fs-info"><div class="fs-label">Lê Thị Trưởng P.TCKT</div><div class="fs-sub">Trưởng phòng Tài chính KT</div>
+              <div class="fs-status fss-active">⏳ Chưa duyệt · Nhận lúc 27/03 08:00</div></div>
+          </div>
+          <div style="margin-top:12px;padding:10px;background:#eff6ff;border-radius:6px;font-size:.8rem;color:#1d4ed8">
+            ℹ️ Người duyệt có thể thêm người duyệt khác trong khi luồng đang chạy
+          </div>
+          <button style="font-size:.82rem;color:var(--orange);background:none;border:1px dashed #fcd9c8;border-radius:6px;padding:6px 14px;cursor:pointer;width:100%;margin-top:10px">+ Thêm người duyệt</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ════════════════════════════ SCREEN 11 — GIÁM ĐỐC KÝ SỐ ════════════════════════════ -->
+<div class="screen" id="s11">
+  <div class="sidebar">
+    <div class="logo-row"><div class="logo-box">E</div><div class="logo-t">Easy<span>Docs</span></div></div>
+    <button class="new-btn">+ Tạo mới</button>
+    <div class="nav-g"><div class="nav-sec">Văn phòng số</div>
+      <div class="ni sub">📥 Văn bản Đến <span class="nbg u">8</span></div>
+      <div class="ni sub on">📤 Văn bản Đi </div>
+      <div class="ni sub">📋 Văn bản Nội bộ </div>
+      <div class="ni sub">📒 Sổ đăng ký </div>
+      <div class="ni sub">🗂 Hồ sơ lưu trữ </div>
+      <div class="ni sub">📊 Báo cáo </div>
+      <div class="ni sub">⚙️ Cấu hình </div>
+    </div></div>
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb"><span>Văn bản Đi</span><span class="bc-sep">›</span><span>CV đề nghị cung cấp vật tư</span><span class="bc-sep">›</span><span class="cur">Ký số</span></div>
+      <div class="top-right"><div class="notif">🔔<div class="ndot"></div></div>
+      <div class="user-pill"><div class="uav">GĐ</div><div class="uname">Lê Văn Giám Đốc</div></div></div>
+    </div>
+    <div class="work-area">
+      <div class="content-pane" style="flex:1;background:#3a3f52;display:flex;align-items:center;justify-content:center">
+        <div style="background:#fff;width:420px;height:560px;border-radius:4px;box-shadow:0 8px 32px rgba(0,0,0,.3);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--text3)">
+          <div style="font-size:3rem">📄</div>
+          <div style="font-size:.9rem;font-weight:600;color:var(--dark)">CongVan_VatTuYTe.pdf</div>
+          <div style="font-size:.75rem">2 trang · 1.2 MB</div>
+          <button style="margin-top:8px;padding:7px 18px;background:var(--orange);color:#fff;border:none;border-radius:6px;font-size:.84rem;cursor:pointer">Xem toàn màn hình</button>
+        </div>
+      </div>
+      <div class="detail-panel open" style="width:var(--panel-w);min-width:var(--panel-w)">
+        <div class="dp-head">
+          <div class="dp-head-row"><div class="dp-title">Công văn đề nghị cung cấp vật tư y tế</div></div>
+          <div class="dp-chips">
+            <span class="chip">Công văn</span>
+            <span class="chip s">Chờ GĐ ký</span>
+            <span class="chip">P. HCNS</span>
+          </div>
+        </div>
+        <div class="dp-body" style="padding:16px">
+          <div class="info-section">
+            <div class="is-title">Đã duyệt bởi</div>
+            <div class="act-item"><div class="act-dot ok">✓</div><div><div class="act-text"><strong>Nguyễn Văn Phó GĐ</strong> đồng ý duyệt</div><span class="act-time">26/03 14:20</span></div></div>
+            <div class="act-item"><div class="act-dot ok">✓</div><div><div class="act-text"><strong>Trưởng P.HCNS</strong> đồng ý duyệt</div><span class="act-time">26/03 15:45</span></div></div>
+          </div>
+          <div class="directive-box" style="background:#f0fdf4;border-color:#a7f3d0">
+            <div class="dir-title" style="color:#065f46">✏️ Chỉ đạo phát hành (sau khi ký)</div>
+            <textarea class="dir-ta" style="border-color:#a7f3d0" placeholder="VD: Gửi Cty Thiết bị Y tế ABC và lưu hồ sơ P.HCNS..."></textarea>
+          </div>
+          <div style="background:#f7f8fb;border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:14px">
+            <div style="font-size:.75rem;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:8px">🔐 Ký số</div>
+            <div style="font-size:.82rem;color:#5a6279;margin-bottom:10px">Cắm USB Token và nhấn ký để ký số lên văn bản</div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:.75rem;color:#1a7a45;background:#edfbf4;border:1px solid #a7f3d0;border-radius:6px;padding:8px 10px;margin-bottom:10px">✓ USB Token đã kết nối · VNPT-CA · Lê Văn Giám Đốc</div>
+            <button class="btn btn-primary" style="width:100%;font-size:.9rem" onclick="goScreen('s12')">🔐 Ký số văn bản này</button>
+          </div>
+          <div style="font-size:.75rem;color:var(--text3);text-align:center">Sau khi ký, văn bản chuyển tự động đến Văn thư để cấp số & đóng dấu</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ════════════════════════════ SCREEN 12 — VĂN THƯ CẤP SỐ & BAN HÀNH ════════════════════════════ -->
+<div class="screen" id="s12">
+  <div class="sidebar">
+    <div class="logo-row"><div class="logo-box">E</div><div class="logo-t">Easy<span>Docs</span></div></div>
+    <button class="new-btn">+ Tạo mới</button>
+    <div class="nav-g"><div class="nav-sec">Văn phòng số</div>
+      <div class="ni sub">📥 Văn bản Đến <span class="nbg u">8</span></div>
+      <div class="ni sub on">📤 Văn bản Đi </div>
+      <div class="ni sub">📋 Văn bản Nội bộ </div>
+      <div class="ni sub">📒 Sổ đăng ký </div>
+      <div class="ni sub">🗂 Hồ sơ lưu trữ </div>
+      <div class="ni sub">📊 Báo cáo </div>
+      <div class="ni sub">⚙️ Cấu hình </div>
+    </div></div>
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb"><span>Văn bản Đi</span><span class="bc-sep">›</span><span>Quyết định thành lập tổ công tác</span><span class="bc-sep">›</span><span class="cur">Cấp số & Ban hành</span></div>
+      <div class="top-right"><div class="notif">🔔<div class="ndot"></div></div>
+      <div class="user-pill"><div class="uav">VT</div><div class="uname">Văn Thư</div></div></div>
+    </div>
+    <div class="work-area"><div class="form-pane" style="max-width:680px">
+      <div style="display:flex;align-items:center;gap:10px;background:#edfbf4;border:1px solid #a7f3d0;border-radius:8px;padding:12px 16px;margin-bottom:16px">
+        <div style="font-size:1.4rem">✅</div>
+        <div><div style="font-size:.88rem;font-weight:700;color:#065f46">Văn bản đã được Giám đốc ký số</div>
+        <div style="font-size:.75rem;color:#047857">Ký lúc 28/03/2026 09:30 · VNPT-CA · Chữ ký hợp lệ</div></div>
+      </div>
+      <div class="form-card">
+        <div class="fc-title"><span>1</span> Cấp số ký hiệu</div>
+        <div class="form-row tri">
+          <div class="fg"><label>Sổ đi <span class="req">*</span></label><select><option>Sổ VB Đi 2026 (hiện: 48)</option></select></div>
+          <div class="fg"><label>Số ký hiệu (preview)</label><input class="auto" value="49/QĐ-BV" disabled></div>
+          <div class="fg"><label>Ngày ban hành <span class="req">*</span></label><input type="date" value="2026-03-28"></div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:4px">Xác nhận cấp số</button>
+      </div>
+      <div class="form-card">
+        <div class="fc-title"><span>2</span> Đóng dấu</div>
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="flex:1">
+            <div style="font-size:.75rem;font-weight:600;color:var(--text2);margin-bottom:8px">Chọn con dấu</div>
+            <div class="person-list">
+              <div class="person-item on"><div style="width:36px;height:36px;border:2px solid #b91c1c;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:700;color:#b91c1c;flex-shrink:0">DẤU<br>TRÒN</div>
+              <div><div class="pi-name">Dấu tròn Bệnh viện</div><div class="pi-role">Dấu chính thức · Scan PNG</div></div><div class="pi-check">✓</div></div>
+            </div>
+          </div>
+          <div class="stamp-preview" style="min-width:150px">
+            <div class="sp-title">Preview dấu</div>
+            <div class="sp-stamp"><div class="sp-org">Bệnh viện Viện E</div><div class="sp-den">SỐ: 49/QĐ-BV</div><div class="sp-date">Ngày 28/03/2026</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="fc-title"><span>3</span> Phát hành theo chỉ đạo GĐ</div>
+        <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:10px 12px;margin-bottom:12px;font-size:.84rem;color:#3a3f52">
+          <div style="font-size:.68rem;font-weight:700;color:#92400e;margin-bottom:4px">CHỈ ĐẠO CỦA GIÁM ĐỐC</div>
+          Phát hành toàn bộ thành viên tổ công tác và lưu hồ sơ phòng chống dịch
+        </div>
+        <div class="form-row">
+          <div class="fg"><label>Người/Đơn vị nhận <span class="req">*</span></label>
+            <select><option>Tất cả thành viên tổ công tác (12 người)</option></select></div>
+          <div class="fg"><label>Phương thức</label>
+            <select><option>Email hệ thống</option><option>In + bưu điện</option><option>Cả hai</option></select></div>
+        </div>
+      </div>
+    </div></div>
+    <div class="form-footer">
+      <button class="btn btn-ghost" onclick="goScreen('s8')">← Quay lại</button>
+      <button class="btn btn-primary" onclick="goScreen('s13')">✅ Ban hành văn bản</button>
+    </div>
+  </div>
+</div>
+<!-- ════════════════════════════ SCREEN 13 — VB ĐI ĐÃ BAN HÀNH ════════════════════════════ -->
+<div class="screen" id="s13">
+  <div class="sidebar">
+    <div class="logo-row"><div class="logo-box">E</div><div class="logo-t">Easy<span>Docs</span></div></div>
+    <button class="new-btn">+ Tạo mới</button>
+    <div class="nav-g"><div class="nav-sec">Văn phòng số</div>
+      <div class="ni sub">📥 Văn bản Đến <span class="nbg u">8</span></div>
+      <div class="ni sub on">📤 Văn bản Đi </div>
+      <div class="ni sub">📋 Văn bản Nội bộ </div>
+      <div class="ni sub">📒 Sổ đăng ký </div>
+      <div class="ni sub">🗂 Hồ sơ lưu trữ </div>
+      <div class="ni sub">📊 Báo cáo </div>
+      <div class="ni sub">⚙️ Cấu hình </div>
+    </div></div>
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb"><span>Văn bản Đi</span><span class="bc-sep">›</span><span class="cur">46/CV-BV · Đã ban hành</span></div>
+      <div class="top-right"><div class="notif">🔔<div class="ndot"></div></div>
+      <div class="user-pill"><div class="uav">VT</div><div class="uname">Văn Thư</div></div></div>
+    </div>
+    <div class="work-area"><div class="content-pane" style="max-width:640px">
+      <div class="completed-banner" style="margin-bottom:16px">
+        <div class="cb-ico">📤</div>
+        <div class="cb-text"><h3>Đã ban hành · 46/CV-BV</h3><p>Ban hành lúc 20/03/2026 14:00 · Văn thư: Nguyễn Thị VT</p></div>
+      </div>
+      <div class="form-card" style="padding:14px">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:0">
+          <div class="sg-item"><label>Số ký hiệu</label><div class="sv big" style="color:#1a7a45">46/CV-BV</div></div>
+          <div class="sg-item"><label>Ngày ban hành</label><div class="sv">20/03/2026</div></div>
+          <div class="sg-item"><label>Loại VB</label><div class="sv">Công văn</div></div>
+        </div>
+      </div>
+      <div class="form-card" style="padding:14px">
+        <div class="is-title">Luồng xử lý hoàn chỉnh</div>
+        <div class="flow-step"><div class="fs-dot done">✓</div><div class="fs-info"><div class="fs-label">Soạn thảo</div><div class="fs-sub">Nguyễn Văn A · P.KHTH</div><div class="fs-status fss-done">✓ Hoàn thành</div><div class="fs-time">19/03 08:00</div></div></div>
+        <div class="flow-step"><div class="fs-dot done">✓</div><div class="fs-info"><div class="fs-label">Duyệt nội dung (song song)</div><div class="fs-sub">2 người duyệt · Tất cả đồng ý</div><div class="fs-status fss-done">✓ Hoàn thành trong 2 giờ</div><div class="fs-time">19/03 10:30</div></div></div>
+        <div class="flow-step"><div class="fs-dot done">✓</div><div class="fs-info"><div class="fs-label">Giám đốc ký số</div><div class="fs-sub">Lê Văn Giám Đốc · VNPT-CA</div><div class="fs-status fss-done">✓ Đã ký số</div><div class="fs-time">20/03 09:15</div></div></div>
+        <div class="flow-step"><div class="fs-dot done">✓</div><div class="fs-info"><div class="fs-label">Cấp số & Đóng dấu</div><div class="fs-sub">Văn Thư · Số: 46/CV-BV</div><div class="fs-status fss-done">✓ Đã cấp số và đóng dấu</div><div class="fs-time">20/03 13:55</div></div></div>
+        <div class="flow-step"><div class="fs-dot done">✓</div><div class="fs-info"><div class="fs-label">Ban hành</div><div class="fs-sub">Gửi BHXH TP.HCM qua email hệ thống</div><div class="fs-status fss-done">✓ Đã gửi đến 1 đơn vị</div><div class="fs-time">20/03 14:00</div></div></div>
+      </div>
+      <div class="dp-btns" style="padding:0 0 16px">
+        <button class="dp-btn">📎 Tải xuống VB đã ký</button>
+        <button class="dp-btn" onclick="goScreen('s18')">📂 Lưu vào hồ sơ</button>
+        <button class="dp-btn">📋 Xem trong sổ đăng ký</button>
+      </div>
+    </div></div>
+  </div>
+</div>
+<!-- ════════════════════════════ SCREEN 14 — DANH SÁCH VB NỘI BỘ ════════════════════════════ -->
+<div class="screen" id="s14">
+  <div class="sidebar">
+    <div class="logo-row"><div class="logo-box">E</div><div class="logo-t">Easy<span>Docs</span></div></div>
+    <button class="new-btn">+ Tạo mới</button>
+    <div class="nav-g"><div class="nav-sec">Văn phòng số</div>
+      <div class="ni sub">📥 Văn bản Đến <span class="nbg u">8</span></div>
+      <div class="ni sub">📤 Văn bản Đi </div>
+      <div class="ni sub on">📋 Văn bản Nội bộ </div>
+      <div class="ni sub">📒 Sổ đăng ký </div>
+      <div class="ni sub">🗂 Hồ sơ lưu trữ </div>
+      <div class="ni sub">📊 Báo cáo </div>
+      <div class="ni sub">⚙️ Cấu hình </div>
+    </div></div>
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb"><span>Văn phòng số</span><span class="bc-sep">›</span><span class="cur">Văn bản Nội bộ</span></div>
+      <div class="top-right"><div class="notif">🔔<div class="ndot"></div></div>
+      <div class="user-pill"><div class="uav">VT</div><div class="uname">Văn Thư</div></div></div>
+    </div>
+    <div class="stat-strip">
+      <div class="si on"><div class="si-num">2</div><div class="si-lbl">Đang soạn</div></div>
+      <div class="si"><div class="si-num" style="color:#c2410c">3</div><div class="si-lbl">Chờ duyệt/ký</div></div>
+      <div class="si"><div class="si-num" style="color:#1a7a45">28</div><div class="si-lbl">Đã ban hành</div></div>
+    </div>
+    <div class="fbar">
+      <div class="sw"><span class="sw-ico">🔍</span><input placeholder="Tìm văn bản nội bộ..."></div>
+      <select class="fsel"><option>Tất cả loại</option><option>Cần cấp số</option><option>Không cấp số</option></select>
+      <select class="fsel"><option>Tất cả trạng thái</option></select>
+      <button class="fbtn primary" onclick="goScreen('s15')">+ Tạo VB Nội bộ</button>
+    </div>
+    <div class="work-area"><div class="content-pane">
+      <div style="display:flex;border-bottom:1px solid var(--border);background:#fff;padding:0 20px;margin:-16px -20px 16px">
+        <div class="dptab on" style="padding:10px 16px">Cần cấp số (3)</div>
+        <div class="dptab" style="padding:10px 16px">Không cấp số (28)</div>
+      </div>
+      <table class="ltable">
+        <thead><tr>
+          <th style="width:32px"><input type="checkbox"></th>
+          <th>Văn bản</th><th>Số nội bộ</th><th>Loại</th><th>Người soạn</th><th>Phát hành cho</th><th>Trạng thái</th><th>Thao tác</th>
+        </tr></thead>
+        <tbody>
+          <tr><td><input type="checkbox"></td>
+            <td><div class="lt-doc"><div class="lt-thumb">📝<span class="lt-ext">DOC</span></div><div><div class="lt-name">Quy trình tiếp nhận bệnh nhân ngoại trú 2026</div><div class="lt-sub">P. KHTH · 27/03/2026</div></div></div></td>
+            <td style="font-size:.82rem;color:#9aa0b4;font-style:italic">Chưa cấp</td><td style="font-size:.82rem">Quy trình</td>
+            <td style="font-size:.82rem">BS. Nguyễn A</td><td style="font-size:.82rem">Tất cả khoa lâm sàng</td>
+            <td><span class="stag" style="background:#fefce8;color:#854d0e">Chờ duyệt</span></td>
+            <td><div class="row-act"><button class="ra ra-p">Xem</button></div></td>
+          </tr>
+          <tr><td><input type="checkbox"></td>
+            <td><div class="lt-doc"><div class="lt-thumb">📄<span class="lt-ext">PDF</span></div><div><div class="lt-name">Thông báo lịch trực Tết 2026</div><div class="lt-sub">P. HCNS · 15/01/2026</div></div></div></td>
+            <td style="font-size:.82rem;color:#9aa0b4;font-style:italic">Không cấp số</td><td style="font-size:.82rem">Thông báo</td>
+            <td style="font-size:.82rem">Trần B</td><td style="font-size:.82rem">Toàn bệnh viện</td>
+            <td><span class="stag st-done">Đã ban hành</span></td>
+            <td><div class="row-act"><button class="ra ra-g">Xem</button></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div></div>
+  </div>
+</div>
+<!-- ════════════════════════════ SCREEN 15 — TẠO VB NỘI BỘ ════════════════════════════ -->
+<div class="screen" id="s15">
+  <div class="sidebar">
+    <div class="logo-row"><div class="logo-box">E</div><div class="logo-t">Easy<span>Docs</span></div></div>
+    <button class="new-btn">+ Tạo mới</button>
+    <div class="nav-g"><div class="nav-sec">Văn phòng số</div>
+      <div class="ni sub">📥 Văn bản Đến <span class="nbg u">8</span></div>
+      <div class="ni sub">📤 Văn bản Đi </div>
+      <div class="ni sub on">📋 Văn bản Nội bộ </div>
+      <div class="ni sub">📒 Sổ đăng ký </div>
+      <div class="ni sub">🗂 Hồ sơ lưu trữ </div>
+      <div class="ni sub">📊 Báo cáo </div>
+      <div class="ni sub">⚙️ Cấu hình </div>
+    </div></div>
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb"><span>Văn bản Nội bộ</span><span class="bc-sep">›</span><span class="cur">Tạo mới</span></div>
+      <div class="top-right"><div class="notif">🔔<div class="ndot"></div></div>
+      <div class="user-pill"><div class="uav">VT</div><div class="uname">Văn Thư</div></div></div>
+    </div>
+    <div class="work-area"><div class="form-pane" style="max-width:640px">
+      <div class="form-card">
+        <div class="fc-title"><span>1</span> Chọn loại luồng</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div style="border:2px solid var(--orange);border-radius:10px;padding:16px;cursor:pointer;background:#fef7f4">
+            <div style="font-size:1.4rem;margin-bottom:6px">📋</div>
+            <div style="font-weight:700;color:var(--dark);margin-bottom:4px">Có cấp số nội bộ</div>
+            <div style="font-size:.78rem;color:var(--text3)">Có duyệt, có ký, có đóng dấu và cấp số nội bộ. Phù hợp: quy trình, quy định, quyết định nội bộ.</div>
+          </div>
+          <div style="border:2px solid var(--border);border-radius:10px;padding:16px;cursor:pointer">
+            <div style="font-size:1.4rem;margin-bottom:6px">📢</div>
+            <div style="font-weight:700;color:var(--dark);margin-bottom:4px">Phát hành trực tiếp</div>
+            <div style="font-size:.78rem;color:var(--text3)">Soạn xong gửi ngay, không qua duyệt/ký. Phù hợp: thông báo, biên bản họp, tài liệu hướng dẫn.</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="fc-title"><span>2</span> Thông tin văn bản</div>
+        <div class="form-row full"><div class="fg"><label>Tên văn bản <span class="req">*</span></label><input placeholder="Nhập tên văn bản nội bộ..."></div></div>
+        <div class="form-row full"><div class="fg"><label>Trích yếu</label><textarea placeholder="Tóm tắt nội dung..."></textarea></div></div>
+        <div class="form-row">
+          <div class="fg"><label>Loại VB</label><select><option>Thông báo</option><option>Biên bản</option><option>Quy trình</option><option>Quyết định NB</option></select></div>
+          <div class="fg"><label>Mức khẩn</label><select><option>Thường</option><option>Khẩn</option></select></div>
+        </div>
+        <div class="fg" style="margin-bottom:12px"><label>Tệp văn bản <span class="req">*</span></label>
+          <div class="upload-area"><div class="ua-ico">📄</div><div class="ua-txt">Kéo thả hoặc click để tải lên</div></div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="fc-title"><span>3</span> Gửi đến</div>
+        <div class="form-row">
+          <div class="fg"><label>Phạm vi phát hành <span class="req">*</span></label>
+            <select><option>Chọn phòng ban / cá nhân...</option><option>Toàn bệnh viện</option><option>P. Kế hoạch TH</option><option>Tất cả khoa lâm sàng</option></select></div>
+          <div class="fg"><label>Thêm tag (tùy chọn)</label><input placeholder="VD: họp, thông báo-tết..."></div>
+        </div>
+      </div>
+    </div></div>
+    <div class="form-footer">
+      <button class="btn btn-ghost" onclick="goScreen('s14')">← Hủy</button>
+      <button class="btn btn-ghost">💾 Lưu nháp</button>
+      <button class="btn btn-primary" onclick="goScreen('s14')">📢 Ban hành ngay</button>
+    </div>
+  </div>
+</div>
+<!-- ════════════════════════════ SCREEN 16 — DANH SÁCH HỒ SƠ ════════════════════════════ -->
+<div class="screen" id="s16">
+  <div class="sidebar">
+    <div class="logo-row"><div class="logo-box">E</div><div class="logo-t">Easy<span>Docs</span></div></div>
+    <button class="new-btn">+ Tạo mới</button>
+    <div class="nav-g"><div class="nav-sec">Văn phòng số</div>
+      <div class="ni sub">📥 Văn bản Đến <span class="nbg u">8</span></div>
+      <div class="ni sub">📤 Văn bản Đi </div>
+      <div class="ni sub">📋 Văn bản Nội bộ </div>
+      <div class="ni sub">📒 Sổ đăng ký </div>
+      <div class="ni sub on">🗂 Hồ sơ lưu trữ </div>
+      <div class="ni sub">📊 Báo cáo </div>
+      <div class="ni sub">⚙️ Cấu hình </div>
+    </div></div>
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb"><span>Văn phòng số</span><span class="bc-sep">›</span><span class="cur">Hồ sơ lưu trữ</span></div>
+      <div class="top-right"><div class="notif">🔔<div class="ndot"></div></div>
+      <div class="user-pill"><div class="uav">KH</div><div class="uname">Trưởng P.KHTH</div></div></div>
+    </div>
+    <div class="stat-strip">
+      <div class="si on"><div class="si-num">5</div><div class="si-lbl">Đang lập</div></div>
+      <div class="si"><div class="si-num" style="color:#854d0e">3</div><div class="si-lbl">Chờ nộp lưu</div></div>
+      <div class="si"><div class="si-num" style="color:#1a7a45">42</div><div class="si-lbl">Đang bảo quản</div></div>
+      <div class="si"><div class="si-num" style="color:#b91c1c">2</div><div class="si-lbl">Sắp hết hạn</div></div>
+    </div>
+    <div class="fbar">
+      <div class="sw"><span class="sw-ico">🔍</span><input placeholder="Tìm tên hồ sơ, mã hồ sơ..."></div>
+      <select class="fsel"><option>Năm 2026</option><option>Năm 2025</option></select>
+      <select class="fsel"><option>Tất cả loại hồ sơ</option><option>Hồ sơ công việc</option><option>Hồ sơ dự án</option><option>Hồ sơ nhân sự</option></select>
+      <select class="fsel"><option>Tất cả trạng thái</option><option>Đang lập</option><option>Chờ nộp lưu</option><option>Đang bảo quản</option></select>
+      <button class="fbtn primary" onclick="goScreen('s17')">+ Lập hồ sơ mới</button>
+    </div>
+    <div class="work-area"><div class="content-pane">
+      <table class="ltable">
+        <thead><tr>
+          <th style="width:32px"><input type="checkbox"></th>
+          <th>Hồ sơ</th><th>Mã hồ sơ</th><th>Loại</th><th>Số VB</th><th>Thời hạn BQ</th><th>Trạng thái</th><th>Thao tác</th>
+        </tr></thead>
+        <tbody>
+          <tr onclick="goScreen('s18')"><td><input type="checkbox"></td>
+            <td><div class="lt-doc"><div class="lt-thumb">📂<span class="lt-ext" style="background:#1d4ed8">HS</span></div><div>
+              <div class="lt-name">Hồ sơ báo cáo KCB quý I/2026</div>
+              <div class="lt-sub">Lập bởi Nguyễn Văn A · P. KHTH · 27/03/2026</div></div></div></td>
+            <td style="font-family:monospace;font-size:.82rem;font-weight:700">BV-2026-047</td>
+            <td style="font-size:.82rem">Hồ sơ công việc</td>
+            <td style="font-size:.88rem;font-weight:700;color:#1d4ed8">3</td>
+            <td style="font-size:.82rem">10 năm</td>
+            <td><span class="stag st-process">Đang lập</span></td>
+            <td><div class="row-act"><button class="ra ra-p" onclick="goScreen('s18')">Xem</button></div></td>
+          </tr>
+          <tr><td><input type="checkbox"></td>
+            <td><div class="lt-doc"><div class="lt-thumb">📂<span class="lt-ext" style="background:#1a7a45">HS</span></div><div>
+              <div class="lt-name">Hồ sơ phòng chống dịch mùa hè 2026</div>
+              <div class="lt-sub">Lập bởi BS. Trần C · P. KHTH · 15/03/2026</div></div></div></td>
+            <td style="font-family:monospace;font-size:.82rem;font-weight:700">BV-2026-032</td>
+            <td style="font-size:.82rem">Hồ sơ dự án</td>
+            <td style="font-size:.88rem;font-weight:700">7</td>
+            <td style="font-size:.82rem">Vĩnh viễn</td>
+            <td><span class="stag" style="background:#fffbeb;color:#92400e">Chờ nộp lưu</span></td>
+            <td><div class="row-act"><button class="ra ra-p">Xem</button><button class="ra ra-m">···</button></div></td>
+          </tr>
+          <tr><td><input type="checkbox"></td>
+            <td><div class="lt-doc"><div class="lt-thumb">📂<span class="lt-ext" style="background:#6b7280">HS</span></div><div>
+              <div class="lt-name">Hồ sơ kiểm tra BHYT tháng 3/2026</div>
+              <div class="lt-sub">Lập bởi Lê D · P. TCKT · 10/03/2026</div></div></div></td>
+            <td style="font-family:monospace;font-size:.82rem;font-weight:700">BV-2026-028</td>
+            <td style="font-size:.82rem">Hồ sơ thanh tra</td>
+            <td style="font-size:.88rem;font-weight:700">5</td>
+            <td style="font-size:.82rem;color:#b91c1c">5 năm ⚠️</td>
+            <td><span class="stag st-done">Đang bảo quản</span></td>
+            <td><div class="row-act"><button class="ra ra-g">Xem</button></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div></div>
+  </div>
+</div>
+<!-- ════════════════════════════ SCREEN 17 — TẠO HỒ SƠ MỚI ════════════════════════════ -->
+<div class="screen" id="s17">
+  <div class="sidebar">
+    <div class="logo-row"><div class="logo-box">E</div><div class="logo-t">Easy<span>Docs</span></div></div>
+    <button class="new-btn">+ Tạo mới</button>
+    <div class="nav-g"><div class="nav-sec">Văn phòng số</div>
+      <div class="ni sub">📥 Văn bản Đến <span class="nbg u">8</span></div>
+      <div class="ni sub">📤 Văn bản Đi </div>
+      <div class="ni sub">📋 Văn bản Nội bộ </div>
+      <div class="ni sub">📒 Sổ đăng ký </div>
+      <div class="ni sub on">🗂 Hồ sơ lưu trữ </div>
+      <div class="ni sub">📊 Báo cáo </div>
+      <div class="ni sub">⚙️ Cấu hình </div>
+    </div></div>
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb"><span>Hồ sơ lưu trữ</span><span class="bc-sep">›</span><span class="cur">Lập hồ sơ mới</span></div>
+      <div class="top-right"><div class="notif">🔔<div class="ndot"></div></div>
+      <div class="user-pill"><div class="uav">KH</div><div class="uname">Trưởng P.KHTH</div></div></div>
+    </div>
+    <div class="work-area"><div class="form-pane" style="max-width:640px">
+      <div class="form-card">
+        <div class="fc-title"><span>1</span> Thông tin hồ sơ</div>
+        <div style="display:flex;align-items:center;gap:10px;background:#f7f8fb;border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:14px">
+          <span style="font-size:.75rem;color:var(--text3)">Mã hồ sơ (tự động):</span>
+          <span style="font-family:monospace;font-weight:700;color:#c2410c;font-size:.95rem">BV-2026-048</span>
+          <span style="font-size:.7rem;color:#9aa0b4;margin-left:auto">Không thể sửa tay</span>
+        </div>
+        <div class="form-row full"><div class="fg"><label>Tiêu đề hồ sơ <span class="req">*</span></label><input placeholder="VD: Hồ sơ báo cáo KCB quý I/2026"></div></div>
+        <div class="form-row">
+          <div class="fg"><label>Loại hồ sơ <span class="req">*</span></label>
+            <select><option>Hồ sơ công việc</option><option>Hồ sơ dự án</option><option>Hồ sơ nhân sự</option><option>Hồ sơ thanh tra</option></select></div>
+          <div class="fg"><label>Khoa/Phòng <span class="req">*</span></label>
+            <select><option>P. Kế hoạch Tổng hợp</option><option>P. Tài chính KT</option><option>P. HCNS</option></select></div>
+        </div>
+        <div class="form-row">
+          <div class="fg"><label>Thời hạn bảo quản <span class="req">*</span></label>
+            <select><option>5 năm</option><option>10 năm</option><option>20 năm</option><option>Vĩnh viễn</option></select></div>
+          <div class="fg"><label>Mức độ mật</label>
+            <select><option>Thường</option><option>Mật</option><option>Tối mật</option></select></div>
+        </div>
+        <div class="form-row">
+          <div class="fg"><label>Ngày bắt đầu</label><input type="date" value="2026-03-28"><div class="hint">Mặc định: ngày tạo hồ sơ</div></div>
+          <div class="fg"><label>Tag</label><input placeholder="VD: khcb, q1-2026, so-yt"></div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="fc-title"><span>2</span> Phân quyền</div>
+        <div style="font-size:.82rem;color:#5a6279;margin-bottom:12px">Người tạo mặc định là người quản lý hồ sơ</div>
+        <div class="form-row full"><div class="fg"><label>Người quản lý</label>
+          <div class="person-list" style="margin-top:4px">
+            <div class="person-item on"><div class="pi-av orange">KH</div><div><div class="pi-name">Nguyễn Văn A</div><div class="pi-role">Trưởng phòng KHTH · Mặc định là bạn</div></div><div class="pi-check">✓</div></div>
+          </div></div></div>
+        <div class="form-row">
+          <div class="fg"><label>Người có thể xem</label><input placeholder="Tìm tên, phòng ban..."></div>
+          <div class="fg"><label>Người có thể chỉnh sửa</label><input placeholder="Tìm tên, phòng ban..."></div>
+        </div>
+        <div style="font-size:.75rem;color:var(--text3);background:#f7f8fb;border-radius:6px;padding:8px 10px">
+          ℹ️ Chỉ người trong luồng xử lý VB mới có thể thêm VB vào hồ sơ
+        </div>
+      </div>
+    </div></div>
+    <div class="form-footer">
+      <button class="btn btn-ghost" onclick="goScreen('s16')">← Hủy</button>
+      <button class="btn btn-primary" onclick="goScreen('s18')">Tạo hồ sơ →</button>
+    </div>
+  </div>
+</div>
+<!-- ════════════════════════════ SCREEN 18 — CHI TIẾT HỒ SƠ ════════════════════════════ -->
+<div class="screen" id="s18">
+  <div class="sidebar">
+    <div class="logo-row"><div class="logo-box">E</div><div class="logo-t">Easy<span>Docs</span></div></div>
+    <button class="new-btn">+ Tạo mới</button>
+    <div class="nav-g"><div class="nav-sec">Văn phòng số</div>
+      <div class="ni sub">📥 Văn bản Đến <span class="nbg u">8</span></div>
+      <div class="ni sub">📤 Văn bản Đi </div>
+      <div class="ni sub">📋 Văn bản Nội bộ </div>
+      <div class="ni sub">📒 Sổ đăng ký </div>
+      <div class="ni sub on">🗂 Hồ sơ lưu trữ </div>
+      <div class="ni sub">📊 Báo cáo </div>
+      <div class="ni sub">⚙️ Cấu hình </div>
+    </div></div>
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb"><span>Hồ sơ lưu trữ</span><span class="bc-sep">›</span><span class="cur">BV-2026-047 · Hồ sơ báo cáo KCB Q1/2026</span></div>
+      <div class="top-right"><div class="notif">🔔<div class="ndot"></div></div>
+      <div class="user-pill"><div class="uav">KH</div><div class="uname">Nguyễn Văn A</div></div></div>
+    </div>
+    <div class="stat-strip" style="padding:12px 20px">
+      <div style="display:flex;align-items:center;gap:16px;flex:1">
+        <div><div style="font-size:1.1rem;font-weight:800;font-family:monospace;color:#c2410c">BV-2026-047</div><div style="font-size:.72rem;color:var(--text3)">Mã hồ sơ</div></div>
+        <div class="fn-sep" style="width:1px;height:32px;background:var(--border)"></div>
+        <div><div style="font-size:.9rem;font-weight:700">Hồ sơ báo cáo KCB quý I/2026</div><div style="font-size:.72rem;color:var(--text3)">P. Kế hoạch TH · 10 năm · Thường</div></div>
+        <span class="stag st-process" style="margin-left:auto">Đang lập</span>
+      </div>
+    </div>
+    <div class="fbar" style="justify-content:flex-end">
+      <button class="fbtn">📎 Xuất danh sách VB</button>
+      <button class="fbtn primary" onclick="goScreen('s19')">📥 Nộp lưu hồ sơ</button>
+    </div>
+    <div class="work-area"><div class="content-pane">
+      <div class="dp-tabs" style="padding:0;margin:0 0 16px;border-bottom:1px solid var(--border)">
+        <div class="dptab on" onclick="switchTab(this,'hs-vb')">📄 Văn bản trong hồ sơ (3)</div>
+        <div class="dptab" onclick="switchTab(this,'hs-info')">ℹ️ Thông tin</div>
+        <div class="dptab" onclick="switchTab(this,'hs-act')">🕐 Lịch sử</div>
+      </div>
+      <div id="hs-vb" class="tab-pane on" style="display:block;padding:0">
+        <div style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:.82rem;color:var(--text3)">Thứ tự: theo ngày thêm vào hồ sơ</div>
+          <button class="fbtn primary" style="height:32px;font-size:.8rem">+ Thêm văn bản vào hồ sơ</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:12px">
+            <div style="font-size:1.5rem">📄</div>
+            <div style="flex:1">
+              <div style="font-size:.86rem;font-weight:600">V/v báo cáo tình hình thực hiện kế hoạch KCB</div>
+              <div style="font-size:.72rem;color:var(--text3);margin-top:2px">VB Đến · 45/CV-SYT · Sở YT TP.HCM · Thêm bởi Nguyễn Văn A · 27/03 16:30</div>
+            </div>
+            <span class="stag st-done">Hoàn thành</span>
+            <button class="ra ra-g">Xem VB</button>
+            <button class="ra ra-m">Gỡ</button>
+          </div>
+          <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:12px">
+            <div style="font-size:1.5rem">📤</div>
+            <div style="flex:1">
+              <div style="font-size:.86rem;font-weight:600">Báo cáo công tác KCB quý I/2026</div>
+              <div style="font-size:.72rem;color:var(--text3);margin-top:2px">VB Đi · 48/BC-BV · Thêm bởi Nguyễn Văn A · 27/03 16:30</div>
+            </div>
+            <span class="stag st-done">Đã ban hành</span>
+            <button class="ra ra-g">Xem VB</button>
+            <button class="ra ra-m">Gỡ</button>
+          </div>
+          <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:12px">
+            <div style="font-size:1.5rem">📋</div>
+            <div style="flex:1">
+              <div style="font-size:.86rem;font-weight:600">Biên bản họp rà soát số liệu KCB</div>
+              <div style="font-size:.72rem;color:var(--text3);margin-top:2px">VB Nội bộ · Thêm bởi Trần Thị B · 26/03 14:00</div>
+            </div>
+            <span class="stag st-done">Đã ban hành</span>
+            <button class="ra ra-g">Xem VB</button>
+            <button class="ra ra-m">Gỡ</button>
+          </div>
+        </div>
+        <div style="margin-top:10px;font-size:.75rem;color:var(--text3);padding:8px 10px;background:#f7f8fb;border-radius:6px">
+          ℹ️ Mỗi văn bản bắt buộc phải thuộc ít nhất 1 hồ sơ. Một VB có thể thuộc nhiều hồ sơ của nhiều phòng ban.
+        </div>
+      </div>
+      <div id="hs-info" class="tab-pane" style="padding:0">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="form-card" style="padding:14px">
+            <div class="is-title">Thông tin chung</div>
+            <div class="info-row"><div class="ir-l">Mã hồ sơ</div><div class="ir-v r" style="font-family:monospace">BV-2026-047</div></div>
+            <div class="info-row"><div class="ir-l">Loại hồ sơ</div><div class="ir-v">Hồ sơ công việc</div></div>
+            <div class="info-row"><div class="ir-l">Khoa/Phòng</div><div class="ir-v">P. Kế hoạch TH</div></div>
+            <div class="info-row"><div class="ir-l">Người lập</div><div class="ir-v">Nguyễn Văn A</div></div>
+            <div class="info-row"><div class="ir-l">Thời hạn BQ</div><div class="ir-v">10 năm</div></div>
+            <div class="info-row"><div class="ir-l">Tổng số VB</div><div class="ir-v g" style="font-weight:700">3 văn bản</div></div>
+          </div>
+          <div class="form-card" style="padding:14px">
+            <div class="is-title">Phân quyền</div>
+            <div class="info-row"><div class="ir-l">Người quản lý</div><div class="ir-v">Nguyễn Văn A</div></div>
+            <div class="info-row"><div class="ir-l">Người xem</div><div class="ir-v">Trưởng P.KHTH, P.TCKT</div></div>
+            <div class="info-row"><div class="ir-l">Người chỉnh sửa</div><div class="ir-v">Nguyễn Văn A</div></div>
+          </div>
+        </div>
+      </div>
+      <div id="hs-act" class="tab-pane" style="padding:0">
+        <div class="act-item"><div class="act-dot c">+</div><div><div class="act-text"><strong>Nguyễn Văn A</strong> tạo hồ sơ <strong>BV-2026-047</strong></div><span class="act-time">27/03 15:00</span></div></div>
+        <div class="act-item"><div class="act-dot ok">📄</div><div><div class="act-text"><strong>Nguyễn Văn A</strong> thêm VB <strong>45/CV-SYT</strong> vào hồ sơ</div><span class="act-time">27/03 16:30</span></div></div>
+        <div class="act-item"><div class="act-dot ok">📤</div><div><div class="act-text"><strong>Nguyễn Văn A</strong> thêm VB <strong>48/BC-BV</strong> vào hồ sơ</div><span class="act-time">27/03 16:30</span></div></div>
+        <div class="act-item"><div class="act-dot">📋</div><div><div class="act-text"><strong>Trần Thị B</strong> thêm biên bản họp vào hồ sơ</div><span class="act-time">26/03 14:00</span></div></div>
+      </div>
+    </div></div>
+  </div>
+</div>
+<!-- ════════════════════════════ SCREEN 19 — NỘP LƯU & XÁC NHẬN ════════════════════════════ -->
+<div class="screen" id="s19">
+  <div class="sidebar">
+    <div class="logo-row"><div class="logo-box">E</div><div class="logo-t">Easy<span>Docs</span></div></div>
+    <button class="new-btn">+ Tạo mới</button>
+    <div class="nav-g"><div class="nav-sec">Văn phòng số</div>
+      <div class="ni sub">📥 Văn bản Đến <span class="nbg u">8</span></div>
+      <div class="ni sub">📤 Văn bản Đi </div>
+      <div class="ni sub">📋 Văn bản Nội bộ </div>
+      <div class="ni sub">📒 Sổ đăng ký </div>
+      <div class="ni sub on">🗂 Hồ sơ lưu trữ </div>
+      <div class="ni sub">📊 Báo cáo </div>
+      <div class="ni sub">⚙️ Cấu hình </div>
+    </div></div>
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb"><span>Hồ sơ lưu trữ</span><span class="bc-sep">›</span><span class="cur">BV-2026-032 · Nộp lưu</span></div>
+      <div class="top-right"><div class="notif">🔔<div class="ndot"></div></div>
+      <div class="user-pill"><div class="uav">LT</div><div class="uname">Bộ phận Lưu trữ</div></div></div>
+    </div>
+    <div class="work-area">
+      <div class="content-pane" style="max-width:420px;border-right:1px solid var(--border)">
+        <div class="form-card" style="padding:14px">
+          <div class="is-title">Tóm tắt hồ sơ nộp lưu</div>
+          <div style="font-size:.9rem;font-weight:700;margin-bottom:8px">Hồ sơ phòng chống dịch mùa hè 2026</div>
+          <div class="info-row"><div class="ir-l">Mã hồ sơ</div><div class="ir-v r" style="font-family:monospace">BV-2026-032</div></div>
+          <div class="info-row"><div class="ir-l">Khoa/Phòng lập</div><div class="ir-v">P. Kế hoạch TH</div></div>
+          <div class="info-row"><div class="ir-l">Tổng số VB</div><div class="ir-v">7 văn bản</div></div>
+          <div class="info-row"><div class="ir-l">Thời hạn BQ</div><div class="ir-v">Vĩnh viễn</div></div>
+          <div class="info-row"><div class="ir-l">Người lập</div><div class="ir-v">BS. Trần C · P.KHTH</div></div>
+          <div class="info-row"><div class="ir-l">Trạng thái</div><div class="ir-v"><span class="stag" style="background:#eff6ff;color:#1d4ed8">Đã nộp - Chờ xác nhận</span></div></div>
+        </div>
+        <div class="form-card" style="padding:14px">
+          <div class="is-title">Danh sách văn bản (7)</div>
+          <div style="font-size:.8rem;color:#5a6279">
+            <div style="padding:6px 0;border-bottom:1px solid #f0f1f4">📥 89/CV-CDC · CV hướng dẫn phòng chống dịch</div>
+            <div style="padding:6px 0;border-bottom:1px solid #f0f1f4">📤 49/QĐ-BV · QĐ thành lập tổ công tác</div>
+            <div style="padding:6px 0;border-bottom:1px solid #f0f1f4">📋 Biên bản họp tổ công tác lần 1</div>
+            <div style="padding:6px 0;color:#9aa0b4;font-style:italic">... và 4 văn bản khác</div>
+          </div>
+        </div>
+      </div>
+      <div class="detail-panel open" style="width:var(--panel-w);min-width:var(--panel-w)">
+        <div class="dp-head">
+          <div class="dp-head-row"><div class="dp-title">Xác nhận của Bộ phận Lưu trữ</div></div>
+          <div style="display:flex;align-items:center;gap:8px;background:#eff6ff;border-radius:6px;padding:8px 10px;margin-bottom:12px">
+            <div class="pi-av" style="background:#1d4ed8;width:28px;height:28px;font-size:.68rem">LT</div>
+            <div style="font-size:.82rem"><strong>Nguyễn Thị Lưu Trữ</strong><div style="font-size:.72rem;color:var(--text3)">Phụ trách lưu trữ · P. HCNS</div></div>
+          </div>
+        </div>
+        <div class="dp-body" style="padding:16px">
+          <div style="margin-bottom:16px">
+            <div style="font-size:.75rem;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:10px">Quy trình nộp lưu</div>
+            <div class="flow-step"><div class="fs-dot done">✓</div><div class="fs-info"><div class="fs-label">Lập hồ sơ</div><div class="fs-status fss-done">✓ Hoàn thành</div></div></div>
+            <div class="flow-step"><div class="fs-dot done">✓</div><div class="fs-info"><div class="fs-label">Nộp lưu</div><div class="fs-sub">BS. Trần C nộp lúc 28/03 09:00</div><div class="fs-status fss-done">✓ Đã nộp · Hồ sơ chỉ đọc</div></div></div>
+            <div class="flow-step"><div class="fs-dot active">!</div><div class="fs-info"><div class="fs-label">Bộ phận lưu trữ kiểm tra</div><div class="fs-status fss-active">⏳ Đang chờ xác nhận</div></div></div>
+            <div class="flow-step"><div class="fs-dot pending">→</div><div class="fs-info"><div class="fs-label">Đang bảo quản</div><div class="fs-status fss-pend">— Chờ tiếp nhận</div></div></div>
+          </div>
+          <div style="font-size:.75rem;font-weight:600;color:var(--text2);margin-bottom:8px">Kết quả kiểm tra</div>
+          <div style="display:flex;gap:8px;margin-bottom:14px">
+            <button class="btn" style="flex:1;background:#edfbf4;border-color:#a7f3d0;color:#065f46;font-size:.84rem" onclick="goScreen('s16')">✅ Tiếp nhận hồ sơ</button>
+            <button class="btn" style="flex:1;background:#fef2f2;border-color:#fca5a5;color:#b91c1c;font-size:.84rem">↩ Trả lại</button>
+          </div>
+          <div class="fg"><label>Ghi chú (bắt buộc khi trả lại)</label>
+            <textarea class="dir-ta" style="background:#fff" placeholder="VD: Thiếu biên bản kiểm kê, bổ sung và nộp lại..."></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ════════════════════════════ SCREEN 20 — SỔ ĐĂNG KÝ ════════════════════════════ -->
+<div class="screen" id="s20">
+  <div class="sidebar">
+    <div class="logo-row"><div class="logo-box">E</div><div class="logo-t">Easy<span>Docs</span></div></div>
+    <button class="new-btn">+ Tạo mới</button>
+    <div class="nav-g"><div class="nav-sec">Văn phòng số</div>
+      <div class="ni sub">📥 Văn bản Đến <span class="nbg u">8</span></div>
+      <div class="ni sub">📤 Văn bản Đi </div>
+      <div class="ni sub">📋 Văn bản Nội bộ </div>
+      <div class="ni sub on">📒 Sổ đăng ký </div>
+      <div class="ni sub">🗂 Hồ sơ lưu trữ </div>
+      <div class="ni sub">📊 Báo cáo </div>
+      <div class="ni sub">⚙️ Cấu hình </div>
+    </div></div>
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb"><span>Văn phòng số</span><span class="bc-sep">›</span><span class="cur">Sổ đăng ký</span></div>
+      <div class="top-right"><div class="notif">🔔<div class="ndot"></div></div>
+      <div class="user-pill"><div class="uav">VT</div><div class="uname">Văn Thư</div></div></div>
+    </div>
+    <div class="fbar">
+      <select class="fsel"><option>Sổ VB Đến 2026</option><option>Sổ VB Đi 2026</option></select>
+      <select class="fsel"><option>Tất cả tháng</option><option>Tháng 3/2026</option><option>Tháng 2/2026</option></select>
+      <select class="fsel"><option>Tất cả loại VB</option><option>Công văn</option><option>Quyết định</option></select>
+      <div class="sw" style="max-width:200px"><span class="sw-ico">🔍</span><input placeholder="Tìm kiếm..."></div>
+      <div style="margin-left:auto;display:flex;gap:6px">
+        <button class="fbtn">📊 Xuất Excel</button>
+        <button class="fbtn">📄 Xuất PDF</button>
+        <button class="fbtn" onclick="goScreen('s21')">⚙️ Cấu hình sổ</button>
+      </div>
+    </div>
+    <div class="work-area"><div class="content-pane">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;background:#fff;padding:10px 14px;border-radius:8px;border:1px solid var(--border)">
+        <div style="font-size:.88rem"><strong>Sổ VB Đến 2026</strong> · Quy tắc số: <span style="font-family:monospace;font-weight:700;color:#c2410c">{STT}</span> · Hiện tại: <strong>47 số đến</strong></div>
+        <div style="font-size:.75rem;color:var(--text3)">Reset đầu năm · Đủ trường theo NĐ 30/2020</div>
+      </div>
+      <table class="ltable" style="font-size:.8rem">
+        <thead><tr>
+          <th style="width:40px">STT</th>
+          <th style="width:60px">Số đến</th>
+          <th style="width:90px">Ngày đến</th>
+          <th>Số ký hiệu gốc</th>
+          <th style="width:90px">Ngày ký</th>
+          <th>Nơi gửi</th>
+          <th>Trích yếu</th>
+          <th style="width:60px">Khẩn/Mật</th>
+          <th>Đơn vị nhận</th>
+          <th style="width:90px">Hạn XL</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="font-weight:700">47</td><td style="font-weight:700;color:#c2410c">#47</td><td>25/03/2026</td>
+            <td style="font-family:monospace">45/CV-SYT</td><td>24/03/2026</td>
+            <td>Sở Y tế TP.HCM</td>
+            <td>V/v báo cáo tình hình thực hiện KH KCB</td>
+            <td><span class="urg urg-hot" style="font-size:.65rem">HỎA TỐC</span></td>
+            <td>P. KHTH</td><td style="color:#c2410c">28/03/26</td>
+          </tr>
+          <tr><td>46</td><td style="font-weight:700;color:#c2410c">#46</td><td>23/03/2026</td>
+            <td style="font-family:monospace">12/TB-BHXH</td><td>22/03/2026</td>
+            <td>BHXH TP.HCM</td>
+            <td>TB lịch kiểm tra công tác BHYT năm 2026</td>
+            <td><span class="urg urg-vurg" style="font-size:.65rem">T.KHẨN</span></td>
+            <td>BGĐ</td><td>25/03/26</td>
+          </tr>
+          <tr><td>45</td><td style="font-weight:700;color:#c2410c">#45</td><td>22/03/2026</td>
+            <td style="font-family:monospace">08/KH-STTTT</td><td>22/03/2026</td>
+            <td>Sở TT&TT</td>
+            <td>KH triển khai hệ thống HIS giai đoạn 2</td>
+            <td><span class="urg urg-urg" style="font-size:.65rem">KHẨN</span></td>
+            <td>P. CNTT</td><td>01/04/26</td>
+          </tr>
+          <tr><td style="color:#9aa0b4;font-style:italic" colspan="10">... 44 mục trước · Tổng: 47 văn bản</td></tr>
+        </tbody>
+      </table>
+    </div></div>
+  </div>
+</div>
+<!-- ════════════════════════════ SCREEN 21 — CẤU HÌNH SỔ (ADMIN) ════════════════════════════ -->
+<div class="screen" id="s21">
+  <div class="sidebar">
+    <div class="logo-row"><div class="logo-box">E</div><div class="logo-t">Easy<span>Docs</span></div></div>
+    <button class="new-btn">+ Tạo mới</button>
+    <div class="nav-g"><div class="nav-sec">Văn phòng số</div>
+      <div class="ni sub">📥 Văn bản Đến <span class="nbg u">8</span></div>
+      <div class="ni sub">📤 Văn bản Đi </div>
+      <div class="ni sub">📋 Văn bản Nội bộ </div>
+      <div class="ni sub on">📒 Sổ đăng ký </div>
+      <div class="ni sub">🗂 Hồ sơ lưu trữ </div>
+      <div class="ni sub">📊 Báo cáo </div>
+      <div class="ni sub">⚙️ Cấu hình </div>
+    </div></div>
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb"><span>Sổ đăng ký</span><span class="bc-sep">›</span><span class="cur">Cấu hình sổ</span></div>
+      <div class="top-right"><div class="notif">🔔<div class="ndot"></div></div>
+      <div class="user-pill"><div class="uav">AD</div><div class="uname">Admin</div></div></div>
+    </div>
+    <div class="fbar" style="justify-content:flex-end">
+      <button class="fbtn primary">+ Tạo sổ mới</button>
+    </div>
+    <div class="work-area"><div class="content-pane">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px">
+        <div class="form-card" style="padding:16px;border-left:3px solid var(--orange)">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+            <div><div style="font-size:.9rem;font-weight:700">Sổ VB Đến 2026</div><div style="font-size:.72rem;color:var(--text3);margin-top:2px">Văn bản Đến · Năm 2026</div></div>
+            <span class="stag st-done">Đang dùng</span>
+          </div>
+          <div class="info-row"><div class="ir-l">Pattern số</div><div class="ir-v" style="font-family:monospace;font-weight:700">{STT}</div></div>
+          <div class="info-row"><div class="ir-l">Ví dụ</div><div class="ir-v" style="color:#c2410c;font-weight:700">47</div></div>
+          <div class="info-row"><div class="ir-l">Số hiện tại</div><div class="ir-v g">47 / không giới hạn</div></div>
+          <div class="info-row"><div class="ir-l">Reset cuối năm</div><div class="ir-v">✅ Có</div></div>
+          <div style="display:flex;gap:6px;margin-top:10px">
+            <button class="dp-btn" style="flex:1;font-size:.8rem">✏️ Chỉnh sửa</button>
+            <button class="dp-btn" style="font-size:.8rem">📊 Xem sổ</button>
+          </div>
+        </div>
+        <div class="form-card" style="padding:16px;border-left:3px solid #1d4ed8">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+            <div><div style="font-size:.9rem;font-weight:700">Sổ VB Đi 2026</div><div style="font-size:.72rem;color:var(--text3);margin-top:2px">Văn bản Đi · Năm 2026</div></div>
+            <span class="stag st-done">Đang dùng</span>
+          </div>
+          <div class="info-row"><div class="ir-l">Pattern số</div><div class="ir-v" style="font-family:monospace;font-weight:700">{STT}/{LOAI}-BV</div></div>
+          <div class="info-row"><div class="ir-l">Ví dụ</div><div class="ir-v" style="color:#1d4ed8;font-weight:700">48/BC-BV</div></div>
+          <div class="info-row"><div class="ir-l">Số hiện tại</div><div class="ir-v g">48 / không giới hạn</div></div>
+          <div class="info-row"><div class="ir-l">Reset cuối năm</div><div class="ir-v">✅ Có</div></div>
+          <div style="display:flex;gap:6px;margin-top:10px">
+            <button class="dp-btn" style="flex:1;font-size:.8rem">✏️ Chỉnh sửa</button>
+            <button class="dp-btn" style="font-size:.8rem">📊 Xem sổ</button>
+          </div>
+        </div>
+      </div>
+      <div class="form-card" style="padding:16px">
+        <div class="fc-title" style="margin-bottom:12px">Tạo sổ cho năm 2027</div>
+        <div class="form-row tri">
+          <div class="fg"><label>Tên sổ <span class="req">*</span></label><input value="Sổ VB Đến 2027"></div>
+          <div class="fg"><label>Loại <span class="req">*</span></label><select><option>VB Đến</option><option>VB Đi</option></select></div>
+          <div class="fg"><label>Năm <span class="req">*</span></label><input value="2027"></div>
+        </div>
+        <div class="form-row">
+          <div class="fg"><label>Pattern số <span class="req">*</span></label><input value="{STT}"><div class="hint">Biến: {STT}, {NĂM}, {LOAI}, {ĐƠN_VỊ}</div></div>
+          <div class="fg"><label>Preview</label><input class="auto" value="1" disabled></div>
+        </div>
+        <div class="form-row">
+          <div class="fg"><label>Bắt đầu từ số</label><input type="number" value="1"></div>
+          <div class="fg"><label>Reset cuối năm</label><select><option>Có</option><option>Không</option></select></div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:4px">Tạo sổ 2027</button>
+      </div>
+    </div></div>
+  </div>
+</div>
+<!-- ════════════════════════════ SCREEN 22 — BÁO CÁO & THỐNG KÊ ════════════════════════════ -->
+<div class="screen" id="s22">
+  <div class="sidebar">
+    <div class="logo-row"><div class="logo-box">E</div><div class="logo-t">Easy<span>Docs</span></div></div>
+    <button class="new-btn">+ Tạo mới</button>
+    <div class="nav-g"><div class="nav-sec">Văn phòng số</div>
+      <div class="ni sub">📥 Văn bản Đến <span class="nbg u">8</span></div>
+      <div class="ni sub">📤 Văn bản Đi </div>
+      <div class="ni sub">📋 Văn bản Nội bộ </div>
+      <div class="ni sub">📒 Sổ đăng ký </div>
+      <div class="ni sub">🗂 Hồ sơ lưu trữ </div>
+      <div class="ni sub on">📊 Báo cáo </div>
+      <div class="ni sub">⚙️ Cấu hình </div>
+    </div></div>
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb"><span>Văn phòng số</span><span class="bc-sep">›</span><span class="cur">Báo cáo & Thống kê</span></div>
+      <div class="top-right"><div class="notif">🔔<div class="ndot"></div></div>
+      <div class="user-pill"><div class="uav">AD</div><div class="uname">Admin</div></div></div>
+    </div>
+    <div class="fbar">
+      <select class="fsel"><option>Năm 2026</option></select>
+      <select class="fsel"><option>Tất cả quý</option><option>Quý I (1-3/2026)</option></select>
+      <select class="fsel"><option>Tất cả đơn vị</option><option>P. Kế hoạch TH</option><option>P. HCNS</option></select>
+      <div style="margin-left:auto"><button class="fbtn primary">📊 Xuất báo cáo</button></div>
+    </div>
+    <div class="work-area"><div class="content-pane">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+        <div class="form-card" style="padding:14px;text-align:center;border-top:3px solid var(--orange)">
+          <div style="font-size:2rem;font-weight:800;color:var(--orange)">47</div>
+          <div style="font-size:.8rem;color:var(--text3);margin-top:4px">VB Đến tháng 3</div>
+          <div style="font-size:.72rem;color:#1a7a45;margin-top:2px">↑ 12% vs tháng 2</div>
+        </div>
+        <div class="form-card" style="padding:14px;text-align:center;border-top:3px solid #1d4ed8">
+          <div style="font-size:2rem;font-weight:800;color:#1d4ed8">23</div>
+          <div style="font-size:.8rem;color:var(--text3);margin-top:4px">VB Đi tháng 3</div>
+          <div style="font-size:.72rem;color:#1a7a45;margin-top:2px">↑ 5% vs tháng 2</div>
+        </div>
+        <div class="form-card" style="padding:14px;text-align:center;border-top:3px solid #b91c1c">
+          <div style="font-size:2rem;font-weight:800;color:#b91c1c">5</div>
+          <div style="font-size:.8rem;color:var(--text3);margin-top:4px">VB Đến quá hạn</div>
+          <div style="font-size:.72rem;color:#b91c1c;margin-top:2px">⚠️ Cần xử lý</div>
+        </div>
+        <div class="form-card" style="padding:14px;text-align:center;border-top:3px solid #854d0e">
+          <div style="font-size:2rem;font-weight:800;color:#854d0e">2</div>
+          <div style="font-size:.8rem;color:var(--text3);margin-top:4px">Hồ sơ sắp hết hạn</div>
+          <div style="font-size:.72rem;color:#854d0e;margin-top:2px">Trong 30 ngày tới</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:14px;margin-bottom:16px">
+        <div class="form-card" style="padding:14px">
+          <div class="is-title" style="margin-bottom:12px">VB Đến theo tháng (2026)</div>
+          <div style="display:flex;align-items:flex-end;gap:6px;height:100px">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1"><div style="background:#e2e4ea;border-radius:3px 3px 0 0;width:100%;height:45px"></div><div style="font-size:.65rem;color:var(--text3)">T1</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1"><div style="background:#e2e4ea;border-radius:3px 3px 0 0;width:100%;height:55px"></div><div style="font-size:.65rem;color:var(--text3)">T2</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1"><div style="background:var(--orange);border-radius:3px 3px 0 0;width:100%;height:80px"></div><div style="font-size:.65rem;color:var(--text3)">T3</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1"><div style="background:#e2e4ea;border-radius:3px 3px 0 0;width:100%;height:0px"></div><div style="font-size:.65rem;color:var(--text3)">T4</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1"><div style="background:#e2e4ea;border-radius:3px 3px 0 0;width:100%;height:0px"></div><div style="font-size:.65rem;color:var(--text3)">T5</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1"><div style="background:#e2e4ea;border-radius:3px 3px 0 0;width:100%;height:0px"></div><div style="font-size:.65rem;color:var(--text3)">T6</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1"><div style="background:#e2e4ea;border-radius:3px 3px 0 0;width:100%;height:0px"></div><div style="font-size:.65rem;color:var(--text3)">T7</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1"><div style="background:#e2e4ea;border-radius:3px 3px 0 0;width:100%;height:0px"></div><div style="font-size:.65rem;color:var(--text3)">T8</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1"><div style="background:#e2e4ea;border-radius:3px 3px 0 0;width:100%;height:0px"></div><div style="font-size:.65rem;color:var(--text3)">T9</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1"><div style="background:#e2e4ea;border-radius:3px 3px 0 0;width:100%;height:0px"></div><div style="font-size:.65rem;color:var(--text3)">T10</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1"><div style="background:#e2e4ea;border-radius:3px 3px 0 0;width:100%;height:0px"></div><div style="font-size:.65rem;color:var(--text3)">T11</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1"><div style="background:#e2e4ea;border-radius:3px 3px 0 0;width:100%;height:0px"></div><div style="font-size:.65rem;color:var(--text3)">T12</div></div>
+          </div>
+        </div>
+        <div class="form-card" style="padding:14px">
+          <div class="is-title" style="margin-bottom:12px">Top đơn vị gửi VB Đến</div>
+          <div style="font-size:.82rem">
+            <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f1f4"><span>Sở Y tế TP.HCM</span><span style="font-weight:700;color:#c2410c">18</span></div>
+            <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f1f4"><span>BHXH TP.HCM</span><span style="font-weight:700">12</span></div>
+            <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f1f4"><span>Sở TT&TT</span><span style="font-weight:700">8</span></div>
+            <div style="display:flex;justify-content:space-between;padding:5px 0"><span>Bộ Y tế</span><span style="font-weight:700">5</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-card" style="padding:14px">
+        <div class="is-title" style="margin-bottom:10px">⚠️ VB Đến quá hạn — cần xử lý ngay</div>
+        <table class="ltable">
+          <thead><tr><th>Văn bản</th><th>Số đến</th><th>Nơi gửi</th><th>Đơn vị XL</th><th>Hạn</th><th>Quá hạn</th><th>Thao tác</th></tr></thead>
+          <tbody>
+            <tr><td><div class="lt-name" style="max-width:200px">CV hướng dẫn phòng chống dịch mùa hè</div></td>
+              <td style="font-weight:700;color:#c2410c">#43</td><td style="font-size:.82rem">CDC TP.HCM</td>
+              <td style="font-size:.82rem">P. KHTH</td><td style="font-size:.82rem">20/03/2026</td>
+              <td><span style="font-size:.8rem;font-weight:700;color:#b91c1c">8 ngày</span></td>
+              <td><button class="ra ra-p" onclick="goScreen('s1')">Xem</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div></div>
+  </div>
+</div>
+<style>
+.flow-nav{ overflow-x:auto; max-width:calc(100vw - 40px); }
+.fn-grp-lbl{ font-size:.6rem;font-weight:700;color:#ffffff60;text-transform:uppercase;letter-spacing:1px;padding:0 6px;white-space:nowrap; }
+</style>
+<!-- ── NAVIGATION BAR ── -->
+<div class="flow-nav" style="display:flex;gap:4px;padding:7px 10px;align-items:center">
+  <span class="fn-grp-lbl">VB ĐẾN</span>
+  <button class="fn-btn on" id="nb-s1" onclick="goScreen('s1')">① Danh sách</button>
+  <button class="fn-btn" id="nb-s2" onclick="goScreen('s2')">② Tiếp nhận</button>
+  <button class="fn-btn" id="nb-s3" onclick="goScreen('s3')">③ Chờ chỉ đạo</button>
+  <button class="fn-btn" id="nb-s4" onclick="goScreen('s4')">④ BGĐ chỉ đạo</button>
+  <button class="fn-btn" id="nb-s7" onclick="goScreen('s7')">⑤ TK thiết lập luồng</button>
+  <button class="fn-btn" id="nb-s5" onclick="goScreen('s5')">⑥ Đang xử lý</button>
+  <button class="fn-btn" id="nb-s6" onclick="goScreen('s6')">⑦ Hoàn thành</button>
+  <div class="fn-sep"></div>
+  <span class="fn-grp-lbl">VB ĐI</span>
+  <button class="fn-btn" id="nb-s8" onclick="goScreen('s8')">⑧ Danh sách</button>
+  <button class="fn-btn" id="nb-s9" onclick="goScreen('s9')">⑨ Soạn thảo</button>
+  <button class="fn-btn" id="nb-s10" onclick="goScreen('s10')">⑩ Duyệt song song</button>
+  <button class="fn-btn" id="nb-s11" onclick="goScreen('s11')">⑪ GĐ ký số</button>
+  <button class="fn-btn" id="nb-s12" onclick="goScreen('s12')">⑫ Cấp số &amp; Ban hành</button>
+  <button class="fn-btn" id="nb-s13" onclick="goScreen('s13')">⑬ Đã ban hành</button>
+  <div class="fn-sep"></div>
+  <span class="fn-grp-lbl">NỘI BỘ</span>
+  <button class="fn-btn" id="nb-s14" onclick="goScreen('s14')">⑭ Danh sách</button>
+  <button class="fn-btn" id="nb-s15" onclick="goScreen('s15')">⑮ Tạo mới</button>
+  <div class="fn-sep"></div>
+  <span class="fn-grp-lbl">HỒ SƠ</span>
+  <button class="fn-btn" id="nb-s16" onclick="goScreen('s16')">⑯ Danh sách</button>
+  <button class="fn-btn" id="nb-s17" onclick="goScreen('s17')">⑰ Tạo hồ sơ</button>
+  <button class="fn-btn" id="nb-s18" onclick="goScreen('s18')">⑱ Chi tiết</button>
+  <button class="fn-btn" id="nb-s19" onclick="goScreen('s19')">⑲ Nộp lưu</button>
+  <div class="fn-sep"></div>
+  <span class="fn-grp-lbl">SỔ &amp; BC</span>
+  <button class="fn-btn" id="nb-s20" onclick="goScreen('s20')">⑳ Sổ đăng ký</button>
+  <button class="fn-btn" id="nb-s21" onclick="goScreen('s21')">㉑ Cấu hình sổ</button>
+  <button class="fn-btn" id="nb-s22" onclick="goScreen('s22')">㉒ Báo cáo</button>
+</div>
+
+<script>
+  function goScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
+    document.getElementById(id).classList.add('on');
+    document.querySelectorAll('.fn-btn').forEach(b => b.classList.remove('on'));
+    const nb = document.getElementById('nb-' + id);
+    if (nb) nb.classList.add('on');
+  }
+  function switchTab(el, paneId) {
+    el.parentElement.querySelectorAll('.dptab').forEach(t => t.classList.remove('on'));
+    el.classList.add('on');
+    const body = el.closest('.dp-tabs').nextElementSibling;
+    body.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('on'));
+    const target = document.getElementById(paneId);
+    if (target) { target.classList.add('on'); target.style.display='block'; }
+  }
+</script>
+</body>
+</html>

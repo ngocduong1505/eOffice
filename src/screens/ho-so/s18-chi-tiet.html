@@ -1,0 +1,94 @@
+<div class="screen" id="s18">
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb"><span>Hồ sơ lưu trữ</span><span class="bc-sep">›</span><span class="cur">BV-2026-047 · Hồ sơ báo cáo KCB Q1/2026</span></div>
+      <div class="top-right"><div class="notif">🔔<div class="ndot"></div></div>
+      <div class="user-pill"><div class="uav">KH</div><div class="uname">Nguyễn Văn A</div></div></div>
+    </div>
+    <div class="stat-strip" style="padding:12px 20px">
+      <div style="display:flex;align-items:center;gap:16px;flex:1">
+        <div><div style="font-size:1.1rem;font-weight:800;font-family:monospace;color:#c2410c">BV-2026-047</div><div style="font-size:.72rem;color:var(--text3)">Mã hồ sơ</div></div>
+        <div class="fn-sep" style="width:1px;height:32px;background:var(--border)"></div>
+        <div><div style="font-size:.9rem;font-weight:700">Hồ sơ báo cáo KCB quý I/2026</div><div style="font-size:.72rem;color:var(--text3)">P. Kế hoạch TH · 10 năm · Thường</div></div>
+        <span class="stag st-process" style="margin-left:auto">Đang lập</span>
+      </div>
+    </div>
+    <div class="fbar" style="justify-content:flex-end">
+      <button class="fbtn">📎 Xuất danh sách VB</button>
+      <button class="fbtn primary" onclick="goScreen('s19')">📥 Nộp lưu hồ sơ</button>
+    </div>
+    <div class="work-area"><div class="content-pane">
+      <div class="dp-tabs" style="padding:0;margin:0 0 16px;border-bottom:1px solid var(--border)">
+        <div class="dptab on" onclick="switchTab(this,'hs-vb')">📄 Văn bản trong hồ sơ (3)</div>
+        <div class="dptab" onclick="switchTab(this,'hs-info')">ℹ️ Thông tin</div>
+        <div class="dptab" onclick="switchTab(this,'hs-act')">🕐 Lịch sử</div>
+      </div>
+      <div id="hs-vb" class="tab-pane on" style="display:block;padding:0">
+        <div style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:.82rem;color:var(--text3)">Thứ tự: theo ngày thêm vào hồ sơ</div>
+          <button class="fbtn primary" style="height:32px;font-size:.8rem">+ Thêm văn bản vào hồ sơ</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:12px">
+            <div style="font-size:1.5rem">📄</div>
+            <div style="flex:1">
+              <div style="font-size:.86rem;font-weight:600">V/v báo cáo tình hình thực hiện kế hoạch KCB</div>
+              <div style="font-size:.72rem;color:var(--text3);margin-top:2px">VB Đến · 45/CV-SYT · Sở YT TP.HCM · Thêm bởi Nguyễn Văn A · 27/03 16:30</div>
+            </div>
+            <span class="stag st-done">Hoàn thành</span>
+            <button class="ra ra-g">Xem VB</button>
+            <button class="ra ra-m">Gỡ</button>
+          </div>
+          <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:12px">
+            <div style="font-size:1.5rem">📤</div>
+            <div style="flex:1">
+              <div style="font-size:.86rem;font-weight:600">Báo cáo công tác KCB quý I/2026</div>
+              <div style="font-size:.72rem;color:var(--text3);margin-top:2px">VB Đi · 48/BC-BV · Thêm bởi Nguyễn Văn A · 27/03 16:30</div>
+            </div>
+            <span class="stag st-done">Đã ban hành</span>
+            <button class="ra ra-g">Xem VB</button>
+            <button class="ra ra-m">Gỡ</button>
+          </div>
+          <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:12px">
+            <div style="font-size:1.5rem">📋</div>
+            <div style="flex:1">
+              <div style="font-size:.86rem;font-weight:600">Biên bản họp rà soát số liệu KCB</div>
+              <div style="font-size:.72rem;color:var(--text3);margin-top:2px">VB Nội bộ · Thêm bởi Trần Thị B · 26/03 14:00</div>
+            </div>
+            <span class="stag st-done">Đã ban hành</span>
+            <button class="ra ra-g">Xem VB</button>
+            <button class="ra ra-m">Gỡ</button>
+          </div>
+        </div>
+        <div style="margin-top:10px;font-size:.75rem;color:var(--text3);padding:8px 10px;background:#f7f8fb;border-radius:6px">
+          ℹ️ Mỗi văn bản bắt buộc phải thuộc ít nhất 1 hồ sơ. Một VB có thể thuộc nhiều hồ sơ của nhiều phòng ban.
+        </div>
+      </div>
+      <div id="hs-info" class="tab-pane" style="padding:0">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="form-card" style="padding:14px">
+            <div class="is-title">Thông tin chung</div>
+            <div class="info-row"><div class="ir-l">Mã hồ sơ</div><div class="ir-v r" style="font-family:monospace">BV-2026-047</div></div>
+            <div class="info-row"><div class="ir-l">Loại hồ sơ</div><div class="ir-v">Hồ sơ công việc</div></div>
+            <div class="info-row"><div class="ir-l">Khoa/Phòng</div><div class="ir-v">P. Kế hoạch TH</div></div>
+            <div class="info-row"><div class="ir-l">Người lập</div><div class="ir-v">Nguyễn Văn A</div></div>
+            <div class="info-row"><div class="ir-l">Thời hạn BQ</div><div class="ir-v">10 năm</div></div>
+            <div class="info-row"><div class="ir-l">Tổng số VB</div><div class="ir-v g" style="font-weight:700">3 văn bản</div></div>
+          </div>
+          <div class="form-card" style="padding:14px">
+            <div class="is-title">Phân quyền</div>
+            <div class="info-row"><div class="ir-l">Người quản lý</div><div class="ir-v">Nguyễn Văn A</div></div>
+            <div class="info-row"><div class="ir-l">Người xem</div><div class="ir-v">Trưởng P.KHTH, P.TCKT</div></div>
+            <div class="info-row"><div class="ir-l">Người chỉnh sửa</div><div class="ir-v">Nguyễn Văn A</div></div>
+          </div>
+        </div>
+      </div>
+      <div id="hs-act" class="tab-pane" style="padding:0">
+        <div class="act-item"><div class="act-dot c">+</div><div><div class="act-text"><strong>Nguyễn Văn A</strong> tạo hồ sơ <strong>BV-2026-047</strong></div><span class="act-time">27/03 15:00</span></div></div>
+        <div class="act-item"><div class="act-dot ok">📄</div><div><div class="act-text"><strong>Nguyễn Văn A</strong> thêm VB <strong>45/CV-SYT</strong> vào hồ sơ</div><span class="act-time">27/03 16:30</span></div></div>
+        <div class="act-item"><div class="act-dot ok">📤</div><div><div class="act-text"><strong>Nguyễn Văn A</strong> thêm VB <strong>48/BC-BV</strong> vào hồ sơ</div><span class="act-time">27/03 16:30</span></div></div>
+        <div class="act-item"><div class="act-dot">📋</div><div><div class="act-text"><strong>Trần Thị B</strong> thêm biên bản họp vào hồ sơ</div><span class="act-time">26/03 14:00</span></div></div>
+      </div>
+    </div></div>
+  </div>
+</div>

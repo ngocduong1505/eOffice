@@ -1,0 +1,64 @@
+<div class="screen" id="s20">
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb"><span>Văn phòng số</span><span class="bc-sep">›</span><span class="cur">Sổ đăng ký</span></div>
+      <div class="top-right"><div class="notif">🔔<div class="ndot"></div></div>
+      <div class="user-pill"><div class="uav">VT</div><div class="uname">Văn Thư</div></div></div>
+    </div>
+    <div class="fbar">
+      <select class="fsel"><option>Sổ VB Đến 2026</option><option>Sổ VB Đi 2026</option></select>
+      <select class="fsel"><option>Tất cả tháng</option><option>Tháng 3/2026</option><option>Tháng 2/2026</option></select>
+      <select class="fsel"><option>Tất cả loại VB</option><option>Công văn</option><option>Quyết định</option></select>
+      <div class="sw" style="max-width:200px"><span class="sw-ico">🔍</span><input placeholder="Tìm kiếm..."></div>
+      <div style="margin-left:auto;display:flex;gap:6px">
+        <button class="fbtn">📊 Xuất Excel</button>
+        <button class="fbtn">📄 Xuất PDF</button>
+        <button class="fbtn" onclick="goScreen('s21')">⚙️ Cấu hình sổ</button>
+      </div>
+    </div>
+    <div class="work-area"><div class="content-pane">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;background:#fff;padding:10px 14px;border-radius:8px;border:1px solid var(--border)">
+        <div style="font-size:.88rem"><strong>Sổ VB Đến 2026</strong> · Quy tắc số: <span style="font-family:monospace;font-weight:700;color:#c2410c">{STT}</span> · Hiện tại: <strong>47 số đến</strong></div>
+        <div style="font-size:.75rem;color:var(--text3)">Reset đầu năm · Đủ trường theo NĐ 30/2020</div>
+      </div>
+      <table class="ltable" style="font-size:.8rem">
+        <thead><tr>
+          <th style="width:40px">STT</th>
+          <th style="width:60px">Số đến</th>
+          <th style="width:90px">Ngày đến</th>
+          <th>Số ký hiệu gốc</th>
+          <th style="width:90px">Ngày ký</th>
+          <th>Nơi gửi</th>
+          <th>Trích yếu</th>
+          <th style="width:60px">Khẩn/Mật</th>
+          <th>Đơn vị nhận</th>
+          <th style="width:90px">Hạn XL</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="font-weight:700">47</td><td style="font-weight:700;color:#c2410c">#47</td><td>25/03/2026</td>
+            <td style="font-family:monospace">45/CV-SYT</td><td>24/03/2026</td>
+            <td>Sở Y tế TP.HCM</td>
+            <td>V/v báo cáo tình hình thực hiện KH KCB</td>
+            <td><span class="urg urg-hot" style="font-size:.65rem">HỎA TỐC</span></td>
+            <td>P. KHTH</td><td style="color:#c2410c">28/03/26</td>
+          </tr>
+          <tr><td>46</td><td style="font-weight:700;color:#c2410c">#46</td><td>23/03/2026</td>
+            <td style="font-family:monospace">12/TB-BHXH</td><td>22/03/2026</td>
+            <td>BHXH TP.HCM</td>
+            <td>TB lịch kiểm tra công tác BHYT năm 2026</td>
+            <td><span class="urg urg-vurg" style="font-size:.65rem">T.KHẨN</span></td>
+            <td>BGĐ</td><td>25/03/26</td>
+          </tr>
+          <tr><td>45</td><td style="font-weight:700;color:#c2410c">#45</td><td>22/03/2026</td>
+            <td style="font-family:monospace">08/KH-STTTT</td><td>22/03/2026</td>
+            <td>Sở TT&TT</td>
+            <td>KH triển khai hệ thống HIS giai đoạn 2</td>
+            <td><span class="urg urg-urg" style="font-size:.65rem">KHẨN</span></td>
+            <td>P. CNTT</td><td>01/04/26</td>
+          </tr>
+          <tr><td style="color:#9aa0b4;font-style:italic" colspan="10">... 44 mục trước · Tổng: 47 văn bản</td></tr>
+        </tbody>
+      </table>
+    </div></div>
+  </div>
+</div>

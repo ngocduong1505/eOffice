@@ -1,0 +1,140 @@
+<div class="screen on" id="s1">
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb">
+        <span>Văn phòng số</span>
+        <span class="bc-sep">›</span>
+        <span class="cur">Quản lý văn bản Đến</span>
+      </div>
+      <div class="top-right">
+        <div class="notif">🔔<div class="ndot"></div></div>
+        <div class="user-pill"><div class="uav">VT</div><div class="uname">Văn Thư</div></div>
+      </div>
+    </div>
+    <div class="stat-strip">
+      <div class="si on"><div class="si-num">47</div><div class="si-lbl">Tổng văn bản đến</div></div>
+      <div class="si"><div class="si-num" style="color:#1d4ed8">8</div><div class="si-lbl">Mới tiếp nhận</div></div>
+      <div class="si"><div class="si-num" style="color:#c2410c">14</div><div class="si-lbl">Đang xử lý</div></div>
+      <div class="si"><div class="si-num" style="color:#b91c1c">3</div><div class="si-lbl">Quá hạn</div></div>
+      <div class="si"><div class="si-num" style="color:#1a7a45">22</div><div class="si-lbl">Hoàn thành</div></div>
+    </div>
+    <div class="fbar">
+      <div class="sw"><span class="sw-ico">🔍</span><input placeholder="Tìm theo tên, số đến, nơi gửi..."></div>
+      <select class="fsel"><option>Tất cả mức khẩn</option><option>🔴 Hỏa tốc</option><option>🟠 Thượng khẩn</option><option>🟡 Khẩn</option><option>⚪ Thường</option></select>
+      <select class="fsel"><option>Tất cả trạng thái</option><option>Mới tiếp nhận</option><option>Đang xử lý</option><option>Hoàn thành</option></select>
+      <select class="fsel"><option>Tất cả đơn vị</option><option>Phòng KHTH</option><option>Phòng HCNS</option><option>BGĐ</option></select>
+      <input type="date" class="fsel" style="color:#3a3f52">
+      <button class="fbtn primary" onclick="goScreen('s2')">+ Tiếp nhận văn bản</button>
+    </div>
+    <div class="work-area">
+      <div class="content-pane">
+        <table class="ltable">
+          <thead>
+            <tr>
+              <th style="width:32px"><input type="checkbox"></th>
+              <th>Văn bản</th>
+              <th>Số đến</th>
+              <th>Mức khẩn</th>
+              <th>Đơn vị xử lý</th>
+              <th>Hạn xử lý</th>
+              <th>Trạng thái</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="selected" onclick="goScreen('s3')">
+              <td><input type="checkbox" checked></td>
+              <td>
+                <div class="lt-doc">
+                  <div class="lt-thumb">📄<span class="lt-ext">PDF</span></div>
+                  <div>
+                    <div class="lt-name">V/v báo cáo tình hình thực hiện kế hoạch KCB</div>
+                    <div class="lt-sub">45/CV-SYT · Sở Y tế TP.HCM · 24/03/2026</div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-weight:700;color:#d94f1e;font-size:.9rem">#47</td>
+              <td><span class="urg urg-hot">Hỏa tốc</span></td>
+              <td style="font-size:.82rem">P. Kế hoạch TH</td>
+              <td style="font-size:.82rem;color:#b91c1c;font-weight:600">28/03/2026 ⚠️</td>
+              <td><span class="stag st-process">Đang xử lý</span></td>
+              <td><div class="row-act"><button class="ra ra-p" onclick="goScreen('s3')">Xem</button><button class="ra ra-m">···</button></div></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td>
+                <div class="lt-doc">
+                  <div class="lt-thumb">📄<span class="lt-ext">PDF</span></div>
+                  <div>
+                    <div class="lt-name">Thông báo lịch kiểm tra công tác BHYT năm 2026</div>
+                    <div class="lt-sub">12/TB-BHXH · BHXH TP.HCM · 23/03/2026</div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-weight:700;color:#d94f1e;font-size:.9rem">#46</td>
+              <td><span class="urg urg-vurg">Thượng khẩn</span></td>
+              <td style="font-size:.82rem">BGĐ</td>
+              <td style="font-size:.82rem;color:#c2410c">25/03/2026</td>
+              <td><span class="stag st-direct">Chờ chỉ đạo</span></td>
+              <td><div class="row-act"><button class="ra ra-p">Xem</button><button class="ra ra-m">···</button></div></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td>
+                <div class="lt-doc">
+                  <div class="lt-thumb">📝<span class="lt-ext">DOC</span></div>
+                  <div>
+                    <div class="lt-name">Kế hoạch triển khai hệ thống HIS giai đoạn 2</div>
+                    <div class="lt-sub">08/KH-STTTT · Sở TT&TT · 22/03/2026</div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-weight:700;color:#d94f1e;font-size:.9rem">#45</td>
+              <td><span class="urg urg-urg">Khẩn</span></td>
+              <td style="font-size:.82rem">P. CNTT</td>
+              <td style="font-size:.82rem;color:#5a6279">01/04/2026</td>
+              <td><span class="stag st-stamp">Đã đóng dấu</span></td>
+              <td><div class="row-act"><button class="ra ra-p">Xem</button><button class="ra ra-m">···</button></div></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td>
+                <div class="lt-doc">
+                  <div class="lt-thumb">📄<span class="lt-ext">PDF</span></div>
+                  <div>
+                    <div class="lt-name">Quyết định về việc điều chỉnh định mức thuốc</div>
+                    <div class="lt-sub">156/QĐ-BYT · Bộ Y tế · 20/03/2026</div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-weight:700;color:#d94f1e;font-size:.9rem">#44</td>
+              <td><span class="urg urg-norm">Thường</span></td>
+              <td style="font-size:.82rem">P. Dược</td>
+              <td style="font-size:.82rem;color:#1a7a45">10/04/2026</td>
+              <td><span class="stag st-done">Hoàn thành</span></td>
+              <td><div class="row-act"><button class="ra ra-g">Xem</button><button class="ra ra-m">···</button></div></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td>
+                <div class="lt-doc">
+                  <div class="lt-thumb">📄<span class="lt-ext">PDF</span></div>
+                  <div>
+                    <div class="lt-name">Công văn hướng dẫn phòng chống dịch mùa hè 2026</div>
+                    <div class="lt-sub">89/CV-CDC · CDC TP.HCM · 18/03/2026</div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-weight:700;color:#d94f1e;font-size:.9rem">#43</td>
+              <td><span class="urg urg-norm">Thường</span></td>
+              <td style="font-size:.82rem">P. KHTH</td>
+              <td style="font-size:.82rem;color:#b91c1c;font-weight:600">20/03/2026 ⚠️</td>
+              <td><span class="stag st-overdue">Quá hạn</span></td>
+              <td><div class="row-act"><button class="ra ra-p">Xem</button><button class="ra ra-m">···</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

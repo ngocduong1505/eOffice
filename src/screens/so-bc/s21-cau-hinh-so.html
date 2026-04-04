@@ -1,0 +1,61 @@
+<div class="screen" id="s21">
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb"><span>Sổ đăng ký</span><span class="bc-sep">›</span><span class="cur">Cấu hình sổ</span></div>
+      <div class="top-right"><div class="notif">🔔<div class="ndot"></div></div>
+      <div class="user-pill"><div class="uav">AD</div><div class="uname">Admin</div></div></div>
+    </div>
+    <div class="fbar" style="justify-content:flex-end">
+      <button class="fbtn primary">+ Tạo sổ mới</button>
+    </div>
+    <div class="work-area"><div class="content-pane">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px">
+        <div class="form-card" style="padding:16px;border-left:3px solid var(--orange)">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+            <div><div style="font-size:.9rem;font-weight:700">Sổ VB Đến 2026</div><div style="font-size:.72rem;color:var(--text3);margin-top:2px">Văn bản Đến · Năm 2026</div></div>
+            <span class="stag st-done">Đang dùng</span>
+          </div>
+          <div class="info-row"><div class="ir-l">Pattern số</div><div class="ir-v" style="font-family:monospace;font-weight:700">{STT}</div></div>
+          <div class="info-row"><div class="ir-l">Ví dụ</div><div class="ir-v" style="color:#c2410c;font-weight:700">47</div></div>
+          <div class="info-row"><div class="ir-l">Số hiện tại</div><div class="ir-v g">47 / không giới hạn</div></div>
+          <div class="info-row"><div class="ir-l">Reset cuối năm</div><div class="ir-v">✅ Có</div></div>
+          <div style="display:flex;gap:6px;margin-top:10px">
+            <button class="dp-btn" style="flex:1;font-size:.8rem">✏️ Chỉnh sửa</button>
+            <button class="dp-btn" style="font-size:.8rem">📊 Xem sổ</button>
+          </div>
+        </div>
+        <div class="form-card" style="padding:16px;border-left:3px solid #1d4ed8">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+            <div><div style="font-size:.9rem;font-weight:700">Sổ VB Đi 2026</div><div style="font-size:.72rem;color:var(--text3);margin-top:2px">Văn bản Đi · Năm 2026</div></div>
+            <span class="stag st-done">Đang dùng</span>
+          </div>
+          <div class="info-row"><div class="ir-l">Pattern số</div><div class="ir-v" style="font-family:monospace;font-weight:700">{STT}/{LOAI}-BV</div></div>
+          <div class="info-row"><div class="ir-l">Ví dụ</div><div class="ir-v" style="color:#1d4ed8;font-weight:700">48/BC-BV</div></div>
+          <div class="info-row"><div class="ir-l">Số hiện tại</div><div class="ir-v g">48 / không giới hạn</div></div>
+          <div class="info-row"><div class="ir-l">Reset cuối năm</div><div class="ir-v">✅ Có</div></div>
+          <div style="display:flex;gap:6px;margin-top:10px">
+            <button class="dp-btn" style="flex:1;font-size:.8rem">✏️ Chỉnh sửa</button>
+            <button class="dp-btn" style="font-size:.8rem">📊 Xem sổ</button>
+          </div>
+        </div>
+      </div>
+      <div class="form-card" style="padding:16px">
+        <div class="fc-title" style="margin-bottom:12px">Tạo sổ cho năm 2027</div>
+        <div class="form-row tri">
+          <div class="fg"><label>Tên sổ <span class="req">*</span></label><input value="Sổ VB Đến 2027"></div>
+          <div class="fg"><label>Loại <span class="req">*</span></label><select><option>VB Đến</option><option>VB Đi</option></select></div>
+          <div class="fg"><label>Năm <span class="req">*</span></label><input value="2027"></div>
+        </div>
+        <div class="form-row">
+          <div class="fg"><label>Pattern số <span class="req">*</span></label><input value="{STT}"><div class="hint">Biến: {STT}, {NĂM}, {LOAI}, {ĐƠN_VỊ}</div></div>
+          <div class="fg"><label>Preview</label><input class="auto" value="1" disabled></div>
+        </div>
+        <div class="form-row">
+          <div class="fg"><label>Bắt đầu từ số</label><input type="number" value="1"></div>
+          <div class="fg"><label>Reset cuối năm</label><select><option>Có</option><option>Không</option></select></div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:4px">Tạo sổ 2027</button>
+      </div>
+    </div></div>
+  </div>
+</div>

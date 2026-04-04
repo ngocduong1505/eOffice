@@ -1,0 +1,61 @@
+/* ═══════════════════════════════════════════
+   NAV.CSS — Flow Navigation Bar (Prototype)
+   eOffice Prototype
+═══════════════════════════════════════════ */
+
+/* ── NAV FLOW BAR ── */
+.flow-nav {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+  background: #1a1a2e;
+  padding: 7px 10px;
+  border-radius: 40px;
+  z-index: 999;
+  box-shadow: 0 4px 20px rgba(0,0,0,.25);
+  overflow-x: auto;
+  max-width: calc(100vw - 40px);
+  align-items: center;
+}
+
+.fn-btn {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 20px;
+  font-size: .78rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: #9aa0b4;
+  background: transparent;
+  transition: .15s;
+  white-space: nowrap;
+}
+
+.fn-btn:hover {
+  color: #fff;
+}
+
+.fn-btn.on {
+  background: #ff6b35;
+  color: #fff;
+}
+
+.fn-sep {
+  width: 1px;
+  background: #ffffff20;
+  margin: 4px 0;
+  min-height: 16px;
+}
+
+.fn-grp-lbl {
+  font-size: .6rem;
+  font-weight: 700;
+  color: #ffffff60;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 0 6px;
+  white-space: nowrap;
+}

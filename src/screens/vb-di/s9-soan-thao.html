@@ -1,0 +1,60 @@
+<div class="screen" id="s9">
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb"><span>Văn bản Đi</span><span class="bc-sep">›</span><span class="cur">Soạn VB mới</span></div>
+      <div class="top-right"><div class="notif">🔔<div class="ndot"></div></div>
+      <div class="user-pill"><div class="uav">VT</div><div class="uname">Văn Thư</div></div></div>
+    </div>
+    <div class="work-area"><div class="form-pane">
+      <div class="form-card">
+        <div class="fc-title"><span>1</span> Thông tin văn bản</div>
+        <div class="form-row full"><div class="fg"><label>Tên văn bản <span class="req">*</span></label><input placeholder="Nhập tên văn bản..."></div></div>
+        <div class="form-row full"><div class="fg"><label>Trích yếu nội dung <span class="req">*</span></label><textarea placeholder="Tóm tắt nội dung chính của văn bản..."></textarea></div></div>
+        <div class="form-row tri">
+          <div class="fg"><label>Loại VB <span class="req">*</span></label><select><option>Công văn</option><option>Tờ trình</option><option>Quyết định</option><option>Thông báo</option><option>Báo cáo</option></select></div>
+          <div class="fg"><label>Mức khẩn</label><select><option>Thường</option><option>Khẩn</option><option>Thượng khẩn</option><option>Hỏa tốc</option></select></div>
+          <div class="fg"><label>Mức mật</label><select><option>Thường</option><option>Mật</option><option>Tối mật</option><option>Tuyệt mật</option></select></div>
+        </div>
+        <div class="form-row">
+          <div class="fg"><label>Sổ đi</label><select><option>Sổ VB Đi 2026 (hiện tại: 47)</option></select></div>
+          <div class="fg"><label>Hạn xử lý</label><input type="date"></div>
+        </div>
+        <div class="form-row">
+          <div class="fg"><label>Số ký hiệu</label><input class="auto" value="Tự động cấp khi ban hành" disabled></div>
+          <div class="fg"><label>Ngày ban hành</label><input class="auto" value="Tự động khi ban hành" disabled></div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="fc-title"><span>2</span> Tệp đính kèm</div>
+        <div class="fg" style="margin-bottom:10px"><label>Tệp chính <span class="req">*</span></label>
+          <div class="upload-area"><div class="ua-ico">📄</div><div class="ua-txt">Kéo thả hoặc click để tải lên tệp Word/PDF</div><div class="ua-hint">Hỗ trợ: .docx, .doc, .pdf — Tối đa 50MB</div></div>
+        </div>
+        <div class="fg"><label>Tệp đính kèm (phụ lục)</label>
+          <div class="upload-area" style="padding:16px"><div class="ua-txt" style="font-size:.82rem">+ Thêm tệp đính kèm</div></div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="fc-title"><span>3</span> Luồng duyệt nội dung</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;background:#eff6ff;border-radius:6px;padding:8px 10px">
+          <span style="font-size:.82rem;color:#1d4ed8">ℹ️ Duyệt SONG SONG — tất cả người duyệt nhận thông báo cùng lúc</span>
+        </div>
+        <div class="person-list">
+          <div class="person-item"><div class="pi-av orange">PG</div><div><div class="pi-name">Nguyễn Văn Phó GĐ</div><div class="pi-role">Phó Giám đốc · BGĐ</div></div><button style="margin-left:auto;background:none;border:none;color:#9aa0b4;cursor:pointer">✕</button></div>
+          <div class="person-item"><div class="pi-av">KH</div><div><div class="pi-name">Trần Thị Trưởng KHTH</div><div class="pi-role">Trưởng phòng · P. KHTH</div></div><button style="margin-left:auto;background:none;border:none;color:#9aa0b4;cursor:pointer">✕</button></div>
+        </div>
+        <button style="font-size:.82rem;color:var(--orange);background:none;border:1px dashed #fcd9c8;border-radius:6px;padding:6px 14px;cursor:pointer;width:100%">+ Thêm người duyệt</button>
+      </div>
+      <div class="form-card">
+        <div class="fc-title"><span>4</span> Người ký</div>
+        <div class="person-list">
+          <div class="person-item on"><div class="pi-av" style="background:#c2410c">GĐ</div><div><div class="pi-name">Lê Văn Giám Đốc</div><div class="pi-role">Giám đốc · BGĐ · Ký số USB Token</div></div><div class="pi-check">✓</div></div>
+        </div>
+      </div>
+    </div></div>
+    <div class="form-footer">
+      <button class="btn btn-ghost" onclick="goScreen('s8')">← Hủy</button>
+      <button class="btn btn-ghost">💾 Lưu nháp</button>
+      <button class="btn btn-primary" onclick="goScreen('s10')">Gửi duyệt →</button>
+    </div>
+  </div>
+</div>

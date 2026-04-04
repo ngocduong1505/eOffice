@@ -1,0 +1,48 @@
+<div class="screen" id="s14">
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb"><span>Văn phòng số</span><span class="bc-sep">›</span><span class="cur">Văn bản Nội bộ</span></div>
+      <div class="top-right"><div class="notif">🔔<div class="ndot"></div></div>
+      <div class="user-pill"><div class="uav">VT</div><div class="uname">Văn Thư</div></div></div>
+    </div>
+    <div class="stat-strip">
+      <div class="si on"><div class="si-num">2</div><div class="si-lbl">Đang soạn</div></div>
+      <div class="si"><div class="si-num" style="color:#c2410c">3</div><div class="si-lbl">Chờ duyệt/ký</div></div>
+      <div class="si"><div class="si-num" style="color:#1a7a45">28</div><div class="si-lbl">Đã ban hành</div></div>
+    </div>
+    <div class="fbar">
+      <div class="sw"><span class="sw-ico">🔍</span><input placeholder="Tìm văn bản nội bộ..."></div>
+      <select class="fsel"><option>Tất cả loại</option><option>Cần cấp số</option><option>Không cấp số</option></select>
+      <select class="fsel"><option>Tất cả trạng thái</option></select>
+      <button class="fbtn primary" onclick="goScreen('s15')">+ Tạo VB Nội bộ</button>
+    </div>
+    <div class="work-area"><div class="content-pane">
+      <div style="display:flex;border-bottom:1px solid var(--border);background:#fff;padding:0 20px;margin:-16px -20px 16px">
+        <div class="dptab on" style="padding:10px 16px">Cần cấp số (3)</div>
+        <div class="dptab" style="padding:10px 16px">Không cấp số (28)</div>
+      </div>
+      <table class="ltable">
+        <thead><tr>
+          <th style="width:32px"><input type="checkbox"></th>
+          <th>Văn bản</th><th>Số nội bộ</th><th>Loại</th><th>Người soạn</th><th>Phát hành cho</th><th>Trạng thái</th><th>Thao tác</th>
+        </tr></thead>
+        <tbody>
+          <tr><td><input type="checkbox"></td>
+            <td><div class="lt-doc"><div class="lt-thumb">📝<span class="lt-ext">DOC</span></div><div><div class="lt-name">Quy trình tiếp nhận bệnh nhân ngoại trú 2026</div><div class="lt-sub">P. KHTH · 27/03/2026</div></div></div></td>
+            <td style="font-size:.82rem;color:#9aa0b4;font-style:italic">Chưa cấp</td><td style="font-size:.82rem">Quy trình</td>
+            <td style="font-size:.82rem">BS. Nguyễn A</td><td style="font-size:.82rem">Tất cả khoa lâm sàng</td>
+            <td><span class="stag" style="background:#fefce8;color:#854d0e">Chờ duyệt</span></td>
+            <td><div class="row-act"><button class="ra ra-p">Xem</button></div></td>
+          </tr>
+          <tr><td><input type="checkbox"></td>
+            <td><div class="lt-doc"><div class="lt-thumb">📄<span class="lt-ext">PDF</span></div><div><div class="lt-name">Thông báo lịch trực Tết 2026</div><div class="lt-sub">P. HCNS · 15/01/2026</div></div></div></td>
+            <td style="font-size:.82rem;color:#9aa0b4;font-style:italic">Không cấp số</td><td style="font-size:.82rem">Thông báo</td>
+            <td style="font-size:.82rem">Trần B</td><td style="font-size:.82rem">Toàn bệnh viện</td>
+            <td><span class="stag st-done">Đã ban hành</span></td>
+            <td><div class="row-act"><button class="ra ra-g">Xem</button></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div></div>
+  </div>
+</div>

@@ -1,0 +1,114 @@
+<div class="screen" id="s5">
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb">
+        <span style="cursor:pointer" onclick="goScreen('s1')">Văn bản Đến</span><span class="bc-sep">›</span>
+        <span class="cur">45/CV-SYT · Đang xử lý</span>
+      </div>
+      <div class="top-right">
+        <div class="user-pill"><div class="uav" style="background:#1d4ed8">KH</div><div class="uname">Trưởng P.KHTH</div></div>
+      </div>
+    </div>
+    <div class="work-area">
+      <div class="content-pane" style="max-width:420px;min-width:320px;border-right:1px solid var(--border);padding:12px">
+        <div style="font-size:.75rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Danh sách</div>
+        <div style="background:#fef7f4;border:1px solid #fcd9c8;border-radius:8px;padding:10px 12px;cursor:pointer;border-left:3px solid var(--orange)">
+          <div style="font-size:.82rem;font-weight:600;color:var(--dark)">V/v báo cáo tình hình KCB</div>
+          <div style="font-size:.72rem;color:var(--text3);margin-top:2px">45/CV-SYT · #47 · <span class="stag st-process" style="font-size:.65rem">Đang xử lý</span></div>
+        </div>
+      </div>
+
+      <div class="detail-panel open" style="width:var(--panel-w);min-width:var(--panel-w)">
+        <div class="dp-head">
+          <div class="dp-head-row">
+            <div class="dp-title">V/v báo cáo tình hình thực hiện kế hoạch KCB quý I/2026</div>
+            <div class="dp-close" onclick="goScreen('s1')">✕</div>
+          </div>
+          <div class="dp-chips">
+            <span class="chip hot">🔴 Hỏa tốc</span>
+            <span class="chip process">🔄 Đang xử lý</span>
+            <span class="chip s">Đến #47</span>
+          </div>
+          <div class="deadline-warn">⚠️ Hạn xử lý: <strong>28/03/2026</strong> · còn 3 ngày</div>
+          <div class="dp-btns">
+            <button class="dp-btn primary" onclick="goScreen('s6')">✓ Hoàn thành xử lý</button>
+            <button class="dp-btn" onclick="goScreen('s4')">↪ Chuyển tiếp</button>
+            <button class="dp-btn">📎 Tải xuống</button>
+          </div>
+        </div>
+        <div class="dp-tabs">
+          <div class="dptab on" onclick="switchTab(this,'tp5-flow')">Luồng xử lý</div>
+          <div class="dptab" onclick="switchTab(this,'tp5-info')">Thông tin</div>
+          <div class="dptab" onclick="switchTab(this,'tp5-act')">Lịch sử</div>
+        </div>
+        <div class="dp-body">
+          <div id="tp5-flow" class="tab-pane on">
+            <div class="stamp-block">
+              <div class="stamp-title">🔴 Dấu Đến</div>
+              <div class="stamp-grid">
+                <div class="sg-item"><label>Số đến</label><div class="sv big">#47</div></div>
+                <div class="sg-item"><label>Ngày tiếp nhận</label><div class="sv">25/03/2026 08:15</div></div>
+              </div>
+            </div>
+
+            <div style="padding:0 2px">
+              <div class="flow-step">
+                <div class="fs-dot done">✓</div>
+                <div class="fs-info">
+                  <div class="fs-label">Tiếp nhận & Đóng dấu đến</div>
+                  <div class="fs-sub">Nguyễn Thị Văn Thư</div>
+                  <div class="fs-status fss-done">✓ Đã đóng dấu #47</div>
+                  <div class="fs-time">25/03 08:15</div>
+                </div>
+              </div>
+              <div class="flow-step">
+                <div class="fs-dot done">✓</div>
+                <div class="fs-info">
+                  <div class="fs-label">Giám đốc — Ý kiến chỉ đạo</div>
+                  <div class="fs-sub">Lê Văn Giám Đốc</div>
+                  <div class="fs-status fss-done">✓ Đã ghi chỉ đạo & giao P.KHTH</div>
+                  <div class="fs-time">25/03 09:45</div>
+                  <div class="fs-note">
+                    <div class="fs-note-label">Ý kiến chỉ đạo</div>
+                    Giao Phòng KHTH chủ trì, phối hợp P.TCKT tổng hợp số liệu và soạn thảo báo cáo gửi Sở Y tế trước 28/03/2026.
+                  </div>
+                </div>
+              </div>
+              <div class="flow-step">
+                <div class="fs-dot active">!</div>
+                <div class="fs-info">
+                  <div class="fs-label">P. Kế hoạch TH — Xử lý</div>
+                  <div class="fs-sub">Nguyễn Văn A · Trưởng phòng KHTH</div>
+                  <div class="fs-status fss-active">⏳ Đang xử lý · Hạn 28/03</div>
+                  <div class="fs-time">Nhận lúc 09:45</div>
+                </div>
+              </div>
+              <div class="flow-step">
+                <div class="fs-dot pending">✓</div>
+                <div class="fs-info">
+                  <div class="fs-label">Hoàn thành</div>
+                  <div class="fs-status fss-pend">— Chờ P.KHTH xử lý xong</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="tp5-info" class="tab-pane">
+            <div class="info-section">
+              <div class="is-title">Thông tin xử lý</div>
+              <div class="info-row"><div class="ir-l">Đơn vị chủ trì</div><div class="ir-v g">P. Kế hoạch TH</div></div>
+              <div class="info-row"><div class="ir-l">Đơn vị phối hợp</div><div class="ir-v">P. Tài chính KT</div></div>
+              <div class="info-row"><div class="ir-l">Hạn xử lý</div><div class="ir-v w">28/03/2026</div></div>
+              <div class="info-row"><div class="ir-l">Người giao</div><div class="ir-v">Lê Văn Giám Đốc</div></div>
+            </div>
+          </div>
+          <div id="tp5-act" class="tab-pane">
+            <div class="act-item"><div class="act-dot c">✓</div><div><div class="act-text"><strong>Văn Thư</strong> tiếp nhận, đóng dấu đến <strong>#47</strong></div><span class="act-time">25/03 08:15</span></div></div>
+            <div class="act-item"><div class="act-dot ok">✓</div><div><div class="act-text"><strong>Giám đốc</strong> ghi ý kiến chỉ đạo, giao <strong>P.KHTH</strong> xử lý</div><span class="act-time">25/03 09:45</span></div></div>
+            <div class="act-item"><div class="act-dot warn">!</div><div><div class="act-text">Thông báo đến <strong>Trưởng P.KHTH</strong> — văn bản Hỏa tốc</div><span class="act-time">25/03 09:45</span></div></div>
+            <div class="act-item"><div class="act-dot">👁</div><div><div class="act-text"><strong>Trưởng P.KHTH</strong> đã xem văn bản</div><span class="act-time">25/03 10:02</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

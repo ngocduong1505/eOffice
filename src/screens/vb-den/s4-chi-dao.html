@@ -1,0 +1,106 @@
+<div class="screen" id="s4">
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb">
+        <span style="cursor:pointer" onclick="goScreen('s1')">Văn bản Đến</span><span class="bc-sep">›</span>
+        <span style="cursor:pointer" onclick="goScreen('s3')">45/CV-SYT</span><span class="bc-sep">›</span>
+        <span class="cur">Ghi ý kiến chỉ đạo</span>
+      </div>
+      <div class="top-right">
+        <div class="user-pill"><div class="uav" style="background:#c2410c">GĐ</div><div class="uname">Giám đốc</div></div>
+      </div>
+    </div>
+    <div class="work-area">
+      <div class="content-pane" style="max-width:640px">
+
+        <!-- Document header card -->
+        <div class="form-card" style="border-left:3px solid #b91c1c;padding:14px 18px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <div style="font-size:1.4rem">📄</div>
+            <div>
+              <div style="font-size:.88rem;font-weight:700;color:var(--dark)">V/v báo cáo tình hình thực hiện kế hoạch KCB quý I/2026</div>
+              <div style="font-size:.75rem;color:var(--text3);margin-top:2px">45/CV-SYT · Sở Y tế TP.HCM · 24/03/2026 · Đến <strong style="color:#b91c1c">#47</strong></div>
+            </div>
+            <span class="urg urg-hot" style="margin-left:auto">Hỏa tốc</span>
+          </div>
+          <div style="font-size:.82rem;color:#5a6279;background:#f7f8fb;padding:8px 10px;border-radius:6px">
+            📎 45_CV_SYT_KHCB_2026.pdf · <span style="color:var(--orange);cursor:pointer">Xem toàn màn hình</span>
+          </div>
+        </div>
+
+        <!-- Ý kiến chỉ đạo -->
+        <div class="form-card">
+          <div class="fc-title"><span>1</span> Ý kiến chỉ đạo</div>
+          <div class="directive-box">
+            <div class="dir-title">✏️ Ý kiến của Giám đốc</div>
+            <textarea class="dir-ta" placeholder="Nhập ý kiến chỉ đạo giải quyết...">Giao Phòng Kế hoạch Tổng hợp chủ trì, phối hợp với Phòng Tài chính Kế toán tổng hợp số liệu và soạn thảo báo cáo gửi Sở Y tế trước ngày 28/03/2026. Báo cáo cần đầy đủ các chỉ số theo mẫu hướng dẫn của Sở.</textarea>
+          </div>
+        </div>
+
+        <!-- Thiết lập chuyển xử lý -->
+        <div class="form-card">
+          <div class="fc-title"><span>2</span> Giao xử lý</div>
+
+          <div style="margin-bottom:14px">
+            <div class="routing-type">
+              <div class="rt-opt on">
+                <div class="rt-ico">🏢</div>
+                <div class="rt-lbl">Chọn phòng ban</div>
+                <div class="rt-sub">Trưởng phòng phân công</div>
+              </div>
+              <div class="rt-opt">
+                <div class="rt-ico">👤</div>
+                <div class="rt-lbl">Chọn người cụ thể</div>
+                <div class="rt-sub">Giao trực tiếp</div>
+              </div>
+              <div class="rt-opt">
+                <div class="rt-ico">👥</div>
+                <div class="rt-lbl">Nhiều đơn vị</div>
+                <div class="rt-sub">Phối hợp xử lý</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-bottom:12px">
+            <div style="font-size:.75rem;font-weight:600;color:var(--text2);margin-bottom:6px">Đơn vị chủ trì <span style="color:var(--orange)">*</span></div>
+            <div class="person-list">
+              <div class="person-item on">
+                <div class="pi-av orange">KH</div>
+                <div><div class="pi-name">Phòng Kế hoạch Tổng hợp</div><div class="pi-role">5 thành viên · Trưởng phòng: Nguyễn Văn A</div></div>
+                <div class="pi-check">✓</div>
+              </div>
+              <div class="person-item">
+                <div class="pi-av">TC</div>
+                <div><div class="pi-name">Phòng Tài chính Kế toán</div><div class="pi-role">4 thành viên · Trưởng phòng: Trần Thị B</div></div>
+                <div class="pi-check">✓</div>
+              </div>
+              <div class="person-item">
+                <div class="pi-av">HC</div>
+                <div><div class="pi-name">Phòng Hành chính Nhân sự</div><div class="pi-role">3 thành viên</div></div>
+                <div class="pi-check">✓</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="fg">
+              <label>Đơn vị phối hợp</label>
+              <select><option>Phòng Tài chính Kế toán</option><option>Phòng CNTT</option></select>
+            </div>
+            <div class="fg">
+              <label>Hạn xử lý <span class="req">*</span></label>
+              <input type="date" value="2026-03-28">
+              <div class="hint" style="color:#b91c1c">⚠️ Văn bản Hỏa tốc — hạn ngắn</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="form-footer">
+      <button class="btn btn-ghost" onclick="goScreen('s3')">← Quay lại</button>
+      <button class="btn btn-ghost">Lưu nháp</button>
+      <button class="btn btn-primary" onclick="goScreen('s5')">Lưu & Giao xử lý →</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,51 @@
+<div class="screen" id="s15">
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb"><span>Văn bản Nội bộ</span><span class="bc-sep">›</span><span class="cur">Tạo mới</span></div>
+      <div class="top-right"><div class="notif">🔔<div class="ndot"></div></div>
+      <div class="user-pill"><div class="uav">VT</div><div class="uname">Văn Thư</div></div></div>
+    </div>
+    <div class="work-area"><div class="form-pane" style="max-width:640px">
+      <div class="form-card">
+        <div class="fc-title"><span>1</span> Chọn loại luồng</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div style="border:2px solid var(--orange);border-radius:10px;padding:16px;cursor:pointer;background:#fef7f4">
+            <div style="font-size:1.4rem;margin-bottom:6px">📋</div>
+            <div style="font-weight:700;color:var(--dark);margin-bottom:4px">Có cấp số nội bộ</div>
+            <div style="font-size:.78rem;color:var(--text3)">Có duyệt, có ký, có đóng dấu và cấp số nội bộ. Phù hợp: quy trình, quy định, quyết định nội bộ.</div>
+          </div>
+          <div style="border:2px solid var(--border);border-radius:10px;padding:16px;cursor:pointer">
+            <div style="font-size:1.4rem;margin-bottom:6px">📢</div>
+            <div style="font-weight:700;color:var(--dark);margin-bottom:4px">Phát hành trực tiếp</div>
+            <div style="font-size:.78rem;color:var(--text3)">Soạn xong gửi ngay, không qua duyệt/ký. Phù hợp: thông báo, biên bản họp, tài liệu hướng dẫn.</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="fc-title"><span>2</span> Thông tin văn bản</div>
+        <div class="form-row full"><div class="fg"><label>Tên văn bản <span class="req">*</span></label><input placeholder="Nhập tên văn bản nội bộ..."></div></div>
+        <div class="form-row full"><div class="fg"><label>Trích yếu</label><textarea placeholder="Tóm tắt nội dung..."></textarea></div></div>
+        <div class="form-row">
+          <div class="fg"><label>Loại VB</label><select><option>Thông báo</option><option>Biên bản</option><option>Quy trình</option><option>Quyết định NB</option></select></div>
+          <div class="fg"><label>Mức khẩn</label><select><option>Thường</option><option>Khẩn</option></select></div>
+        </div>
+        <div class="fg" style="margin-bottom:12px"><label>Tệp văn bản <span class="req">*</span></label>
+          <div class="upload-area"><div class="ua-ico">📄</div><div class="ua-txt">Kéo thả hoặc click để tải lên</div></div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="fc-title"><span>3</span> Gửi đến</div>
+        <div class="form-row">
+          <div class="fg"><label>Phạm vi phát hành <span class="req">*</span></label>
+            <select><option>Chọn phòng ban / cá nhân...</option><option>Toàn bệnh viện</option><option>P. Kế hoạch TH</option><option>Tất cả khoa lâm sàng</option></select></div>
+          <div class="fg"><label>Thêm tag (tùy chọn)</label><input placeholder="VD: họp, thông báo-tết..."></div>
+        </div>
+      </div>
+    </div></div>
+    <div class="form-footer">
+      <button class="btn btn-ghost" onclick="goScreen('s14')">← Hủy</button>
+      <button class="btn btn-ghost">💾 Lưu nháp</button>
+      <button class="btn btn-primary" onclick="goScreen('s14')">📢 Ban hành ngay</button>
+    </div>
+  </div>
+</div>

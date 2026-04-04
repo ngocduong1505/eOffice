@@ -1,0 +1,97 @@
+<!--
+  sidebar.html — Component Snippet: Sidebar
+  eOffice Prototype
+
+  Mỗi nav item có id="si-{screenId}" để app.js có thể
+  cập nhật class .on khi goScreen() được gọi.
+  Các item có class .ni-parent mở/đóng nhóm con (collapse).
+-->
+<div class="sidebar">
+  <div class="logo-row">
+    <div class="logo-box">E</div>
+    <div class="logo-t">Easy<span>Docs</span></div>
+  </div>
+  <button class="new-btn" onclick="goScreen('s2')">+ Tiếp nhận văn bản</button>
+
+  <!-- ── VĂN PHÒNG SỐ ── -->
+  <div class="nav-g">
+    <div class="nav-sec">Văn phòng số</div>
+
+    <!-- Văn bản Đến -->
+    <div class="ni sub on" id="si-vb-den" onclick="toggleNavGroup('vb-den', 's1')">
+      📥 Văn bản Đến <span class="nbg u" id="badge-den">8</span>
+      <span class="ni-arrow">▾</span>
+    </div>
+    <div class="ni-children" id="children-vb-den">
+      <div class="ni sub-2" id="si-s1" onclick="goScreen('s1')">Danh sách</div>
+      <div class="ni sub-2" id="si-s2" onclick="goScreen('s2')">Tiếp nhận</div>
+      <div class="ni sub-2" id="si-s3" onclick="goScreen('s3')">Chờ chỉ đạo</div>
+      <div class="ni sub-2" id="si-s4" onclick="goScreen('s4')">BGĐ chỉ đạo</div>
+      <div class="ni sub-2" id="si-s7" onclick="goScreen('s7')">Thiết lập luồng</div>
+      <div class="ni sub-2" id="si-s5" onclick="goScreen('s5')">Đang xử lý</div>
+      <div class="ni sub-2" id="si-s6" onclick="goScreen('s6')">Hoàn thành</div>
+    </div>
+
+    <!-- Văn bản Đi -->
+    <div class="ni sub" id="si-vb-di" onclick="toggleNavGroup('vb-di', 's8')">
+      📤 Văn bản Đi
+      <span class="ni-arrow">▾</span>
+    </div>
+    <div class="ni-children collapsed" id="children-vb-di">
+      <div class="ni sub-2" id="si-s8"  onclick="goScreen('s8')">Danh sách</div>
+      <div class="ni sub-2" id="si-s9"  onclick="goScreen('s9')">Soạn thảo</div>
+      <div class="ni sub-2" id="si-s10" onclick="goScreen('s10')">Duyệt song song</div>
+      <div class="ni sub-2" id="si-s11" onclick="goScreen('s11')">GĐ ký số</div>
+      <div class="ni sub-2" id="si-s12" onclick="goScreen('s12')">Cấp số & Ban hành</div>
+      <div class="ni sub-2" id="si-s13" onclick="goScreen('s13')">Đã ban hành</div>
+    </div>
+
+    <!-- Văn bản Nội bộ -->
+    <div class="ni sub" id="si-noi-bo" onclick="toggleNavGroup('noi-bo', 's14')">
+      📋 Văn bản Nội bộ
+      <span class="ni-arrow">▾</span>
+    </div>
+    <div class="ni-children collapsed" id="children-noi-bo">
+      <div class="ni sub-2" id="si-s14" onclick="goScreen('s14')">Danh sách</div>
+      <div class="ni sub-2" id="si-s15" onclick="goScreen('s15')">Tạo mới</div>
+    </div>
+
+    <!-- Hồ sơ lưu trữ -->
+    <div class="ni sub" id="si-ho-so" onclick="toggleNavGroup('ho-so', 's16')">
+      🗂 Hồ sơ lưu trữ
+      <span class="ni-arrow">▾</span>
+    </div>
+    <div class="ni-children collapsed" id="children-ho-so">
+      <div class="ni sub-2" id="si-s16" onclick="goScreen('s16')">Danh sách</div>
+      <div class="ni sub-2" id="si-s17" onclick="goScreen('s17')">Tạo hồ sơ</div>
+      <div class="ni sub-2" id="si-s18" onclick="goScreen('s18')">Chi tiết</div>
+      <div class="ni sub-2" id="si-s19" onclick="goScreen('s19')">Nộp lưu</div>
+    </div>
+
+    <!-- Sổ đăng ký & Báo cáo -->
+    <div class="ni sub" id="si-so-bc" onclick="toggleNavGroup('so-bc', 's20')">
+      📒 Sổ & Báo cáo
+      <span class="ni-arrow">▾</span>
+    </div>
+    <div class="ni-children collapsed" id="children-so-bc">
+      <div class="ni sub-2" id="si-s20" onclick="goScreen('s20')">Sổ đăng ký</div>
+      <div class="ni sub-2" id="si-s21" onclick="goScreen('s21')">Cấu hình sổ</div>
+      <div class="ni sub-2" id="si-s22" onclick="goScreen('s22')">Báo cáo</div>
+    </div>
+  </div>
+
+  <!-- ── TÀI LIỆU ── -->
+  <div class="nav-g">
+    <div class="nav-sec">Tài liệu</div>
+    <div class="ni">📄 Tài liệu của tôi</div>
+    <div class="ni">✉️ Chờ tôi ký <span class="nbg u">12</span></div>
+    <div class="ni">✅ Đã gửi</div>
+  </div>
+
+  <!-- ── HỆ THỐNG ── -->
+  <div class="nav-g">
+    <div class="nav-sec">Hệ thống</div>
+    <div class="ni">🏢 Đơn vị</div>
+    <div class="ni">⚙️ Cấu hình</div>
+  </div>
+</div>

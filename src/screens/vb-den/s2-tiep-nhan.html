@@ -1,0 +1,169 @@
+<div class="screen" id="s2">
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb">
+        <span>Văn phòng số</span><span class="bc-sep">›</span>
+        <span style="cursor:pointer;color:var(--text3)" onclick="goScreen('s1')">Văn bản Đến</span>
+        <span class="bc-sep">›</span>
+        <span class="cur">Tiếp nhận văn bản mới</span>
+      </div>
+      <div class="top-right">
+        <div class="notif">🔔<div class="ndot"></div></div>
+        <div class="user-pill"><div class="uav">VT</div><div class="uname">Văn Thư</div></div>
+      </div>
+    </div>
+    <div class="receive-layout">
+      <div class="form-pane">
+
+        <!-- Stepper -->
+        <div style="display:flex;align-items:center;margin-bottom:20px;gap:6px">
+          <div class="stepper">
+            <div class="step-item active"><div class="step-num">1</div> Thông tin văn bản</div>
+            <span class="step-arrow">›</span>
+            <div class="step-item"><div class="step-num">2</div> Đóng dấu đến</div>
+            <span class="step-arrow">›</span>
+            <div class="step-item"><div class="step-num">3</div> Thiết lập xử lý</div>
+          </div>
+        </div>
+
+        <!-- Upload file -->
+        <div class="form-card">
+          <div class="fc-title"><span>1</span> Tải lên văn bản</div>
+          <div class="upload-file-show">
+            <div class="ufs-ico">📄</div>
+            <div>
+              <div class="ufs-name">45_CV_SYT_KHCB_2026.pdf</div>
+              <div class="ufs-size">PDF · 2.4 MB · Đã tải lên</div>
+            </div>
+            <div class="ufs-del">✕</div>
+          </div>
+        </div>
+
+        <!-- Thông tin văn bản gốc -->
+        <div class="form-card">
+          <div class="fc-title"><span>2</span> Thông tin văn bản gốc</div>
+          <div class="form-row">
+            <div class="fg">
+              <label>Loại văn bản <span class="req">*</span></label>
+              <select><option>Công văn</option><option>Quyết định</option><option>Thông báo</option><option>Chỉ thị</option></select>
+            </div>
+            <div class="fg">
+              <label>Số ký hiệu gốc <span class="req">*</span></label>
+              <input type="text" value="45/CV-SYT" placeholder="VD: 45/CV-SYT">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="fg">
+              <label>Nơi gửi <span class="req">*</span></label>
+              <input type="text" value="Sở Y tế TP.HCM">
+            </div>
+            <div class="fg">
+              <label>Ngày ban hành gốc <span class="req">*</span></label>
+              <input type="date" value="2026-03-24">
+            </div>
+          </div>
+          <div class="form-row full">
+            <div class="fg">
+              <label>Trích yếu nội dung <span class="req">*</span></label>
+              <textarea>V/v báo cáo tình hình thực hiện kế hoạch khám chữa bệnh quý I/2026</textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dấu đến & Phân loại -->
+        <div class="form-card">
+          <div class="fc-title"><span>3</span> Đóng dấu đến & Phân loại</div>
+          <div class="form-row tri">
+            <div class="fg">
+              <label>Số đến (tự động)</label>
+              <input class="auto" value="#47" readonly>
+              <div class="hint">Tự động cấp liên tiếp trong năm</div>
+            </div>
+            <div class="fg">
+              <label>Ngày giờ tiếp nhận</label>
+              <input class="auto" value="25/03/2026 08:15" readonly>
+            </div>
+            <div class="fg">
+              <label>Người tiếp nhận</label>
+              <input class="auto" value="Nguyễn Thị Văn Thư" readonly>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="fg">
+              <label>Mức độ khẩn <span class="req">*</span></label>
+              <select>
+                <option>🔴 Hỏa tốc — xử lý ngay</option>
+                <option>🟠 Thượng khẩn — trong ngày</option>
+                <option>🟡 Khẩn — trong 2 ngày</option>
+                <option selected>⚪ Thường — trong 5 ngày</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label>Phân loại bảo mật</label>
+              <select><option selected>Thường (không mật)</option><option>Mật</option><option>Tối mật</option></select>
+            </div>
+          </div>
+          <!-- Stamp preview -->
+          <div style="margin-top:4px">
+            <div class="stamp-preview">
+              <div class="sp-title">Dấu đến sẽ được tạo</div>
+              <div class="sp-stamp">
+                <div class="sp-org">Bệnh viện XYZ</div>
+                <div class="sp-den">ĐẾN</div>
+                <div class="sp-num">47</div>
+                <div class="sp-date">Ngày 25/03/2026 lúc 08:15</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Thiết lập xử lý -->
+        <div class="form-card">
+          <div class="fc-title"><span>4</span> Thiết lập luồng xử lý</div>
+          <div class="form-row">
+            <div class="fg">
+              <label>Đơn vị chủ trì <span class="req">*</span></label>
+              <select><option>BGĐ — Chỉ đạo trước</option><option>P. Kế hoạch TH</option><option>P. Tài chính KT</option></select>
+            </div>
+            <div class="fg">
+              <label>Hạn xử lý <span class="req">*</span></label>
+              <input type="date" value="2026-03-28">
+            </div>
+          </div>
+          <div class="form-row full">
+            <div class="fg">
+              <label>Ghi chú tiếp nhận</label>
+              <textarea placeholder="Ghi chú nội bộ khi tiếp nhận..."></textarea>
+            </div>
+          </div>
+          <!-- Luồng xử lý preview -->
+          <div style="background:#f7f8fb;border:1px solid var(--border);border-radius:8px;padding:12px;margin-top:4px">
+            <div style="font-size:.72rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Luồng xử lý sẽ được tạo</div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+                <div style="width:36px;height:36px;border-radius:50%;background:#fef0eb;border:2px solid #fcd9c8;display:flex;align-items:center;justify-content:center;font-size:.8rem">👤</div>
+                <div style="font-size:.7rem;color:#c2410c;font-weight:600;text-align:center;max-width:64px">BGĐ<br>Chỉ đạo</div>
+              </div>
+              <div style="color:#d0d4e0;font-size:1.2rem">→</div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+                <div style="width:36px;height:36px;border-radius:50%;background:#f0f1f4;border:2px dashed #d0d4e0;display:flex;align-items:center;justify-content:center;font-size:.8rem">?</div>
+                <div style="font-size:.7rem;color:var(--text3);text-align:center;max-width:64px">BGĐ chọn<br>khi chỉ đạo</div>
+              </div>
+              <div style="color:#d0d4e0;font-size:1.2rem">→</div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+                <div style="width:36px;height:36px;border-radius:50%;background:#f0f1f4;border:2px dashed #d0d4e0;display:flex;align-items:center;justify-content:center;font-size:.8rem">?</div>
+                <div style="font-size:.7rem;color:var(--text3);text-align:center;max-width:64px">Xử lý nội<br>bộ</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="form-footer">
+      <button class="btn btn-ghost" onclick="goScreen('s1')">Hủy</button>
+      <button class="btn btn-ghost">Lưu nháp</button>
+      <button class="btn btn-primary" onclick="goScreen('s3')">Lưu & Đóng dấu đến →</button>
+    </div>
+  </div>
+</div>

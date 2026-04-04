@@ -1,0 +1,65 @@
+<div class="screen" id="s16">
+  <div class="cw">
+    <div class="topbar">
+      <div class="breadcrumb"><span>Văn phòng số</span><span class="bc-sep">›</span><span class="cur">Hồ sơ lưu trữ</span></div>
+      <div class="top-right"><div class="notif">🔔<div class="ndot"></div></div>
+      <div class="user-pill"><div class="uav">KH</div><div class="uname">Trưởng P.KHTH</div></div></div>
+    </div>
+    <div class="stat-strip">
+      <div class="si on"><div class="si-num">5</div><div class="si-lbl">Đang lập</div></div>
+      <div class="si"><div class="si-num" style="color:#854d0e">3</div><div class="si-lbl">Chờ nộp lưu</div></div>
+      <div class="si"><div class="si-num" style="color:#1a7a45">42</div><div class="si-lbl">Đang bảo quản</div></div>
+      <div class="si"><div class="si-num" style="color:#b91c1c">2</div><div class="si-lbl">Sắp hết hạn</div></div>
+    </div>
+    <div class="fbar">
+      <div class="sw"><span class="sw-ico">🔍</span><input placeholder="Tìm tên hồ sơ, mã hồ sơ..."></div>
+      <select class="fsel"><option>Năm 2026</option><option>Năm 2025</option></select>
+      <select class="fsel"><option>Tất cả loại hồ sơ</option><option>Hồ sơ công việc</option><option>Hồ sơ dự án</option><option>Hồ sơ nhân sự</option></select>
+      <select class="fsel"><option>Tất cả trạng thái</option><option>Đang lập</option><option>Chờ nộp lưu</option><option>Đang bảo quản</option></select>
+      <button class="fbtn primary" onclick="goScreen('s17')">+ Lập hồ sơ mới</button>
+    </div>
+    <div class="work-area"><div class="content-pane">
+      <table class="ltable">
+        <thead><tr>
+          <th style="width:32px"><input type="checkbox"></th>
+          <th>Hồ sơ</th><th>Mã hồ sơ</th><th>Loại</th><th>Số VB</th><th>Thời hạn BQ</th><th>Trạng thái</th><th>Thao tác</th>
+        </tr></thead>
+        <tbody>
+          <tr onclick="goScreen('s18')"><td><input type="checkbox"></td>
+            <td><div class="lt-doc"><div class="lt-thumb">📂<span class="lt-ext" style="background:#1d4ed8">HS</span></div><div>
+              <div class="lt-name">Hồ sơ báo cáo KCB quý I/2026</div>
+              <div class="lt-sub">Lập bởi Nguyễn Văn A · P. KHTH · 27/03/2026</div></div></div></td>
+            <td style="font-family:monospace;font-size:.82rem;font-weight:700">BV-2026-047</td>
+            <td style="font-size:.82rem">Hồ sơ công việc</td>
+            <td style="font-size:.88rem;font-weight:700;color:#1d4ed8">3</td>
+            <td style="font-size:.82rem">10 năm</td>
+            <td><span class="stag st-process">Đang lập</span></td>
+            <td><div class="row-act"><button class="ra ra-p" onclick="goScreen('s18')">Xem</button></div></td>
+          </tr>
+          <tr><td><input type="checkbox"></td>
+            <td><div class="lt-doc"><div class="lt-thumb">📂<span class="lt-ext" style="background:#1a7a45">HS</span></div><div>
+              <div class="lt-name">Hồ sơ phòng chống dịch mùa hè 2026</div>
+              <div class="lt-sub">Lập bởi BS. Trần C · P. KHTH · 15/03/2026</div></div></div></td>
+            <td style="font-family:monospace;font-size:.82rem;font-weight:700">BV-2026-032</td>
+            <td style="font-size:.82rem">Hồ sơ dự án</td>
+            <td style="font-size:.88rem;font-weight:700">7</td>
+            <td style="font-size:.82rem">Vĩnh viễn</td>
+            <td><span class="stag" style="background:#fffbeb;color:#92400e">Chờ nộp lưu</span></td>
+            <td><div class="row-act"><button class="ra ra-p">Xem</button><button class="ra ra-m">···</button></div></td>
+          </tr>
+          <tr><td><input type="checkbox"></td>
+            <td><div class="lt-doc"><div class="lt-thumb">📂<span class="lt-ext" style="background:#6b7280">HS</span></div><div>
+              <div class="lt-name">Hồ sơ kiểm tra BHYT tháng 3/2026</div>
+              <div class="lt-sub">Lập bởi Lê D · P. TCKT · 10/03/2026</div></div></div></td>
+            <td style="font-family:monospace;font-size:.82rem;font-weight:700">BV-2026-028</td>
+            <td style="font-size:.82rem">Hồ sơ thanh tra</td>
+            <td style="font-size:.88rem;font-weight:700">5</td>
+            <td style="font-size:.82rem;color:#b91c1c">5 năm ⚠️</td>
+            <td><span class="stag st-done">Đang bảo quản</span></td>
+            <td><div class="row-act"><button class="ra ra-g">Xem</button></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div></div>
+  </div>
+</div>
