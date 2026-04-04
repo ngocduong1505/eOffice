@@ -2,20 +2,20 @@ import React, { createContext, useContext, useState, useCallback } from 'react'
 
 // Map each screen ID to its sidebar group key
 const SCREEN_GROUP: Record<string, string> = {
-  s1: 'vb-den', s2: 'vb-den', s3: 'vb-den', s4: 'vb-den',
-  s5: 'vb-den', s6: 'vb-den', s7: 'vb-den',
-  s8: 'vb-di',  s9: 'vb-di',  s10: 'vb-di', s11: 'vb-di',
+  s1: 'vb-den', s2: 'vb-den', s3: 'vb-den', s7: 'vb-den',
+  s8: 'vb-di', s9: 'vb-di', s10: 'vb-di', s11: 'vb-di',
   s12: 'vb-di', s13: 'vb-di',
   s14: 'noi-bo', s15: 'noi-bo',
-  s16: 'ho-so',  s17: 'ho-so', s18: 'ho-so', s19: 'ho-so',
-  s20: 'so-bc',  s21: 'so-bc', s22: 'so-bc',
+  s16: 'ho-so', s17: 'ho-so', s18: 'ho-so', s19: 'ho-so',
+  s20: 'so-bc', s21: 'so-bc', s22: 'so-bc',
 }
 
 interface NavigationContextType {
   currentScreen: string
   currentGroup: string
   openGroups: Set<string>
-  goScreen: (id: string) => void
+  screenParams: Record<string, unknown>
+  goScreen: (id: string, params?: Record<string, unknown>) => void
   toggleNavGroup: (group: string, defaultScreen: string) => void
   openNavGroup: (group: string) => void
 }
@@ -25,6 +25,7 @@ const NavigationContext = createContext<NavigationContextType | null>(null)
 export function NavigationProvider({ children }: { children: React.ReactNode }) {
   const [currentScreen, setCurrentScreen] = useState('s1')
   const [openGroups, setOpenGroups] = useState<Set<string>>(new Set(['vb-den']))
+  const [screenParams, setScreenParams] = useState<Record<string, unknown>>({})
 
   const currentGroup = SCREEN_GROUP[currentScreen] ?? ''
 
@@ -32,8 +33,9 @@ export function NavigationProvider({ children }: { children: React.ReactNode }) 
     setOpenGroups(new Set([group]))
   }, [])
 
-  const goScreen = useCallback((id: string) => {
+  const goScreen = useCallback((id: string, params?: Record<string, unknown>) => {
     setCurrentScreen(id)
+    setScreenParams(params ?? {})
     const group = SCREEN_GROUP[id]
     if (group) {
       openNavGroup(group)
@@ -58,6 +60,7 @@ export function NavigationProvider({ children }: { children: React.ReactNode }) 
       currentScreen,
       currentGroup,
       openGroups,
+      screenParams,
       goScreen,
       toggleNavGroup,
       openNavGroup,

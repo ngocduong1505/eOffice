@@ -1,5 +1,5 @@
 import { useNavigation } from '@/hooks/useNavigation'
-
+import logo from "../assets/logo_EasyDocs.png";
 interface SidebarNavItem {
   id: string
   label: string
@@ -21,20 +21,17 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
     defaultScreen: 's1',
     items: [
       { id: 's1', label: 'Danh sách' },
-      { id: 's2', label: 'Tiếp nhận' },
-      { id: 's3', label: 'Chờ chỉ đạo' },
-      { id: 's4', label: 'BGĐ chỉ đạo' },
+      { id: 's2', label: 'Tiếp nhận (Tạo văn bản)' },
+      { id: 's3', label: 'Chi tiết' },
       { id: 's7', label: 'Thiết lập luồng' },
-      { id: 's5', label: 'Đang xử lý' },
-      { id: 's6', label: 'Hoàn thành' },
     ],
   },
   {
     key: 'vb-di', icon: '📤', label: 'Văn bản Đi',
     defaultScreen: 's8',
     items: [
-      { id: 's8',  label: 'Danh sách' },
-      { id: 's9',  label: 'Soạn thảo' },
+      { id: 's8', label: 'Danh sách' },
+      { id: 's9', label: 'Soạn thảo' },
       { id: 's10', label: 'Duyệt song song' },
       { id: 's11', label: 'GĐ ký số' },
       { id: 's12', label: 'Cấp số & Ban hành' },
@@ -77,8 +74,7 @@ export default function Sidebar() {
     <div className="sidebar">
       {/* Logo */}
       <div className="logo-row">
-        <div className="logo-box">E</div>
-        <div className="logo-t">Easy<span>Docs</span></div>
+        <img src={logo} alt="Logo" />
       </div>
 
       <button className="new-btn" onClick={() => goScreen('s2')}>

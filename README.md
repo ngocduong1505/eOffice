@@ -3,9 +3,10 @@
 ## Cách chạy
 
 ```bash
-cd d:\eOffice\src
-python -m http.server 8000
-# Mở: http://localhost:8000/index.html
+cd d:\eOffice\react-app
+npm install
+npm run dev
+# Mở: http://localhost:5173
 ```
 
 > ⚠️ **Lưu ý:** Dynamic fetch yêu cầu chạy qua HTTP server (không dùng double-click `file://`).
