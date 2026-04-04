@@ -4,7 +4,7 @@ import { useNavigation } from '@/hooks/useNavigation'
 // Screens – vb-den
 import S1DanhSach from '@/screens/vb-den/S1DanhSach'
 import S2TiepNhan from '@/screens/vb-den/S2TaoVbDen'
-import S3ChiTiet from '@/screens/vb-den/S3ChiTiet'
+import S3ChiTiet from '@/screens/vb-den/chi-tiet/S3ChiTiet'
 import S7ThietLapLuong from '@/screens/mau_luong/S7ThietLapLuong'
 // vb-di
 import S8DanhSach from '@/screens/vb-di/S8DanhSach'

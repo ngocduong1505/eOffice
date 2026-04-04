@@ -2,7 +2,8 @@ import { useState } from 'react'
 import Topbar from '@/components/Topbar'
 import { useNavigation } from '@/hooks/useNavigation'
 
-type VbStatus = 'cho-chi-dao' | 'cho-dieu-phoi' | 'cho-xu-ly' | 'dang-xu-ly' | 'hoan-thanh' | 'qua-han'
+type VbStatus = 'nhap' | 'cho-chi-dao' | 'cho-dieu-phoi' | 'cho-xu-ly' | 'hoan-thanh' | 'qua-han'
+type MucDo = 'hoa-toc' | 'khan' | 'thuong'
 
 interface VanBan {
   id: number
@@ -13,27 +14,70 @@ interface VanBan {
   ngayDen: string
   hanXuLy: string
   donViBanHanh: string
+  mucDo: MucDo
   status: VbStatus
   isOverdue?: boolean
 }
 
 const DATA: VanBan[] = [
-  { id: 47, soKyHieu: '45/CV-SYT', trichYeu: 'V/v báo cáo tình hình thực hiện kế hoạch KCB quý I/2026', loaiVB: 'Công văn', ngayVB: '24/03/2026', ngayDen: '25/03/2026 08:15', hanXuLy: '28/03/2026', donViBanHanh: 'Sở Y tế TP.HCM', status: 'cho-chi-dao', isOverdue: true },
-  { id: 46, soKyHieu: '12/TB-BHXH', trichYeu: 'Thông báo lịch kiểm tra công tác BHYT năm 2026', loaiVB: 'Thông báo', ngayVB: '23/03/2026', ngayDen: '23/03/2026 14:00', hanXuLy: '25/03/2026', donViBanHanh: 'BHXH TP.HCM', status: 'cho-dieu-phoi', isOverdue: true },
-  { id: 45, soKyHieu: '08/KH-STTTT', trichYeu: 'Kế hoạch triển khai hệ thống HIS giai đoạn 2', loaiVB: 'Kế hoạch', ngayVB: '22/03/2026', ngayDen: '22/03/2026 09:30', hanXuLy: '01/04/2026', donViBanHanh: 'Sở TT&TT', status: 'cho-xu-ly' },
-  { id: 44, soKyHieu: '156/QĐ-BYT', trichYeu: 'Quyết định về việc điều chỉnh định mức thuốc', loaiVB: 'Quyết định', ngayVB: '20/03/2026', ngayDen: '21/03/2026 10:00', hanXuLy: '10/04/2026', donViBanHanh: 'Bộ Y tế', status: 'hoan-thanh' },
-  { id: 43, soKyHieu: '89/CV-CDC', trichYeu: 'Công văn hướng dẫn phòng chống dịch mùa hè 2026', loaiVB: 'Công văn', ngayVB: '18/03/2026', ngayDen: '19/03/2026 15:45', hanXuLy: '20/03/2026', donViBanHanh: 'CDC TP.HCM', status: 'qua-han', isOverdue: true },
+  { id: 47, soKyHieu: '45/CV-SYT', trichYeu: 'V/v báo cáo tình hình thực hiện kế hoạch KCB quý I/2026', loaiVB: 'Công văn', ngayVB: '24/03/2026', ngayDen: '25/03/2026 08:15', hanXuLy: '28/03/2026', donViBanHanh: 'Sở Y tế TP.HCM', mucDo: 'hoa-toc', status: 'cho-chi-dao', isOverdue: true },
+  { id: 46, soKyHieu: '12/TB-BHXH', trichYeu: 'Thông báo lịch kiểm tra công tác BHYT năm 2026', loaiVB: 'Thông báo', ngayVB: '23/03/2026', ngayDen: '23/03/2026 14:00', hanXuLy: '25/03/2026', donViBanHanh: 'BHXH TP.HCM', mucDo: 'khan', status: 'cho-dieu-phoi', isOverdue: true },
+  { id: 45, soKyHieu: '08/KH-STTTT', trichYeu: 'Kế hoạch triển khai hệ thống HIS giai đoạn 2', loaiVB: 'Kế hoạch', ngayVB: '22/03/2026', ngayDen: '22/03/2026 09:30', hanXuLy: '01/04/2026', donViBanHanh: 'Sở TT&TT', mucDo: 'thuong', status: 'cho-xu-ly' },
+  { id: 44, soKyHieu: '156/QĐ-BYT', trichYeu: 'Quyết định về việc điều chỉnh định mức thuốc', loaiVB: 'Quyết định', ngayVB: '20/03/2026', ngayDen: '21/03/2026 10:00', hanXuLy: '10/04/2026', donViBanHanh: 'Bộ Y tế', mucDo: 'thuong', status: 'hoan-thanh' },
+  { id: 43, soKyHieu: '89/CV-CDC', trichYeu: 'Công văn hướng dẫn phòng chống dịch mùa hè 2026', loaiVB: 'Công văn', ngayVB: '18/03/2026', ngayDen: '19/03/2026 15:45', hanXuLy: '20/03/2026', donViBanHanh: 'CDC TP.HCM', mucDo: 'hoa-toc', status: 'qua-han', isOverdue: true },
+  { id: 42, soKyHieu: '03/CV-SKHDT', trichYeu: 'Yêu cầu báo cáo tình hình thực hiện dự án đầu tư', loaiVB: 'Công văn', ngayVB: '15/03/2026', ngayDen: '16/03/2026 08:00', hanXuLy: '30/03/2026', donViBanHanh: 'Sở KH&ĐT', mucDo: 'khan', status: 'nhap' },
 ]
 
+// ─── Status config ─────────────────────────────────────────────────────────────
 const STATUS_CONFIG: Record<VbStatus, { label: string; cls: string; actionLabel: string; actionCls: string }> = {
+  'nhap': { label: 'Nháp', cls: 'stag st-draft', actionLabel: 'Tiếp tục', actionCls: 'ra ra-m' },
   'cho-chi-dao': { label: 'Chờ chỉ đạo', cls: 'stag st-direct', actionLabel: 'Chỉ đạo ngay', actionCls: 'ra ra-warn' },
   'cho-dieu-phoi': { label: 'Chờ điều phối', cls: 'stag st-coord', actionLabel: 'Điều phối ngay', actionCls: 'ra ra-warn' },
-  'cho-xu-ly': { label: 'Chờ xử lý', cls: 'stag st-pending', actionLabel: 'Xử lý ngay', actionCls: 'ra ra-p' },
-  'dang-xu-ly': { label: 'Đang xử lý', cls: 'stag st-process', actionLabel: 'Xem tiến độ', actionCls: 'ra ra-p' },
-  'hoan-thanh': { label: 'Hoàn thành', cls: 'stag st-done', actionLabel: 'Xem', actionCls: 'ra ra-g' },
+  'cho-xu-ly': { label: 'Chờ xử lý', cls: 'stag st-pending', actionLabel: 'Hoàn thành xử lý', actionCls: 'ra ra-p' },
+  'hoan-thanh': { label: 'Hoàn thành', cls: 'stag st-done', actionLabel: 'Thêm vào hồ sơ', actionCls: 'ra ra-g' },
   'qua-han': { label: 'Quá hạn', cls: 'stag st-overdue', actionLabel: 'Xử lý khẩn', actionCls: 'ra ra-danger' },
 }
 
+// ─── Mức độ badge ─────────────────────────────────────────────────────────────
+function MucDoBadge({ mucDo }: { mucDo: MucDo }) {
+  if (mucDo === 'thuong') return null
+  if (mucDo === 'hoa-toc') return <span className="chip hot" style={{ fontSize: '.68rem' }}>Hỏa tốc</span>
+  return <span className="chip" style={{ fontSize: '.68rem', background: '#fff7ed', color: '#c2410c', border: '1px solid #fed7aa' }}>Khẩn</span>
+}
+
+// ─── Row action menu ──────────────────────────────────────────────────────────
+function RowMenu({ status, onClose }: { status: VbStatus; onClose: () => void }) {
+  const items: { label: string; danger?: boolean }[] = [
+    { label: 'Ủy quyền' },
+    { label: 'Từ chối', danger: true },
+    ...(status === 'cho-xu-ly'
+      ? [{ label: 'Chuyển tiếp xử lý' }, { label: 'Tạo văn bản đi' }]
+      : []),
+    { label: 'Thêm vào hồ sơ' },
+  ]
+  return (
+    <div style={{
+      position: 'absolute', right: 0, top: '100%', background: '#fff',
+      border: '1px solid var(--border)', borderRadius: 8,
+      boxShadow: '0 4px 16px rgba(0,0,0,.12)',
+      zIndex: 100, minWidth: 170, padding: '4px 0',
+    }}>
+      {items.map(item => (
+        <div
+          key={item.label}
+          style={{ padding: '8px 16px', fontSize: '.82rem', cursor: 'pointer', color: item.danger ? '#dc2626' : 'var(--dark)' }}
+          onMouseEnter={e => (e.currentTarget.style.background = '#f5f6fa')}
+          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+          onClick={onClose}
+        >
+          {item.label}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// ─── Main ─────────────────────────────────────────────────────────────────────
 export default function S1DanhSach() {
   const { goScreen } = useNavigation()
   const [checked, setChecked] = useState<Set<number>>(new Set())
@@ -81,17 +125,16 @@ export default function S1DanhSach() {
         </div>
         <select className="fsel">
           <option>Tất cả trạng thái</option>
+          <option>Nháp</option>
           <option>Chờ chỉ đạo</option>
           <option>Chờ điều phối</option>
           <option>Chờ xử lý</option>
-          <option>Đang xử lý</option>
           <option>Hoàn thành</option>
           <option>Quá hạn</option>
         </select>
         <input type="date" className="fsel" style={{ color: '#3a3f52' }} title="Từ ngày" />
         <input type="date" className="fsel" style={{ color: '#3a3f52' }} title="Đến ngày" />
 
-        {/* Lưu hồ sơ — chỉ hiện khi có checkbox tick */}
         {hasChecked && (
           <button className="fbtn" style={{ background: '#1d4ed8', color: '#fff' }}>
             💾 Lưu hồ sơ ({checked.size})
@@ -120,8 +163,9 @@ export default function S1DanhSach() {
                 <th style={{ width: 130 }}>Ngày đến</th>
                 <th style={{ width: 96 }}>Hạn xử lý</th>
                 <th style={{ width: 140 }}>Đơn vị ban hành</th>
+                <th style={{ width: 100 }}>Mức độ</th>
                 <th style={{ width: 110 }}>Trạng thái</th>
-                <th style={{ width: 160 }}>Thao tác</th>
+                <th style={{ width: 180 }}>Thao tác</th>
               </tr>
             </thead>
             <tbody>
@@ -150,10 +194,15 @@ export default function S1DanhSach() {
                       {row.hanXuLy}{row.isOverdue ? ' ⚠️' : ''}
                     </td>
                     <td style={{ fontSize: '.78rem' }}>{row.donViBanHanh}</td>
+                    <td><MucDoBadge mucDo={row.mucDo} /></td>
                     <td><span className={cfg.cls}>{cfg.label}</span></td>
                     <td onClick={e => e.stopPropagation()}>
-                      <div className="row-act" style={{ position: 'relative', justifyContent: 'space-between' }}>
-                        <button className={cfg.actionCls} onClick={() => goScreen('s3', { status: row.status })}>
+                      <div className="row-act" style={{ position: 'relative' }}>
+                        <button
+                          className={cfg.actionCls}
+                          style={{ flexShrink: 0, width: '110px', border: 'solid 1px #bfbfbf' }}
+                          onClick={() => goScreen('s3', { status: row.status })}
+                        >
                           {cfg.actionLabel}
                         </button>
                         <div style={{ position: 'relative' }}>
@@ -162,23 +211,7 @@ export default function S1DanhSach() {
                             onClick={() => setOpenMenu(openMenu === row.id ? null : row.id)}
                           >···</button>
                           {openMenu === row.id && (
-                            <div style={{
-                              position: 'absolute', right: 0, top: '100%', background: '#fff',
-                              border: '1px solid var(--border)', borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,.12)',
-                              zIndex: 100, minWidth: 140, padding: '4px 0'
-                            }}>
-                              {['Ủy quyền', 'Chuyển xử lý', 'Từ chối', 'Thêm vào hồ sơ'].map(act => (
-                                <div
-                                  key={act}
-                                  style={{ padding: '8px 16px', fontSize: '.82rem', cursor: 'pointer', color: 'var(--dark)' }}
-                                  onMouseEnter={e => (e.currentTarget.style.background = '#f5f6fa')}
-                                  onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                                  onClick={() => setOpenMenu(null)}
-                                >
-                                  {act}
-                                </div>
-                              ))}
-                            </div>
+                            <RowMenu status={row.status} onClose={() => setOpenMenu(null)} />
                           )}
                         </div>
                       </div>

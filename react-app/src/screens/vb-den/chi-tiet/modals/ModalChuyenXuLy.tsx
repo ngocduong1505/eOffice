@@ -1,0 +1,267 @@
+import { useState, useRef } from 'react'
+
+// UI_DOC_IN_007_MODAL — Chuyển tiếp xử lý
+// Trigger: [Chuyển tiếp xử lý] trong Menu [...] khi trạng thái = "Chờ xử lý"
+
+type LoaiChuyen = 'chinh' | 'phoi-hop'
+
+interface AttachedFile { name: string; size: number }
+
+interface SubmitData {
+  loaiChuyen: LoaiChuyen
+  nguoiNhan: string[]
+  ykienChuyen: string
+  hanXuLy: string
+  fileDinhKem: AttachedFile[]
+}
+
+interface Props {
+  open: boolean
+  onClose: () => void
+  onSubmit: (data: SubmitData) => void
+  defaultHanXuLy?: string
+}
+
+const NGUOI_OPTIONS = [
+  { value: 'nva', label: 'Nguyễn Văn A — Trưởng phòng · P.KHTH' },
+  { value: 'tthb', label: 'Trần Thị Hồng B — Chuyên viên · P.KHTH' },
+  { value: 'lvc', label: 'Lê Văn C — Phó phòng · P.TCKT' },
+  { value: 'pttd', label: 'Phạm Thị Thu D — Chuyên viên · P.HCNS' },
+  { value: 'nths', label: 'Nguyễn Thị Hoa S — Trưởng phòng · P.HCNS' },
+]
+
+const CURRENT_USER = 'nva' // giả lập người dùng hiện tại (không được tự chọn mình)
+const TODAY = new Date().toISOString().slice(0, 16)
+const DEFAULT_HAN = '2026-03-28T17:00'
+const MAX_FILE_SIZE = 20 * 1024 * 1024 // 20MB
+const ALLOWED_EXT = ['.pdf', '.doc', '.docx', '.xls', '.xlsx']
+
+export default function ModalChuyenXuLy({ open, onClose, onSubmit, defaultHanXuLy }: Props) {
+  const [loaiChuyen, setLoaiChuyen] = useState<LoaiChuyen | ''>('')
+  const [nguoiNhan, setNguoiNhan] = useState<string[]>([])
+  const [ykienChuyen, setYkienChuyen] = useState('')
+  const [hanXuLy, setHanXuLy] = useState(defaultHanXuLy || DEFAULT_HAN)
+  const [files, setFiles] = useState<AttachedFile[]>([])
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const fileRef = useRef<HTMLInputElement>(null)
+
+  if (!open) return null
+
+  const defaultHan = defaultHanXuLy || DEFAULT_HAN
+
+  const toggleNguoiNhan = (val: string) => {
+    setNguoiNhan(prev =>
+      prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val]
+    )
+    setErrors(p => ({ ...p, nguoiNhan: '' }))
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const picked = Array.from(e.target.files ?? [])
+    const errs: string[] = []
+    const valid: AttachedFile[] = []
+    picked.forEach(f => {
+      const ext = '.' + f.name.split('.').pop()?.toLowerCase()
+      if (!ALLOWED_EXT.includes(ext)) { errs.push(`${f.name}: sai định dạng.`); return }
+      if (f.size > MAX_FILE_SIZE) { errs.push(`${f.name}: vượt quá 20MB.`); return }
+      valid.push({ name: f.name, size: f.size })
+    })
+    if (errs.length) setErrors(p => ({ ...p, files: errs.join(' ') }))
+    setFiles(prev => [...prev, ...valid])
+    e.target.value = ''
+  }
+
+  const removeFile = (name: string) => setFiles(prev => prev.filter(f => f.name !== name))
+
+  const validate = (): Record<string, string> => {
+    const e: Record<string, string> = {}
+    if (!loaiChuyen) e.loaiChuyen = 'Vui lòng chọn loại chuyển xử lý.'
+    if (nguoiNhan.length === 0) e.nguoiNhan = 'Vui lòng chọn ít nhất một người nhận.'
+    if (nguoiNhan.includes(CURRENT_USER)) e.nguoiNhan = 'Không thể chuyển xử lý cho chính mình.'
+    if (!hanXuLy || hanXuLy < TODAY) e.hanXuLy = 'Hạn xử lý không hợp lệ.'
+    else if (hanXuLy > defaultHan) e.hanXuLy = 'Hạn xử lý không được trễ hơn hạn xử lý gốc.'
+    return e
+  }
+
+  const handleSubmit = () => {
+    const e = validate()
+    if (Object.keys(e).length) { setErrors(e); return }
+    onSubmit({ loaiChuyen: loaiChuyen as LoaiChuyen, nguoiNhan, ykienChuyen, hanXuLy, fileDinhKem: files })
+    setLoaiChuyen(''); setNguoiNhan([]); setYkienChuyen(''); setHanXuLy(defaultHanXuLy || DEFAULT_HAN); setFiles([]); setErrors({})
+  }
+
+  const canSubmit = loaiChuyen && nguoiNhan.length > 0 && hanXuLy
+
+  const fmtSize = (b: number) => b > 1024 * 1024 ? `${(b / 1024 / 1024).toFixed(1)} MB` : `${Math.round(b / 1024)} KB`
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, background: 'rgba(15,20,40,.45)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 500,
+    }}>
+      <div style={{
+        background: '#fff', borderRadius: 16, width: 640, maxWidth: '94vw',
+        boxShadow: '0 24px 64px rgba(0,0,0,.22)',
+        display: 'flex', flexDirection: 'column', maxHeight: '90vh',
+      }}>
+        {/* Header */}
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '18px 24px 14px', borderBottom: '1px solid var(--border)',
+        }}>
+          <div>
+            <div style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--dark)' }}>Chuyển tiếp xử lý</div>
+            <div style={{ fontSize: '.78rem', color: 'var(--text3)', marginTop: 3 }}>
+              45/CV-SYT · V/v báo cáo tình hình KCB quý I/2026
+            </div>
+          </div>
+          <button onClick={onClose} style={{ border: 'none', background: 'transparent', fontSize: '1.2rem', cursor: 'pointer', color: 'var(--text3)' }}>✕</button>
+        </div>
+
+        {/* Body */}
+        <div style={{ padding: '20px 24px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+          {/* Loại chuyển */}
+          <div className="fg">
+            <label style={{ fontSize: '.82rem', fontWeight: 600, color: 'var(--text2)', marginBottom: 10, display: 'block' }}>
+              Loại chuyển <span className="req">*</span>
+            </label>
+            <div style={{ display: 'flex', gap: 12 }}>
+              {([
+                { val: 'chinh', title: 'Chuyển chính', desc: 'Bàn giao toàn bộ trách nhiệm — bạn không còn hành động nào sau khi chuyển.' },
+                { val: 'phoi-hop', title: 'Chuyển phối hợp', desc: 'Bạn vẫn giữ trách nhiệm chính — thêm người xử lý song song.' },
+              ] as const).map(opt => (
+                <div
+                  key={opt.val}
+                  onClick={() => { setLoaiChuyen(opt.val); setErrors(p => ({ ...p, loaiChuyen: '' })) }}
+                  style={{
+                    flex: 1, border: `2px solid ${loaiChuyen === opt.val ? 'var(--orange)' : 'var(--border)'}`,
+                    borderRadius: 10, padding: '12px 14px', cursor: 'pointer',
+                    background: loaiChuyen === opt.val ? '#fff7ed' : '#fafbfc',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                    <div style={{
+                      width: 16, height: 16, borderRadius: '50%',
+                      border: `2px solid ${loaiChuyen === opt.val ? 'var(--orange)' : '#cbd5e1'}`,
+                      background: loaiChuyen === opt.val ? 'var(--orange)' : '#fff',
+                      flexShrink: 0,
+                    }} />
+                    <span style={{ fontSize: '.82rem', fontWeight: 700, color: 'var(--dark)' }}>{opt.title}</span>
+                  </div>
+                  <div style={{ fontSize: '.72rem', color: 'var(--text3)', lineHeight: 1.5, paddingLeft: 24 }}>{opt.desc}</div>
+                </div>
+              ))}
+            </div>
+            {errors.loaiChuyen && <div style={{ fontSize: '.75rem', color: '#dc2626', marginTop: 4 }}>{errors.loaiChuyen}</div>}
+          </div>
+
+          {/* Người nhận */}
+          <div className="fg">
+            <label style={{ fontSize: '.82rem', fontWeight: 600, color: 'var(--text2)', marginBottom: 6, display: 'block' }}>
+              Người nhận <span className="req">*</span>
+            </label>
+            <div style={{ border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden' }}>
+              {NGUOI_OPTIONS.filter(o => o.value !== CURRENT_USER).map((o, i, arr) => (
+                <div
+                  key={o.value}
+                  onClick={() => toggleNguoiNhan(o.value)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    padding: '10px 14px', cursor: 'pointer',
+                    background: nguoiNhan.includes(o.value) ? '#fff7ed' : '#fff',
+                    borderBottom: i < arr.length - 1 ? '1px solid var(--border)' : 'none',
+                  }}
+                >
+                  <input type="checkbox" checked={nguoiNhan.includes(o.value)} onChange={() => {}} style={{ cursor: 'pointer' }} />
+                  <span style={{ fontSize: '.82rem', color: 'var(--dark)' }}>{o.label}</span>
+                </div>
+              ))}
+            </div>
+            {errors.nguoiNhan && <div style={{ fontSize: '.75rem', color: '#dc2626', marginTop: 4 }}>{errors.nguoiNhan}</div>}
+          </div>
+
+          {/* Ý kiến chuyển */}
+          <div className="fg">
+            <label style={{ fontSize: '.82rem', fontWeight: 600, color: 'var(--text2)', marginBottom: 6, display: 'block' }}>
+              Ý kiến chuyển
+            </label>
+            <textarea
+              value={ykienChuyen}
+              onChange={e => setYkienChuyen(e.target.value)}
+              placeholder="Nhập ý kiến chuyển xử lý (nếu có)..."
+              style={{ height: 90, resize: 'vertical', width: '100%', boxSizing: 'border-box' }}
+            />
+          </div>
+
+          {/* Hạn xử lý */}
+          <div className="fg">
+            <label style={{ fontSize: '.82rem', fontWeight: 600, color: 'var(--text2)', marginBottom: 6, display: 'block' }}>
+              Hạn xử lý <span className="req">*</span>
+            </label>
+            <input
+              type="datetime-local"
+              value={hanXuLy}
+              onChange={e => { setHanXuLy(e.target.value); setErrors(p => ({ ...p, hanXuLy: '' })) }}
+              min={TODAY}
+              max={defaultHan}
+              style={{ width: '100%', boxSizing: 'border-box' }}
+            />
+            <div className="hint">Không được trễ hơn hạn xử lý gốc: 28/03/2026</div>
+            {errors.hanXuLy && <div style={{ fontSize: '.75rem', color: '#dc2626', marginTop: 4 }}>{errors.hanXuLy}</div>}
+          </div>
+
+          {/* Tệp đính kèm bổ sung */}
+          <div className="fg">
+            <label style={{ fontSize: '.82rem', fontWeight: 600, color: 'var(--text2)', marginBottom: 6, display: 'block' }}>
+              Tệp đính kèm bổ sung
+            </label>
+            <input ref={fileRef} type="file" multiple accept=".pdf,.doc,.docx,.xls,.xlsx" style={{ display: 'none' }} onChange={handleFileChange} />
+            <button
+              onClick={() => fileRef.current?.click()}
+              style={{
+                border: '1px dashed var(--border)', background: '#fafbfc', borderRadius: 8,
+                padding: '10px 16px', cursor: 'pointer', fontSize: '.8rem', color: 'var(--text2)',
+                width: '100%',
+              }}
+            >
+              📎 Chọn tệp (PDF, Word, Excel · tối đa 20MB/tệp)
+            </button>
+            {errors.files && <div style={{ fontSize: '.75rem', color: '#dc2626', marginTop: 4 }}>{errors.files}</div>}
+            {files.length > 0 && (
+              <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {files.map(f => (
+                  <div key={f.name} style={{
+                    display: 'flex', alignItems: 'center', gap: 8,
+                    background: '#f8fafc', border: '1px solid var(--border)', borderRadius: 6,
+                    padding: '6px 10px',
+                  }}>
+                    <span style={{ fontSize: '.8rem', flex: 1, color: 'var(--dark)' }}>📄 {f.name}</span>
+                    <span style={{ fontSize: '.72rem', color: 'var(--text3)' }}>{fmtSize(f.size)}</span>
+                    <button onClick={() => removeFile(f.name)} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#dc2626', fontSize: '.8rem' }}>✕</button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 10,
+          padding: '14px 24px', borderTop: '1px solid var(--border)',
+        }}>
+          <button className="btn btn-ghost" onClick={onClose}>Hủy</button>
+          <button
+            className="btn btn-primary"
+            style={{ opacity: canSubmit ? 1 : .45, cursor: canSubmit ? 'pointer' : 'not-allowed' }}
+            onClick={handleSubmit}
+            disabled={!canSubmit}
+          >
+            ↪ Chuyển xử lý
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
