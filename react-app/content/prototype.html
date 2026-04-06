@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eOffice – Prototype: Quản lý Quy trình xử lý</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f6fa; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 3px; }
+
+    /* Screen transitions */
+    .screen { display: none; }
+    .screen.active { display: flex; flex-direction: column; flex: 1; min-height: 100vh; }
+
+    /* Orange theme */
+    .btn-orange { background: #ea580c; color: #fff; border: none; cursor: pointer; transition: background .15s; }
+    .btn-orange:hover { background: #c2410c; }
+    .btn-orange:disabled { background: #fdba74; cursor: not-allowed; }
+    .btn-ghost { background: #fff; color: #374151; border: 1.5px solid #d1d5db; cursor: pointer; transition: all .15s; }
+    .btn-ghost:hover { border-color: #9ca3af; background: #f9fafb; }
+    .btn-outline-orange { background: #fff; color: #ea580c; border: 1.5px solid #ea580c; cursor: pointer; transition: all .15s; }
+    .btn-outline-orange:hover { background: #fff7ed; }
+
+    /* Badges */
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 99px; font-size: 12px; font-weight: 500; }
+    .badge-active { background: #dcfce7; color: #15803d; }
+    .badge-draft { background: #f3f4f6; color: #6b7280; }
+    .badge-inactive { background: #fee2e2; color: #dc2626; }
+    .badge-vbd { background: #ede9fe; color: #7c3aed; }   /* Văn bản đi */
+    .badge-vbden { background: #dbeafe; color: #1d4ed8; }  /* Văn bản đến */
+    .badge-noi-bo { background: #fef9c3; color: #a16207; } /* Nội bộ */
+
+    /* Dot status */
+    .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .dot-active { background: #16a34a; }
+    .dot-draft { background: #9ca3af; }
+    .dot-inactive { background: #dc2626; }
+
+    /* Table */
+    table { border-collapse: collapse; width: 100%; table-layout: auto; }
+    thead th { background: #f9fafb; font-size: 12px; font-weight: 600; color: #6b7280; text-align: left; padding: 7px 10px; border-bottom: 1px solid #e5e7eb; white-space: nowrap; }
+    tbody tr { border-bottom: 1px solid #f3f4f6; transition: background .1s; }
+    tbody tr:hover { background: #fafafa; }
+    tbody td { padding: 6px 10px; font-size: 13px; color: #1f2937; vertical-align: middle; white-space: nowrap; }
+    tbody td.td-name { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* 3-dot menu */
+    .menu-dropdown { position: absolute; right: 0; top: calc(100% + 4px); background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.1); min-width: 160px; z-index: 100; overflow: hidden; }
+    .menu-item { display: flex; align-items: center; gap: 8px; padding: 9px 14px; font-size: 14px; color: #374151; cursor: pointer; transition: background .1s; }
+    .menu-item:hover { background: #f9fafb; }
+    .menu-item.danger { color: #dc2626; }
+    .menu-item.danger:hover { background: #fff5f5; }
+    .menu-item.disabled { color: #d1d5db; cursor: not-allowed; }
+    .menu-item.disabled:hover { background: #fff; }
+
+    /* Custom select */
+    .custom-select { position: relative; }
+    .custom-select-trigger { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border: 1.5px solid #d1d5db; border-radius: 6px; cursor: pointer; font-size: 14px; background: #fff; gap: 8px; transition: border-color .15s; min-height: 38px; }
+    .custom-select-trigger:hover { border-color: #9ca3af; }
+    .custom-select-trigger.open { border-color: #ea580c; box-shadow: 0 0 0 2px #fed7aa40; }
+    .custom-select-dropdown { position: absolute; left: 0; right: 0; top: calc(100% + 4px); background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.1); z-index: 200; max-height: 240px; overflow-y: auto; }
+    .custom-option { display: flex; align-items: center; gap: 10px; padding: 9px 14px; font-size: 14px; cursor: pointer; transition: background .1s; }
+    .custom-option:hover { background: #fff7ed; }
+    .custom-option.selected { background: #fff7ed; color: #ea580c; }
+
+    /* Tags in select */
+    .select-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+    .select-tag { display: inline-flex; align-items: center; gap: 4px; background: #ffedd5; color: #ea580c; border-radius: 4px; padding: 1px 6px; font-size: 12px; font-weight: 500; }
+    .select-tag-remove { cursor: pointer; opacity: .7; font-size: 14px; line-height: 1; }
+    .select-tag-remove:hover { opacity: 1; }
+
+    /* Step cards */
+    .step-card { background: #fff; border: 1.5px solid #e5e7eb; border-radius: 10px; padding: 14px 16px; cursor: grab; transition: box-shadow .15s, border-color .15s; }
+    .step-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+    .step-card.active-edit { border-color: #ea580c; box-shadow: 0 0 0 3px #fed7aa50; }
+    .step-card.dragging { opacity: .5; box-shadow: 0 8px 24px rgba(0,0,0,.15); }
+    .step-card.drag-over { border-color: #fb923c; background: #fff7ed; }
+
+    /* Right panel transition */
+    .right-panel { transition: all .25s ease; }
+
+    /* Drag handle */
+    .drag-handle { cursor: grab; color: #9ca3af; display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px; padding: 2px; }
+    .drag-handle span { width: 3px; height: 3px; border-radius: 50%; background: currentColor; display: block; }
+
+    /* Form fields */
+    .field-label { font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px; display: flex; align-items: center; gap: 4px; }
+    .field-label .req { color: #ef4444; }
+    .field-hint { font-size: 12px; color: #9ca3af; margin-top: 5px; }
+    .field-input { width: 100%; border: 1.5px solid #d1d5db; border-radius: 6px; padding: 8px 12px; font-size: 14px; outline: none; transition: border-color .15s, box-shadow .15s; }
+    .field-input:focus { border-color: #ea580c; box-shadow: 0 0 0 2px #fed7aa40; }
+    textarea.field-input { resize: none; min-height: 80px; }
+
+    /* Modal overlay */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 500; display: flex; align-items: center; justify-content: center; }
+    .modal-box { background: #fff; border-radius: 12px; padding: 28px; max-width: 420px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,.2); }
+    .modal-title { font-size: 16px; font-weight: 700; color: #1f2937; margin-bottom: 10px; }
+    .modal-body { font-size: 14px; color: #6b7280; line-height: 1.6; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
+
+    /* Toast */
+    .toast { position: fixed; bottom: 28px; right: 28px; background: #1f2937; color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 14px; box-shadow: 0 4px 16px rgba(0,0,0,.2); z-index: 600; transform: translateY(0); transition: all .3s; max-width: 360px; }
+    .toast.toast-success { background: #15803d; }
+    .toast.toast-error { background: #dc2626; }
+    .toast.hidden { transform: translateY(20px); opacity: 0; pointer-events: none; }
+
+    /* Pagination */
+    .page-btn { width: 32px; height: 32px; border-radius: 6px; border: 1px solid #e5e7eb; background: #fff; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; transition: all .15s; color: #374151; }
+    .page-btn:hover { border-color: #ea580c; color: #ea580c; }
+    .page-btn.active { background: #ea580c; border-color: #ea580c; color: #fff; }
+    .page-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+    /* Sidebar guide */
+    .guide-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f3f4f6; }
+    .guide-num { width: 22px; height: 22px; border-radius: 50%; background: #ea580c; color: #fff; font-size: 11px; font-weight: 700; flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
+    .behavior-item { padding: 10px 0; border-bottom: 1px solid #f3f4f6; }
+    .behavior-title { font-size: 13px; font-weight: 600; color: #1f2937; margin-bottom: 3px; }
+    .behavior-desc { font-size: 12px; color: #6b7280; line-height: 1.5; }
+
+    /* App layout */
+    body { margin: 0; }
+    #app { display: flex; min-height: 100vh; }
+    #sidebar { width: 248px; flex-shrink: 0; background: #fff; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; overflow-y: auto; z-index: 40; }
+    #main-content { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
+
+    /* Screen fix inside layout */
+    .screen.active { min-height: 100vh; }
+
+    /* Nav sidebar */
+    .nav-section-label { font-size: 10px; font-weight: 700; color: #9ca3af; letter-spacing: .08em; text-transform: uppercase; padding: 14px 16px 6px; }
+    .nav-item { display: flex; align-items: center; justify-content: space-between; padding: 9px 16px; cursor: pointer; transition: background .12s; border-radius: 0; user-select: none; }
+    .nav-item:hover { background: #f9fafb; }
+    .nav-item.active-parent { background: #fff7ed; }
+    .nav-item-left { display: flex; align-items: center; gap: 10px; }
+    .nav-item-label { font-size: 14px; color: #374151; font-weight: 500; }
+    .nav-item.active-parent .nav-item-label { color: #ea580c; font-weight: 600; }
+    .nav-badge { background: #fee2e2; color: #dc2626; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 99px; min-width: 20px; text-align: center; }
+    .nav-arrow { color: #9ca3af; transition: transform .2s; flex-shrink: 0; }
+    .nav-arrow.open { transform: rotate(90deg); }
+    .nav-sub { overflow: hidden; }
+    .nav-sub-item { display: flex; align-items: center; gap: 8px; padding: 8px 16px 8px 42px; font-size: 13px; color: #6b7280; cursor: pointer; transition: background .12s; border-radius: 0; }
+    .nav-sub-item:hover { background: #f9fafb; color: #374151; }
+    .nav-sub-item.active { background: #f3f4f6; color: #1f2937; font-weight: 600; border-left: 3px solid #ea580c; padding-left: 39px; }
+    .nav-icon { width: 20px; height: 20px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+  </style>
+</head>
+<body>
+<div id="app">
+
+<!-- ================================================================ -->
+<!-- SIDEBAR                                                           -->
+<!-- ================================================================ -->
+<div id="sidebar">
+
+  <!-- Logo -->
+  <div style="padding:18px 16px 14px; border-bottom:1px solid #f3f4f6;">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <div style="width:36px; height:36px; background:linear-gradient(135deg,#ea580c,#f97316); border-radius:8px; display:flex; align-items:center; justify-content:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path stroke-linecap="round" d="M9 12h6M9 16h6M7 4h10a2 2 0 012 2v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z"/><path stroke-linecap="round" d="M9 4v4h6V4"/></svg>
+      </div>
+      <div>
+        <div style="font-size:15px; font-weight:800; color:#1f2937; line-height:1.1;">Easy<span style="color:#ea580c;">Docs</span></div>
+        <div style="font-size:10px; color:#9ca3af; letter-spacing:.02em;">Document Management</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA Button -->
+  <div style="padding:14px 14px 10px;">
+    <button class="btn-orange" style="width:100%; padding:10px; border-radius:8px; font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:6px;">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" d="M12 4v16m8-8H4"/></svg>
+      Tiếp nhận văn bản
+    </button>
+  </div>
+
+  <!-- Nav -->
+  <div style="flex:1; overflow-y:auto; padding-bottom:16px;">
+    <div class="nav-section-label">Văn phòng số</div>
+
+    <!-- Văn bản Đến -->
+    <div class="nav-item" onclick="toggleNav('vbd')">
+      <div class="nav-item-left">
+        <div class="nav-icon" style="background:#fee2e2;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5"><path stroke-linecap="round" d="M3 16l4 4 4-4M7 20V4"/><path stroke-linecap="round" d="M13 8h8M13 12h6M13 16h4"/></svg>
+        </div>
+        <span class="nav-item-label">Văn bản Đến</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:6px;">
+        <span class="nav-badge">8</span>
+        <svg class="nav-arrow" id="arrow-vbd" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" d="M9 5l7 7-7 7"/></svg>
+      </div>
+    </div>
+    <div class="nav-sub" id="sub-vbd" style="display:none;">
+      <div class="nav-sub-item">Danh sách</div>
+      <div class="nav-sub-item">Tiếp nhận (Tạo văn bản)</div>
+      <div class="nav-sub-item">Chi tiết</div>
+    </div>
+
+    <!-- Văn bản Đi -->
+    <div class="nav-item" onclick="toggleNav('vbdi')">
+      <div class="nav-item-left">
+        <div class="nav-icon" style="background:#dbeafe;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2.5"><path stroke-linecap="round" d="M21 8l-4-4-4 4M17 4v16"/><path stroke-linecap="round" d="M11 16H3M11 12H5M11 8H7"/></svg>
+        </div>
+        <span class="nav-item-label">Văn bản Đi</span>
+      </div>
+      <svg class="nav-arrow" id="arrow-vbdi" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" d="M9 5l7 7-7 7"/></svg>
+    </div>
+    <div class="nav-sub" id="sub-vbdi" style="display:none;">
+      <div class="nav-sub-item">Danh sách</div>
+      <div class="nav-sub-item">Tạo văn bản</div>
+    </div>
+
+    <!-- Văn bản Nội bộ -->
+    <div class="nav-item" onclick="toggleNav('vbnb')">
+      <div class="nav-item-left">
+        <div class="nav-icon" style="background:#fef9c3;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a16207" stroke-width="2.5"><path stroke-linecap="round" d="M9 12h6M9 16h6M7 4h10a2 2 0 012 2v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z"/></svg>
+        </div>
+        <span class="nav-item-label">Văn bản Nội bộ</span>
+      </div>
+      <svg class="nav-arrow" id="arrow-vbnb" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" d="M9 5l7 7-7 7"/></svg>
+    </div>
+    <div class="nav-sub" id="sub-vbnb" style="display:none;">
+      <div class="nav-sub-item">Danh sách</div>
+      <div class="nav-sub-item">Tạo văn bản</div>
+    </div>
+
+    <!-- Hồ sơ lưu trữ -->
+    <div class="nav-item" onclick="toggleNav('hslt')">
+      <div class="nav-item-left">
+        <div class="nav-icon" style="background:#f3f4f6;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2.5"><path stroke-linecap="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><path stroke-linecap="round" d="M10 12h4"/></svg>
+        </div>
+        <span class="nav-item-label">Hồ sơ lưu trữ</span>
+      </div>
+      <svg class="nav-arrow" id="arrow-hslt" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" d="M9 5l7 7-7 7"/></svg>
+    </div>
+    <div class="nav-sub" id="sub-hslt" style="display:none;">
+      <div class="nav-sub-item">Danh sách hồ sơ</div>
+    </div>
+
+    <!-- Sổ & Báo cáo -->
+    <div class="nav-item" onclick="toggleNav('sbc')">
+      <div class="nav-item-left">
+        <div class="nav-icon" style="background:#fef3c7;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.5"><path stroke-linecap="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        </div>
+        <span class="nav-item-label">Sổ & Báo cáo</span>
+      </div>
+      <svg class="nav-arrow" id="arrow-sbc" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" d="M9 5l7 7-7 7"/></svg>
+    </div>
+    <div class="nav-sub" id="sub-sbc" style="display:none;">
+      <div class="nav-sub-item">Sổ văn bản</div>
+      <div class="nav-sub-item">Báo cáo thống kê</div>
+    </div>
+
+    <!-- Mẫu quy trình — ACTIVE -->
+    <div class="nav-item active-parent" onclick="toggleNav('ml')">
+      <div class="nav-item-left">
+        <div class="nav-icon" style="background:#fff7ed;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path stroke-linecap="round" d="M19.07 4.93l-1.41 1.41M4.93 19.07l1.41-1.41M19.07 19.07l-1.41-1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
+        </div>
+        <span class="nav-item-label">Mẫu quy trình</span>
+      </div>
+      <svg class="nav-arrow open" id="arrow-ml" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#ea580c" stroke-width="2.5"><path stroke-linecap="round" d="M9 5l7 7-7 7"/></svg>
+    </div>
+    <div class="nav-sub" id="sub-ml" style="display:block;">
+      <div class="nav-sub-item active" id="nav-luong-xs" onclick="goToList()">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+        Quy trình xử lý
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MAIN CONTENT WRAPPER -->
+<div id="main-content">
+
+<!-- ================================================================ -->
+<!-- SCREEN 1: DANH SÁCH QUY TRÌNH XỬ LÝ                                 -->
+<!-- ================================================================ -->
+<div id="screen-list" class="screen active">
+  <!-- Header Row 1: title + icons -->
+  <div style="background:#fff; border-bottom:1px solid #f3f4f6; padding:0 24px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; height:48px;">
+      <div style="font-size:15px; font-weight:700; color:#1f2937;">Danh sách quy trình xử lý</div>
+      <div style="display:flex; align-items:center; gap:14px;">
+        <button style="background:none; border:none; cursor:pointer; padding:4px; color:#6b7280; position:relative;" title="Thông báo">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+          <span style="position:absolute;top:2px;right:2px;width:7px;height:7px;background:#ea580c;border-radius:50%;border:1.5px solid #fff;"></span>
+        </button>
+        <button style="background:none; border:none; cursor:pointer; padding:4px; color:#6b7280;" title="Trợ giúp">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+        </button>
+        <div style="width:32px; height:32px; border-radius:50%; background:#ea580c; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; cursor:pointer;" title="Nguyễn Văn An">NA</div>
+      </div>
+    </div>
+  </div>
+  <!-- Header Row 2: filters + action button -->
+  <div style="background:#fff; border-bottom:1px solid #e5e7eb; padding:0 24px;">
+    <div style="display:flex; gap:10px; align-items:center; height:48px;">
+      <div style="position:relative; flex:1; min-width:180px;">
+        <svg style="position:absolute;left:9px;top:50%;transform:translateY(-50%);color:#9ca3af;" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/></svg>
+        <input id="search-input" class="field-input" style="padding-left:30px; height:32px; font-size:13px;" placeholder="Tìm theo tên quy trình..." oninput="filterList()" />
+      </div>
+      <select id="filter-type" class="field-input" style="width:180px; height:32px; font-size:13px; cursor:pointer; padding:0 10px;" onchange="filterList()">
+        <option value="">Tất cả loại VB</option>
+        <option value="vbd">Văn bản đi</option>
+        <option value="vbden">Văn bản đến</option>
+        <option value="noi-bo">Nội bộ</option>
+      </select>
+      <select id="filter-status" class="field-input" style="width:185px; height:32px; font-size:13px; cursor:pointer; padding:0 10px;" onchange="filterList()">
+        <option value="">Tất cả trạng thái</option>
+        <option value="active">Đang hoạt động</option>
+        <option value="draft">Nháp</option>
+        <option value="inactive">Không hoạt động</option>
+      </select>
+      <button class="btn-orange" onclick="goToCreate()" style="padding:0 14px; height:32px; border-radius:6px; font-size:13px; font-weight:600; display:flex; align-items:center; gap:5px; white-space:nowrap; flex-shrink:0;">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" d="M12 4v16m8-8H4"/></svg>
+        Tạo quy trình mới
+      </button>
+    </div>
+  </div>
+
+
+  <!-- Table -->
+  <div style="padding:12px 24px 16px; flex:1;">
+    <div style="background:#fff; border-radius:8px; border:1px solid #e5e7eb; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,.06);">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:40px; text-align:center; padding:7px 8px;">STT</th>
+            <th>Tên quy trình</th>
+            <th>Loại VB áp dụng</th>
+            <th>Trạng thái</th>
+            <th style="text-align:center;">Số bước</th>
+            <th>Ngày tạo</th>
+            <th>Người tạo</th>
+            <th style="text-align:right; padding-right:12px; white-space:nowrap;">Thao tác</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+
+      <!-- Empty state -->
+      <div id="empty-state" style="display:none; padding:40px 20px; text-align:center;">
+        <svg style="margin:0 auto 12px; color:#d1d5db;" width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/></svg>
+        <div style="font-size:15px; font-weight:600; color:#6b7280;">Không tìm thấy kết quả phù hợp</div>
+        <div style="font-size:13px; color:#9ca3af; margin-top:4px;">Thử thay đổi từ khóa hoặc bộ lọc</div>
+      </div>
+
+      <!-- Pagination -->
+      <div id="pagination-bar" style="display:flex; align-items:center; justify-content:space-between; padding:8px 14px; border-top:1px solid #f3f4f6;">
+        <div style="font-size:13px; color:#6b7280;" id="pagination-info"></div>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <button class="page-btn" id="btn-prev" onclick="changePage(-1)">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" d="M15 19l-7-7 7-7"/></svg>
+          </button>
+          <div id="page-numbers" style="display:flex; gap:4px;"></div>
+          <button class="page-btn" id="btn-next" onclick="changePage(1)">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" d="M9 5l7 7-7 7"/></svg>
+          </button>
+          <select class="field-input" style="width:110px; height:32px; font-size:13px;" onchange="changePageSize(this.value)">
+            <option value="10">10 / trang</option>
+            <option value="20">20 / trang</option>
+            <option value="50">50 / trang</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ================================================================ -->
+<!-- SCREEN 2: TẠO / CHỈNH SỬA QUY TRÌNH                                 -->
+<!-- ================================================================ -->
+<div id="screen-create" class="screen" style="background:#f5f6fa;">
+
+  <!-- Header Row 1: breadcrumb title + icons -->
+  <div style="background:#fff; border-bottom:1px solid #f3f4f6; padding:0 24px; position:sticky; top:0; z-index:50;">
+    <div style="display:flex; align-items:center; justify-content:space-between; height:48px;">
+      <div style="font-size:15px; font-weight:700; color:#1f2937;" id="create-screen-title">Tạo quy trình mới — Thiết lập bước</div>
+      <div style="display:flex; align-items:center; gap:14px;">
+        <!-- Bell -->
+        <button style="background:none; border:none; cursor:pointer; padding:4px; color:#6b7280; position:relative;" title="Thông báo">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+          <span style="position:absolute;top:2px;right:2px;width:7px;height:7px;background:#ea580c;border-radius:50%;border:1.5px solid #fff;"></span>
+        </button>
+        <!-- Help -->
+        <button style="background:none; border:none; cursor:pointer; padding:4px; color:#6b7280;" title="Trợ giúp">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+        </button>
+        <!-- Avatar -->
+        <div style="width:32px; height:32px; border-radius:50%; background:#ea580c; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; cursor:pointer;" title="Nguyễn Văn An">NA</div>
+      </div>
+    </div>
+  </div>
+  <!-- Header Row 2: action buttons -->
+  <div style="background:#fff; border-bottom:1px solid #e5e7eb; padding:0 24px; position:sticky; top:48px; z-index:49;">
+    <div style="display:flex; align-items:center; justify-content:flex-end; gap:8px; height:42px;">
+      <button class="btn-ghost" onclick="confirmClose()" style="padding:5px 14px; border-radius:6px; font-size:13px;">Đóng</button>
+      <button class="btn-orange" onclick="saveFlow()" style="padding:5px 16px; border-radius:6px; font-size:13px; font-weight:600; display:flex; align-items:center; gap:5px;">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" d="M5 13l4 4L19 7"/></svg>
+        Lưu
+      </button>
+    </div>
+  </div>
+
+  <!-- Main content: 4:3 grid — LEFT=form+steps, RIGHT=guide/panel -->
+  <div style="display:grid; grid-template-columns: 4fr 3fr; gap:0; flex:1; height:calc(100vh - 90px); overflow:hidden;">
+
+    <!-- LEFT COLUMN (4) — Thông tin quy trình + Quy trình xử lý -->
+    <div style="padding:16px 20px; overflow-y:auto; background:#fff; display:flex; flex-direction:column; gap:0; height:100%; border-right:1px solid #e5e7eb;">
+
+      <!-- Block: Thông tin quy trình -->
+      <div style="margin-bottom:16px; padding-bottom:16px; border-bottom:1px solid #f3f4f6;">
+        <div style="font-size:13px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:.05em; margin-bottom:12px;">Thông tin quy trình</div>
+        <!-- Row 1: Tên quy trình + Loại VB -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+          <div>
+            <div class="field-label">Tên quy trình <span class="req">*</span></div>
+            <input id="flow-name" class="field-input" type="text" placeholder="VD: Quy trình duyệt VB đi cấp Phòng" />
+          </div>
+          <div>
+            <div class="field-label">Loại văn bản áp dụng <span class="req">*</span></div>
+            <div class="custom-select" id="apply-select">
+              <div class="custom-select-trigger" id="apply-trigger" onclick="toggleApplySelect()">
+                <div class="select-tags" id="apply-tags"><span style="color:#9ca3af;font-size:13px;">Chọn loại văn bản...</span></div>
+                <svg style="flex-shrink:0;color:#9ca3af;transition:transform .2s;" id="apply-chevron" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" d="M19 9l-7 7-7-7"/></svg>
+              </div>
+              <div class="custom-select-dropdown" id="apply-dropdown" style="display:none;">
+                <div class="custom-option" onclick="toggleApplyOption('vbd','Văn bản đi')"><input type="checkbox" id="chk-vbd" style="accent-color:#ea580c;" onclick="event.stopPropagation()" onchange="toggleApplyOptionFromChk('vbd','Văn bản đi')" /><span>Văn bản đi</span></div>
+                <div class="custom-option" onclick="toggleApplyOption('vbden','Văn bản đến')"><input type="checkbox" id="chk-vbden" style="accent-color:#ea580c;" onclick="event.stopPropagation()" onchange="toggleApplyOptionFromChk('vbden','Văn bản đến')" /><span>Văn bản đến</span></div>
+                <div class="custom-option" onclick="toggleApplyOption('noi-bo','Văn bản nội bộ')"><input type="checkbox" id="chk-noi-bo" style="accent-color:#ea580c;" onclick="event.stopPropagation()" onchange="toggleApplyOptionFromChk('noi-bo','Văn bản nội bộ')" /><span>Văn bản nội bộ</span></div>
+              </div>
+            </div>
+            <div class="field-hint">Có thể chọn nhiều loại cùng lúc.</div>
+          </div>
+        </div>
+        <!-- Row 2: Mô tả + Trạng thái -->
+        <div style="display:grid; grid-template-columns:1fr auto; gap:12px; align-items:start;">
+          <div>
+            <div class="field-label">Mô tả quy trình</div>
+            <textarea class="field-input" id="flow-desc" placeholder="Ghi chú mục đích sử dụng của quy trình này..." style="min-height:60px; resize:none;"></textarea>
+          </div>
+          <div style="min-width:160px;">
+            <div class="field-label">Trạng thái</div>
+            <div style="display:flex; align-items:center; gap:10px; padding:9px 12px; border:1.5px solid #e5e7eb; border-radius:6px; background:#fff; cursor:pointer; user-select:none;" onclick="toggleFlowStatus()">
+              <div id="flow-toggle" style="width:36px; height:20px; border-radius:99px; background:#16a34a; flex-shrink:0; position:relative; transition:background .2s;">
+                <div style="width:16px; height:16px; border-radius:50%; background:#fff; position:absolute; top:2px; left:18px; transition:left .2s; box-shadow:0 1px 3px rgba(0,0,0,.2);"></div>
+              </div>
+              <span id="flow-status-label" style="font-size:13px; color:#16a34a; font-weight:500;">Đang hoạt động</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Block: Quy trình xử lý -->
+      <div style="flex:1;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid #f3f4f6;">
+          <div style="font-size:13px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:.05em;">Quy trình xử lý</div>
+          <button class="btn-outline-orange" onclick="openStepPanel(null)" style="padding:4px 12px; border-radius:6px; font-size:13px; font-weight:600; display:flex; align-items:center; gap:4px;">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" d="M12 4v16m8-8H4"/></svg>
+            Thêm bước
+          </button>
+        </div>
+        <div id="step-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+        <div id="step-empty" style="text-align:center; padding:28px 16px; background:#fafafa; border-radius:8px; border:1.5px dashed #e5e7eb; margin-top:4px;">
+          <svg style="margin:0 auto 8px; color:#d1d5db;" width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+          <div style="font-size:13px; color:#9ca3af;">Chưa có bước nào. Nhấn <strong style="color:#ea580c;">Thêm bước</strong> để bắt đầu.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN (3) — Guide / Step config panel -->
+    <div id="left-column" style="position:relative; overflow:hidden; height:100%;">
+
+      <!-- Panel A: Hướng dẫn & Danh mục hành vi (default) -->
+      <div id="panel-guide" class="right-panel" style="padding:16px; overflow-y:auto; height:100%; background:#f9fafb;">
+        <div style="background:#fff; border-radius:10px; border:1px solid #e5e7eb; padding:18px; margin-bottom:14px;">
+          <div style="font-size:14px; font-weight:700; color:#1f2937; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 16v-4M12 8h.01"/></svg>
+            Hướng dẫn nhanh
+          </div>
+          <div class="guide-item">
+            <div class="guide-num">1</div>
+            <div style="font-size:13px; color:#374151; line-height:1.5;">Điền <strong>tên quy trình</strong> và chọn <strong>loại văn bản áp dụng</strong> ở cột phải.</div>
+          </div>
+          <div class="guide-item">
+            <div class="guide-num">2</div>
+            <div style="font-size:13px; color:#374151; line-height:1.5;">Nhấn <strong style="color:#ea580c;">Thêm bước</strong> để cấu hình từng bước xử lý.</div>
+          </div>
+          <div class="guide-item">
+            <div class="guide-num">3</div>
+            <div style="font-size:13px; color:#374151; line-height:1.5;">Kéo thả biểu tượng <strong>⠿</strong> để thay đổi thứ tự các bước.</div>
+          </div>
+          <div class="guide-item" style="border:none; padding-bottom:0;">
+            <div class="guide-num">4</div>
+            <div style="font-size:13px; color:#374151; line-height:1.5;">Nhấn <strong style="color:#ea580c;">Lưu</strong> để lưu cấu hình quy trình.</div>
+          </div>
+        </div>
+        <div style="background:#fff; border-radius:10px; border:1px solid #e5e7eb; padding:18px;">
+          <div style="font-size:14px; font-weight:700; color:#1f2937; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2"><path stroke-linecap="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+            Danh mục hành vi
+          </div>
+          <div class="behavior-item"><div class="behavior-title">📋 Duyệt nội dung</div><div class="behavior-desc">Xem xét, phê duyệt hoặc yêu cầu sửa đổi. Hỗ trợ duyệt song song hoặc lần lượt.</div></div>
+          <div class="behavior-item"><div class="behavior-title">✏️ Ghi ý kiến / Bút phê</div><div class="behavior-desc">Ghi chú chỉ đạo, không mang tính phê duyệt pháp lý.</div></div>
+          <div class="behavior-item"><div class="behavior-title">👤 Phân công người xử lý</div><div class="behavior-desc">Đọc ý kiến và chỉ định người nhận ở bước tiếp theo.</div></div>
+          <div class="behavior-item"><div class="behavior-title">🔏 Ký số văn bản</div><div class="behavior-desc">Sử dụng chứng thư số để ký điện tử vào tệp tin.</div></div>
+          <div class="behavior-item"><div class="behavior-title">🏛️ Đóng dấu & Cấp số</div><div class="behavior-desc">Cấp số hiệu chính thức và đóng dấu pháp nhân. Dành cho Văn thư.</div></div>
+          <div class="behavior-item" style="border:none; padding-bottom:0;"><div class="behavior-title">📤 Ban hành / Phân phát</div><div class="behavior-desc">Gửi văn bản đến nơi nhận và kết thúc quy trình.</div></div>
+        </div>
+      </div>
+
+      <!-- Panel B: Cấu hình bước (thay thế guide khi thêm/sửa bước) -->
+      <div id="panel-step" class="right-panel" style="display:none; height:100%; background:#fff; flex-direction:column; position:absolute; inset:0;">
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid #e5e7eb; flex-shrink:0;">
+          <div style="font-size:15px; font-weight:700; color:#1f2937;" id="step-panel-title">Thêm bước</div>
+          <button onclick="closeStepPanel()" style="background:none; border:none; cursor:pointer; color:#9ca3af; padding:4px; border-radius:4px;" title="Đóng panel">
+            <svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div style="flex:1; overflow-y:auto; padding:20px;">
+          <div style="margin-bottom:18px;">
+            <div class="field-label">Tên bước <span class="req">*</span></div>
+            <input id="step-name" class="field-input" type="text" placeholder="VD: Duyệt nội dung, Ký số..." />
+            <div class="field-hint">Đặt tên theo nghiệp vụ đơn vị — người thực hiện sẽ thấy tên này.</div>
+          </div>
+          <div style="margin-bottom:6px;">
+            <div class="field-label">Loại hành vi <span class="req">*</span></div>
+            <select id="step-behavior" class="field-input" style="height:38px; cursor:pointer;">
+              <option value="">— Chọn loại hành vi —</option>
+              <option value="duyet">📋 Duyệt nội dung — Người duyệt đồng ý hoặc yêu cầu sửa</option>
+              <option value="y-kien">✏️ Ghi ý kiến / Bút phê — Ghi chú chỉ đạo</option>
+              <option value="phan-cong">👤 Phân công người xử lý — Chỉ định người nhận tiếp theo</option>
+              <option value="ky-so">🔏 Ký số văn bản — Ký điện tử bằng chứng thư số</option>
+              <option value="dong-dau">🏛️ Đóng dấu & Cấp số — Cấp số hiệu và đóng dấu pháp nhân</option>
+              <option value="ban-hanh">📤 Ban hành / Phân phát — Gửi và kết thúc quy trình</option>
+              <option value="luu-ho-so">🗄️ Lưu hồ sơ — Đưa vào kho lưu trữ số</option>
+            </select>
+          </div>
+          <div style="margin-bottom:18px;">
+            <div class="field-label">Người thực hiện</div>
+            <div class="custom-select" id="role-select">
+              <div class="custom-select-trigger" id="role-trigger" onclick="toggleRoleSelect()">
+                <div class="select-tags" id="role-tags"><span style="color:#9ca3af; font-size:14px;">Chọn chức vụ người thực hiện</span></div>
+                <svg style="flex-shrink:0; color:#9ca3af;" id="role-chevron" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" d="M19 9l-7 7-7-7"/></svg>
+              </div>
+              <div class="custom-select-dropdown" id="role-dropdown" style="display:none;">
+                <div class="custom-option" onclick="toggleRoleOption('vp', 'Văn phòng')"><input type="checkbox" id="chk-vp" style="accent-color:#ea580c;" onclick="event.stopPropagation()" onchange="toggleRoleOptionFromChk('vp','Văn phòng')" /><span>Văn phòng</span></div>
+                <div class="custom-option" onclick="toggleRoleOption('pb', 'Phòng ban')"><input type="checkbox" id="chk-pb" style="accent-color:#ea580c;" onclick="event.stopPropagation()" onchange="toggleRoleOptionFromChk('pb','Phòng ban')" /><span>Phòng ban</span></div>
+                <div class="custom-option" onclick="toggleRoleOption('ld', 'Lãnh đạo')"><input type="checkbox" id="chk-ld" style="accent-color:#ea580c;" onclick="event.stopPropagation()" onchange="toggleRoleOptionFromChk('ld','Lãnh đạo')" /><span>Lãnh đạo</span></div>
+                <div class="custom-option" onclick="toggleRoleOption('vt', 'Văn thư')"><input type="checkbox" id="chk-vt" style="accent-color:#ea580c;" onclick="event.stopPropagation()" onchange="toggleRoleOptionFromChk('vt','Văn thư')" /><span>Văn thư</span></div>
+                <div class="custom-option" onclick="toggleRoleOption('kh', 'Kế hoạch')"><input type="checkbox" id="chk-kh" style="accent-color:#ea580c;" onclick="event.stopPropagation()" onchange="toggleRoleOptionFromChk('kh','Kế hoạch')" /><span>Kế hoạch</span></div>
+              </div>
+            </div>
+            <div class="field-hint">Có thể chọn nhiều chức vụ — Chỉ người thuộc chức vụ đó mới có quyền thực hiện.</div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:18px;">
+            <div>
+              <div class="field-label">Thời hạn xử lý (giờ) <span class="req">*</span></div>
+              <input id="step-deadline" class="field-input" type="number" min="1" placeholder="VD: 8" />
+              <div class="field-hint">Tính từ lúc bước bắt đầu.</div>
+            </div>
+            <div>
+              <div class="field-label">Khi quá hạn / lỗi <span class="req">*</span></div>
+              <select id="step-timeout" class="field-input" style="height:40px; cursor:pointer;">
+                <option value="stop">Dừng quy trình, chờ xử lý</option>
+                <option value="skip">Bỏ qua, chuyển bước tiếp</option>
+                <option value="notify">Thông báo và tiếp tục</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div style="padding:14px 20px; border-top:1px solid #e5e7eb; display:flex; justify-content:flex-end; gap:10px; flex-shrink:0;">
+          <button class="btn-ghost" onclick="closeStepPanel()" style="padding:7px 18px; border-radius:6px; font-size:13px;">Hủy</button>
+          <button class="btn-orange" onclick="saveStep()" style="padding:7px 18px; border-radius:6px; font-size:13px; font-weight:600; display:flex; align-items:center; gap:5px;">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" d="M5 13l4 4L19 7"/></svg>
+            Lưu bước
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /grid -->
+</div><!-- /screen-create -->
+
+
+<!-- ================================================================ -->
+<!-- SCREEN 3: THÔNG TIN QUY TRÌNH (Read-only view)                      -->
+<!-- ================================================================ -->
+<div id="screen-view" class="screen" style="background:#f5f6fa;">
+
+  <!-- Header Row 1: breadcrumb + icons -->
+  <div style="background:#fff; border-bottom:1px solid #f3f4f6; padding:0 24px; position:sticky; top:0; z-index:50;">
+    <div style="display:flex; align-items:center; justify-content:space-between; height:48px;">
+      <div style="display:flex; align-items:center; gap:6px;">
+        <button onclick="goToList()" style="background:none; border:none; cursor:pointer; color:#6b7280; padding:4px; border-radius:4px; display:flex; align-items:center; transition:color .15s;" title="Quay lại danh sách" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#6b7280'">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <span style="color:#9ca3af; font-size:13px; cursor:pointer;" onclick="goToList()">Danh sách quy trình xử lý</span>
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#d1d5db" stroke-width="2"><path stroke-linecap="round" d="M9 5l7 7-7 7"/></svg>
+        <span style="font-size:15px; font-weight:700; color:#1f2937;" id="view-screen-title">Thông tin quy trình</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:14px;">
+        <button style="background:none; border:none; cursor:pointer; padding:4px; color:#6b7280; position:relative;" title="Thông báo">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+          <span style="position:absolute;top:2px;right:2px;width:7px;height:7px;background:#ea580c;border-radius:50%;border:1.5px solid #fff;"></span>
+        </button>
+        <button style="background:none; border:none; cursor:pointer; padding:4px; color:#6b7280;" title="Trợ giúp">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+        </button>
+        <div style="width:32px; height:32px; border-radius:50%; background:#ea580c; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; cursor:pointer;" title="Nguyễn Văn An">NA</div>
+      </div>
+    </div>
+  </div>
+  <!-- Header Row 2: action buttons -->
+  <div style="background:#fff; border-bottom:1px solid #e5e7eb; padding:0 24px; position:sticky; top:48px; z-index:49;">
+    <div style="display:flex; align-items:center; justify-content:flex-end; gap:8px; height:42px;">
+      <button class="btn-ghost" onclick="goToList()" style="padding:5px 14px; border-radius:6px; font-size:13px;">Đóng</button>
+      <button class="btn-orange" onclick="editCurrentFlow()" style="padding:5px 16px; border-radius:6px; font-size:13px; font-weight:600; display:flex; align-items:center; gap:5px;">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Chỉnh sửa
+      </button>
+    </div>
+  </div>
+
+  <!-- Main content: 3:2 grid -->
+  <div style="display:grid; grid-template-columns: 3fr 2fr; gap:0; flex:1; height:calc(100vh - 90px); overflow:hidden;">
+
+    <!-- LEFT: Info + Steps -->
+    <div style="padding:20px 24px; overflow-y:auto; background:#fff; display:flex; flex-direction:column; gap:16px; border-right:1px solid #e5e7eb;">
+
+      <!-- Block: Thông tin quy trình -->
+      <div style="border:1px solid #e5e7eb; border-radius:10px; overflow:hidden;">
+        <div style="background:#f9fafb; padding:10px 16px; border-bottom:1px solid #e5e7eb; display:flex; align-items:center; gap:8px;">
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="#ea580c" stroke-width="2"><path stroke-linecap="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+          <span style="font-size:13px; font-weight:700; color:#374151; text-transform:uppercase; letter-spacing:.05em;">Thông tin quy trình</span>
+        </div>
+        <div style="padding:16px; display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+          <div>
+            <div style="font-size:11px; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:.06em; margin-bottom:5px;">Tên quy trình</div>
+            <div id="view-flow-name" style="font-size:15px; font-weight:700; color:#1f2937;"></div>
+          </div>
+          <div>
+            <div style="font-size:11px; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:.06em; margin-bottom:5px;">Trạng thái</div>
+            <div id="view-flow-status"></div>
+          </div>
+          <div>
+            <div style="font-size:11px; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:.06em; margin-bottom:5px;">Loại VB áp dụng</div>
+            <div id="view-flow-types" style="display:flex; flex-wrap:wrap; gap:4px;"></div>
+          </div>
+          <div>
+            <div style="font-size:11px; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:.06em; margin-bottom:5px;">Số bước xử lý</div>
+            <div id="view-flow-steps" style="font-size:14px; font-weight:700; color:#ea580c;"></div>
+          </div>
+          <div>
+            <div style="font-size:11px; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:.06em; margin-bottom:5px;">Ngày tạo</div>
+            <div id="view-flow-created" style="font-size:13px; color:#374151;"></div>
+          </div>
+          <div>
+            <div style="font-size:11px; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:.06em; margin-bottom:5px;">Người tạo</div>
+            <div id="view-flow-author" style="font-size:13px; color:#374151;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Block: Các bước xử lý -->
+      <div style="border:1px solid #e5e7eb; border-radius:10px; overflow:hidden;">
+        <div style="background:#f9fafb; padding:10px 16px; border-bottom:1px solid #e5e7eb; display:flex; align-items:center; gap:8px;">
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="#ea580c" stroke-width="2"><path stroke-linecap="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+          <span style="font-size:13px; font-weight:700; color:#374151; text-transform:uppercase; letter-spacing:.05em;">Các bước xử lý</span>
+          <span id="view-steps-count" style="background:#fff7ed; color:#ea580c; font-size:11px; font-weight:700; padding:1px 8px; border-radius:99px; border:1px solid #fed7aa;"></span>
+        </div>
+        <div id="view-steps-list" style="padding:12px 16px; display:flex; flex-direction:column; gap:10px;"></div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: Summary panel -->
+    <div style="padding:20px; overflow-y:auto; background:#f5f6fa; display:flex; flex-direction:column; gap:14px;">
+
+      <!-- Tóm tắt -->
+      <div style="background:#fff; border:1px solid #e5e7eb; border-radius:10px; padding:16px;">
+        <div style="font-size:13px; font-weight:700; color:#374151; margin-bottom:12px; text-transform:uppercase; letter-spacing:.05em; display:flex; align-items:center; gap:6px;">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#ea580c" stroke-width="2"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 8v4l3 3"/></svg>
+          Tóm tắt
+        </div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #f3f4f6;">
+            <span style="font-size:13px; color:#6b7280;">Tổng số bước</span>
+            <span id="view-summary-steps" style="font-size:14px; font-weight:700; color:#1f2937;"></span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #f3f4f6;">
+            <span style="font-size:13px; color:#6b7280;">Tổng thời hạn tối đa</span>
+            <span id="view-summary-hours" style="font-size:14px; font-weight:700; color:#1f2937;"></span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0;">
+            <span style="font-size:13px; color:#6b7280;">Đang áp dụng cho VB</span>
+            <span id="view-summary-docs" style="font-size:14px; font-weight:700; color:#1f2937;"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hành vi trong quy trình -->
+      <div style="background:#fff; border:1px solid #e5e7eb; border-radius:10px; padding:16px;">
+        <div style="font-size:13px; font-weight:700; color:#374151; margin-bottom:12px; text-transform:uppercase; letter-spacing:.05em; display:flex; align-items:center; gap:6px;">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#ea580c" stroke-width="2"><path stroke-linecap="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+          Hành vi trong quy trình
+        </div>
+        <div id="view-behaviors" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
+      </div>
+
+      <!-- Vai trò tham gia -->
+      <div style="background:#fff; border:1px solid #e5e7eb; border-radius:10px; padding:16px;">
+        <div style="font-size:13px; font-weight:700; color:#374151; margin-bottom:12px; text-transform:uppercase; letter-spacing:.05em; display:flex; align-items:center; gap:6px;">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#ea580c" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+          Vai trò tham gia
+        </div>
+        <div id="view-roles" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
+      </div>
+
+    </div>
+
+  </div><!-- /grid -->
+</div><!-- /screen-view -->
+
+
+<!-- ================================================================ -->
+<!-- MODAL: Confirm dialog                                             -->
+<!-- ================================================================ -->
+<div id="modal-overlay" class="modal-overlay" style="display:none;" onclick="modalBackdropClick(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-title" id="modal-title">Xác nhận</div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="modal-cancel" onclick="closeModal()" style="padding:8px 18px; border-radius:6px; font-size:14px;">Hủy</button>
+      <button class="btn-orange" id="modal-confirm" style="padding:8px 18px; border-radius:6px; font-size:14px; font-weight:600;">Xác nhận</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast notification -->
+<div id="toast" class="toast hidden"></div>
+
+
+<!-- ================================================================ -->
+<!-- JAVASCRIPT                                                        -->
+<!-- ================================================================ -->
+<script>
+// ─── DATA ────────────────────────────────────────────────────────────
+const TYPE_LABELS = {
+  'vbd':    { label: 'Văn bản đi',    cls: 'badge-vbd' },
+  'vbden':  { label: 'Văn bản đến',   cls: 'badge-vbden' },
+  'noi-bo': { label: 'Nội bộ',        cls: 'badge-noi-bo' },
+};
+const STATUS_LABELS = {
+  active:   { label: 'Đang hoạt động', cls: 'badge-active', dot: 'dot-active' },
+  draft:    { label: 'Nháp',           cls: 'badge-draft',  dot: 'dot-draft' },
+  inactive: { label: 'Không hoạt động',cls: 'badge-inactive',dot: 'dot-inactive' },
+};
+const BEHAVIOR_LABELS = {
+  duyet:      'Duyệt nội dung',
+  'y-kien':   'Ghi ý kiến',
+  'phan-cong':'Phân công',
+  'ky-so':    'Ký số',
+  'dong-dau': 'Đóng dấu & Cấp số',
+  'ban-hanh': 'Ban hành',
+  'luu-ho-so':'Lưu hồ sơ',
+};
+
+let allFlows = [
+  { id:1, name:'Quy trình duyệt VB đi cấp Phòng', types:['vbd'], status:'active', steps:3, created:'12/03/2025', author:'Nguyễn Văn An', hasDoc:true },
+  { id:2, name:'Quy trình xử lý VB đến khẩn', types:['vbden'], status:'active', steps:5, created:'01/04/2025', author:'Trần Thị Bình', hasDoc:false },
+  { id:3, name:'Quy trình nội bộ báo cáo tuần', types:['noi-bo'], status:'draft', steps:2, created:'20/03/2025', author:'Lê Minh Cường', hasDoc:false },
+  { id:4, name:'Quy trình ký số và ban hành VB đi', types:['vbd'], status:'active', steps:6, created:'05/02/2025', author:'Phạm Thu Hà', hasDoc:true },
+  { id:5, name:'Quy trình tổng hợp đa loại VB', types:['vbd','vbden','noi-bo'], status:'inactive', steps:4, created:'10/01/2025', author:'Hoàng Đức Mạnh', hasDoc:false },
+  { id:6, name:'Quy trình lưu hồ sơ cuối năm', types:['noi-bo'], status:'draft', steps:3, created:'28/03/2025', author:'Vũ Lan Anh', hasDoc:false },
+  { id:7, name:'Quy trình phân công VB đến thường', types:['vbden'], status:'inactive', steps:2, created:'15/02/2025', author:'Đinh Quang Huy', hasDoc:true },
+  { id:8, name:'Quy trình ban hành quyết định', types:['vbd'], status:'active', steps:7, created:'22/03/2025', author:'Bùi Thế Vinh', hasDoc:true },
+  { id:9, name:'Quy trình nội bộ họp định kỳ', types:['noi-bo'], status:'draft', steps:2, created:'01/04/2025', author:'Ngô Kim Ngân', hasDoc:false },
+  { id:10, name:'Quy trình duyệt nhanh VB đi cấp Cục', types:['vbd','noi-bo'], status:'active', steps:4, created:'30/03/2025', author:'Cao Thị Lan', hasDoc:true },
+  { id:11, name:'Quy trình xử lý khiếu nại VB đến', types:['vbden'], status:'active', steps:5, created:'18/03/2025', author:'Phan Bảo Long', hasDoc:false },
+  { id:12, name:'Quy trình cấp số văn bản thường', types:['vbd'], status:'inactive', steps:3, created:'08/01/2025', author:'Tô Thanh Tâm', hasDoc:true },
+];
+
+// Pagination state
+let currentPage = 1;
+let pageSize = 10;
+let filteredFlows = [...allFlows];
+
+// Steps for create screen
+let steps = [];
+let editingStepIndex = null;
+
+// Multi-select state
+let selectedApplyTypes = [];
+let selectedRoles = [];
+
+// ─── SCREEN NAVIGATION ───────────────────────────────────────────────
+let currentViewFlowId = null;
+
+const ROLE_LABELS = { vp:'Văn phòng', pb:'Phòng ban', ld:'Lãnh đạo', vt:'Văn thư', kh:'Kế hoạch' };
+
+const MOCK_STEP_POOLS = {
+  'vbd': [
+    { name: 'Văn thư tiếp nhận hồ sơ', behavior: 'luu-ho-so', deadline: 4, timeout: 'stop', roles: ['vt'] },
+    { name: 'Lãnh đạo phòng soạn thảo', behavior: 'y-kien', deadline: 8, timeout: 'notify', roles: ['pb'] },
+    { name: 'Duyệt nội dung văn bản', behavior: 'duyet', deadline: 8, timeout: 'stop', roles: ['pb','ld'] },
+    { name: 'Phê duyệt lãnh đạo cơ quan', behavior: 'duyet', deadline: 4, timeout: 'stop', roles: ['ld'] },
+    { name: 'Ký số văn bản', behavior: 'ky-so', deadline: 4, timeout: 'stop', roles: ['ld'] },
+    { name: 'Đóng dấu & Cấp số phát hành', behavior: 'dong-dau', deadline: 2, timeout: 'stop', roles: ['vt'] },
+    { name: 'Ban hành văn bản', behavior: 'ban-hanh', deadline: 2, timeout: 'stop', roles: ['vt'] },
+  ],
+  'vbden': [
+    { name: 'Văn thư tiếp nhận & Đăng ký', behavior: 'luu-ho-so', deadline: 2, timeout: 'stop', roles: ['vt'] },
+    { name: 'Lãnh đạo phân công xử lý', behavior: 'phan-cong', deadline: 4, timeout: 'stop', roles: ['ld'] },
+    { name: 'Phòng ban nghiên cứu, xử lý', behavior: 'duyet', deadline: 16, timeout: 'notify', roles: ['pb'] },
+    { name: 'Ghi ý kiến chuyên môn', behavior: 'y-kien', deadline: 8, timeout: 'notify', roles: ['pb'] },
+    { name: 'Lưu hồ sơ theo dõi', behavior: 'luu-ho-so', deadline: 2, timeout: 'notify', roles: ['vt'] },
+  ],
+  'noi-bo': [
+    { name: 'Phòng ban khởi tạo tài liệu', behavior: 'y-kien', deadline: 4, timeout: 'notify', roles: ['pb'] },
+    { name: 'Duyệt nội bộ cấp phòng', behavior: 'duyet', deadline: 8, timeout: 'stop', roles: ['pb'] },
+    { name: 'Phê duyệt lãnh đạo', behavior: 'duyet', deadline: 4, timeout: 'stop', roles: ['ld'] },
+    { name: 'Lưu hồ sơ nội bộ', behavior: 'luu-ho-so', deadline: 2, timeout: 'notify', roles: ['vt'] },
+  ],
+};
+
+function getMockSteps(f) {
+  const primaryType = f.types[0] || 'vbd';
+  const pool = MOCK_STEP_POOLS[primaryType] || MOCK_STEP_POOLS['vbd'];
+  const count = Math.min(f.steps, pool.length);
+  return pool.slice(0, count);
+}
+
+function goToView(id) {
+  const f = allFlows.find(x => x.id === id);
+  if (!f) return;
+  currentViewFlowId = id;
+  document.getElementById('screen-list').classList.remove('active');
+  document.getElementById('screen-view').classList.add('active');
+  setNavActive('nav-luong-xs');
+  renderViewScreen(f);
+}
+
+function renderViewScreen(f) {
+  const steps = getMockSteps(f);
+  const st = STATUS_LABELS[f.status];
+
+  // Header title
+  document.getElementById('view-screen-title').textContent = f.name;
+
+  // Info fields
+  document.getElementById('view-flow-name').textContent = f.name;
+  document.getElementById('view-flow-status').innerHTML =
+    `<span class="badge ${st.cls}" style="padding:3px 10px; font-size:12px;"><span class="dot ${st.dot}" style="margin-right:4px;"></span>${st.label}</span>`;
+  document.getElementById('view-flow-types').innerHTML =
+    f.types.map(t => `<span class="badge ${TYPE_LABELS[t].cls}" style="padding:2px 8px; font-size:11px;">${TYPE_LABELS[t].label}</span>`).join('');
+  document.getElementById('view-flow-steps').textContent = f.steps + ' bước';
+  document.getElementById('view-flow-created').textContent = f.created;
+  document.getElementById('view-flow-author').textContent = f.author;
+
+  // Steps count badge
+  document.getElementById('view-steps-count').textContent = steps.length + ' bước';
+
+  // Steps list
+  document.getElementById('view-steps-list').innerHTML = steps.map((s, i) => `
+    <div style="background:#fff; border:1.5px solid #e5e7eb; border-radius:10px; padding:12px 14px; display:flex; align-items:flex-start; gap:10px;">
+      <div style="width:26px; height:26px; border-radius:50%; background:#fff7ed; border:2px solid #ea580c; color:#ea580c; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0;">${i + 1}</div>
+      <div style="flex:1; min-width:0;">
+        <div style="font-weight:600; color:#1f2937; font-size:14px; margin-bottom:5px;">${s.name}</div>
+        <div style="font-size:12px; color:#6b7280; display:flex; flex-wrap:wrap; gap:10px;">
+          <span style="display:flex; align-items:center; gap:3px;">
+            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            ${BEHAVIOR_LABELS[s.behavior] || s.behavior}
+          </span>
+          <span style="display:flex; align-items:center; gap:3px;">
+            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            ${s.deadline} giờ
+          </span>
+          ${s.roles && s.roles.length > 0 ? `<span style="display:flex; align-items:center; gap:3px;">
+            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            ${s.roles.map(r => ROLE_LABELS[r] || r).join(', ')}
+          </span>` : ''}
+        </div>
+      </div>
+      <div style="flex-shrink:0;">
+        <span style="font-size:11px; background:#f3f4f6; color:#6b7280; padding:2px 8px; border-radius:4px;">${
+          s.timeout === 'stop' ? 'Dừng khi quá hạn' : s.timeout === 'skip' ? 'Bỏ qua khi quá hạn' : 'Thông báo & tiếp tục'
+        }</span>
+      </div>
+    </div>
+  `).join('');
+
+  // Summary panel
+  const totalHours = steps.reduce((sum, s) => sum + s.deadline, 0);
+  document.getElementById('view-summary-steps').textContent = f.steps + ' bước';
+  document.getElementById('view-summary-hours').textContent = totalHours + ' giờ';
+  document.getElementById('view-summary-docs').textContent = f.hasDoc ? 'Có' : 'Chưa có';
+
+  // Behaviors (unique)
+  const behaviors = [...new Set(steps.map(s => s.behavior))];
+  document.getElementById('view-behaviors').innerHTML = behaviors.map(b =>
+    `<span style="background:#fff7ed; color:#ea580c; border:1px solid #fed7aa; border-radius:6px; padding:3px 10px; font-size:12px; font-weight:500;">${BEHAVIOR_LABELS[b] || b}</span>`
+  ).join('');
+
+  // Roles (unique across all steps)
+  const allRoles = [...new Set(steps.flatMap(s => s.roles || []))];
+  document.getElementById('view-roles').innerHTML = allRoles.map(r =>
+    `<span style="background:#ede9fe; color:#7c3aed; border:1px solid #ddd6fe; border-radius:6px; padding:3px 10px; font-size:12px; font-weight:500;">${ROLE_LABELS[r] || r}</span>`
+  ).join('') || '<span style="font-size:13px; color:#9ca3af;">Chưa phân công vai trò</span>';
+}
+
+function editCurrentFlow() {
+  const f = allFlows.find(x => x.id === currentViewFlowId);
+  if (!f) return;
+  document.getElementById('screen-view').classList.remove('active');
+  goToCreate({ id: f.id, name: f.name, types: f.types, status: f.status });
+}
+
+function goToCreate(editData) {
+  document.getElementById('screen-list').classList.remove('active');
+  document.getElementById('screen-view').classList.remove('active');
+  document.getElementById('screen-create').classList.add('active');
+  document.getElementById('create-screen-title').textContent = editData ? 'Chỉnh sửa quy trình' : 'Tạo quy trình mới';
+  steps = editData ? (editData.stepsData || []) : [];
+  selectedApplyTypes = editData ? (editData.types || []) : [];
+  selectedRoles = [];
+  flowStatusActive = editData ? editData.status === 'active' : true;
+  resetCreateScreen(editData);
+  renderSteps();
+  renderApplyTags();
+}
+
+function goToList() {
+  document.getElementById('screen-create').classList.remove('active');
+  document.getElementById('screen-view').classList.remove('active');
+  document.getElementById('screen-list').classList.add('active');
+  setNavActive('nav-luong-xs');
+}
+
+function confirmClose() {
+  const hasData = document.getElementById('flow-name').value.trim() || steps.length > 0;
+  if (hasData) {
+    showModal('Thoát không lưu?', 'Thông tin quy trình chưa được lưu. Bạn có chắc chắn muốn thoát?', 'Thoát', () => goToList(), true);
+  } else {
+    goToList();
+  }
+}
+
+function resetCreateScreen(data) {
+  document.getElementById('flow-name').value = data ? data.name : '';
+  document.getElementById('flow-desc').value = '';
+  closeStepPanel();
+  // Reset apply select
+  ['vbd','vbden','noi-bo'].forEach(k => {
+    const el = document.getElementById('chk-' + k);
+    if (el) el.checked = selectedApplyTypes.includes(k);
+  });
+  renderApplyTags();
+}
+
+// ─── LIST & FILTER ────────────────────────────────────────────────────
+function filterList() {
+  const q = document.getElementById('search-input').value.toLowerCase();
+  const type = document.getElementById('filter-type').value;
+  const status = document.getElementById('filter-status').value;
+  filteredFlows = allFlows.filter(f => {
+    const nameMatch = f.name.toLowerCase().includes(q);
+    const typeMatch = !type || f.types.includes(type);
+    const statusMatch = !status || f.status === status;
+    return nameMatch && typeMatch && statusMatch;
+  });
+  currentPage = 1;
+  renderTable();
+}
+
+function renderTable() {
+  const tbody = document.getElementById('table-body');
+  const emptyEl = document.getElementById('empty-state');
+  const paginationBar = document.getElementById('pagination-bar');
+  const start = (currentPage - 1) * pageSize;
+  const pageData = filteredFlows.slice(start, start + pageSize);
+
+  if (filteredFlows.length === 0) {
+    tbody.innerHTML = '';
+    emptyEl.style.display = 'block';
+    paginationBar.style.display = 'none';
+    return;
+  }
+  emptyEl.style.display = 'none';
+  paginationBar.style.display = 'flex';
+
+  tbody.innerHTML = pageData.map((f, idx) => {
+    const stt = start + idx + 1;
+    const typeBadges = f.types.map(t => `<span class="badge ${TYPE_LABELS[t].cls}" style="margin-right:3px; padding:1px 7px; font-size:11px;">${TYPE_LABELS[t].label}</span>`).join('');
+    const st = STATUS_LABELS[f.status];
+    const canDelete = !f.hasDoc;
+    return `
+      <tr>
+        <td style="text-align:center; color:#9ca3af; font-size:12px; padding:6px 8px; width:40px;">${stt}</td>
+        <td class="td-name" style="font-weight:600; color:#1f2937;" title="${f.name}">${f.name}</td>
+        <td>${typeBadges}</td>
+        <td>
+          <span class="badge ${st.cls}" style="padding:2px 8px; font-size:11px;">
+            <span class="dot ${st.dot}"></span>
+            ${st.label}
+          </span>
+        </td>
+        <td style="text-align:center; font-weight:600; color:#374151;">${f.steps}</td>
+        <td style="color:#6b7280; font-size:12px;">${f.created}</td>
+        <td style="color:#374151; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${f.author}">${f.author}</td>
+        <td style="text-align:right; padding-right:10px; white-space:nowrap;">
+          <div style="display:inline-flex; align-items:center; gap:4px;">
+            <button class="btn-ghost" style="padding:3px 10px; border-radius:5px; font-size:12px; font-weight:500;"
+              onclick="goToView(${f.id})">
+              Xem
+            </button>
+            <div style="position:relative;" id="menu-wrap-${f.id}">
+              <button class="btn-ghost" style="padding:3px 7px; border-radius:5px;" title="Thao tác khác"
+                onclick="toggleMenu(${f.id}, event)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+              </button>
+              <div class="menu-dropdown" id="menu-${f.id}" style="display:none;">
+                <div class="menu-item" onclick="editFlow(${f.id}); closeAllMenus()">
+                  <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  Chỉnh sửa
+                </div>
+                <div class="menu-item" onclick="cloneFlow(${f.id}); closeAllMenus()">
+                  <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                  Nhân bản
+                </div>
+                <div class="menu-item ${canDelete ? 'danger' : 'disabled'}" onclick="${canDelete ? 'deleteFlow(' + f.id + ')' : ''} closeAllMenus()">
+                  <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+                  ${canDelete ? 'Xóa' : 'Xóa (đang được dùng)'}
+                </div>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  renderPagination();
+}
+
+// ─── PAGINATION ───────────────────────────────────────────────────────
+function renderPagination() {
+  const total = filteredFlows.length;
+  const totalPages = Math.ceil(total / pageSize);
+  const start = (currentPage - 1) * pageSize + 1;
+  const end = Math.min(currentPage * pageSize, total);
+  document.getElementById('pagination-info').textContent = `Hiển thị ${start}–${end} của ${total} bản ghi`;
+
+  const pnEl = document.getElementById('page-numbers');
+  let pages = [];
+  for (let i = 1; i <= totalPages; i++) {
+    if (i === 1 || i === totalPages || Math.abs(i - currentPage) <= 1) pages.push(i);
+    else if (pages[pages.length - 1] !== '...') pages.push('...');
+  }
+  pnEl.innerHTML = pages.map(p =>
+    p === '...'
+      ? `<span style="padding:0 4px; color:#9ca3af; font-size:13px;">…</span>`
+      : `<button class="page-btn ${p === currentPage ? 'active' : ''}" onclick="gotoPage(${p})">${p}</button>`
+  ).join('');
+
+  document.getElementById('btn-prev').disabled = currentPage === 1;
+  document.getElementById('btn-next').disabled = currentPage === totalPages || totalPages === 0;
+}
+
+function gotoPage(p) { currentPage = p; renderTable(); }
+function changePage(d) { gotoPage(currentPage + d); }
+function changePageSize(v) { pageSize = parseInt(v); currentPage = 1; renderTable(); }
+
+// ─── MENU ─────────────────────────────────────────────────────────────
+function toggleMenu(id, e) {
+  e.stopPropagation();
+  const el = document.getElementById('menu-' + id);
+  const wasOpen = el.style.display !== 'none';
+  closeAllMenus();
+  if (!wasOpen) el.style.display = 'block';
+}
+function closeAllMenus() {
+  document.querySelectorAll('.menu-dropdown').forEach(m => m.style.display = 'none');
+}
+document.addEventListener('click', closeAllMenus);
+
+function editFlow(id) {
+  const f = allFlows.find(x => x.id === id);
+  goToCreate({ id: f.id, name: f.name, types: f.types });
+}
+
+function cloneFlow(id) {
+  const f = allFlows.find(x => x.id === id);
+  const clone = { ...f, id: Date.now(), name: f.name + ' (bản sao)', status: 'draft', hasDoc: false };
+  allFlows.push(clone);
+  filteredFlows = [...allFlows];
+  renderTable();
+  showToast('Đã tạo bản sao quy trình thành công.', 'success');
+}
+
+function deleteFlow(id) {
+  closeAllMenus();
+  showModal(
+    'Xóa quy trình xử lý',
+    'Bạn có chắc chắn muốn xóa quy trình xử lý này không? Thao tác không thể hoàn tác.',
+    'Xóa',
+    () => {
+      allFlows = allFlows.filter(x => x.id !== id);
+      filterList();
+      showToast('Đã xóa quy trình thành công.', 'success');
+    },
+    true
+  );
+}
+
+// ─── STEP PANEL ────────────────────────────────────────────────────────
+function openStepPanel(idx) {
+  editingStepIndex = idx;
+  document.getElementById('step-panel-title').textContent = idx === null ? 'Thêm bước' : 'Chỉnh sửa bước';
+  document.getElementById('panel-guide').style.display = 'none';
+  const panelStep = document.getElementById('panel-step');
+  panelStep.style.display = 'flex';
+
+  // Highlight editing card
+  document.querySelectorAll('.step-card').forEach((c, i) => {
+    c.classList.toggle('active-edit', i === idx);
+  });
+
+  // Load data if editing
+  if (idx !== null && steps[idx]) {
+    const s = steps[idx];
+    document.getElementById('step-name').value = s.name;
+    document.getElementById('step-behavior').value = s.behavior;
+    document.getElementById('step-deadline').value = s.deadline;
+    document.getElementById('step-timeout').value = s.timeout;
+    selectedRoles = s.roles || [];
+    renderRoleTags();
+  } else {
+    document.getElementById('step-name').value = '';
+    document.getElementById('step-behavior').value = '';
+    document.getElementById('step-deadline').value = '';
+    document.getElementById('step-timeout').value = 'stop';
+    selectedRoles = [];
+    renderRoleTags();
+  }
+  // Reset role checkboxes
+  ['vp','pb','ld','vt','kh'].forEach(k => {
+    const el = document.getElementById('chk-' + k);
+    if (el) el.checked = selectedRoles.includes(k);
+  });
+}
+
+function closeStepPanel() {
+  document.getElementById('panel-guide').style.display = 'block';
+  document.getElementById('panel-step').style.display = 'none';
+  document.querySelectorAll('.step-card').forEach(c => c.classList.remove('active-edit'));
+  editingStepIndex = null;
+}
+
+function saveStep() {
+  const name = document.getElementById('step-name').value.trim();
+  const behavior = document.getElementById('step-behavior').value;
+  const deadline = document.getElementById('step-deadline').value;
+  const timeout = document.getElementById('step-timeout').value;
+
+  if (!name) { document.getElementById('step-name').focus(); showToast('Vui lòng nhập tên bước.', 'error'); return; }
+  if (!behavior) { showToast('Vui lòng chọn loại hành vi.', 'error'); return; }
+  if (!deadline) { document.getElementById('step-deadline').focus(); showToast('Vui lòng nhập thời hạn xử lý.', 'error'); return; }
+
+  const stepData = { name, behavior, deadline: parseInt(deadline), timeout, roles: [...selectedRoles] };
+
+  if (editingStepIndex !== null) {
+    steps[editingStepIndex] = stepData;
+  } else {
+    steps.push(stepData);
+  }
+  renderSteps();
+  closeStepPanel();
+  showToast(editingStepIndex !== null ? 'Đã cập nhật bước.' : 'Đã thêm bước mới.', 'success');
+}
+
+function deleteStep(idx) {
+  showModal('Xóa bước xử lý', 'Bạn có chắc chắn muốn xóa bước xử lý này không?', 'Xóa', () => {
+    if (editingStepIndex === idx) closeStepPanel();
+    steps.splice(idx, 1);
+    renderSteps();
+  }, true);
+}
+
+function renderSteps() {
+  const list = document.getElementById('step-list');
+  const empty = document.getElementById('step-empty');
+  if (steps.length === 0) {
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  list.innerHTML = steps.map((s, i) => `
+    <div class="step-card" id="step-card-${i}" draggable="true"
+      ondragstart="dragStart(event,${i})" ondragover="dragOver(event,${i})" ondrop="drop(event,${i})" ondragleave="dragLeave(${i})">
+      <div style="display:flex; align-items:flex-start; gap:10px;">
+        <!-- Drag handle -->
+        <div class="drag-handle" title="Kéo để sắp xếp" style="margin-top:2px;">
+          <span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <!-- Step number -->
+        <div style="width:26px; height:26px; border-radius:50%; background:#fff7ed; border:2px solid #ea580c; color:#ea580c; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0;">${i + 1}</div>
+        <!-- Content -->
+        <div style="flex:1; min-width:0;">
+          <div style="font-weight:600; color:#1f2937; font-size:14px; margin-bottom:4px;">${s.name}</div>
+          <div style="font-size:12px; color:#6b7280; display:flex; flex-wrap:wrap; gap:10px;">
+            <span style="display:flex; align-items:center; gap:3px;">
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+              ${BEHAVIOR_LABELS[s.behavior] || s.behavior}
+            </span>
+            <span style="display:flex; align-items:center; gap:3px;">
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              ${s.deadline} giờ
+            </span>
+            ${s.roles && s.roles.length > 0 ? `<span style="display:flex; align-items:center; gap:3px;">
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              ${s.roles.length} vai trò
+            </span>` : ''}
+          </div>
+        </div>
+        <!-- Actions -->
+        <div style="display:flex; gap:4px; flex-shrink:0;">
+          <button onclick="openStepPanel(${i})" title="Sửa bước" style="background:none; border:none; cursor:pointer; color:#9ca3af; padding:4px; border-radius:4px; transition:color .15s;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button onclick="deleteStep(${i})" title="Xóa bước" style="background:none; border:none; cursor:pointer; color:#9ca3af; padding:4px; border-radius:4px; transition:color .15s;" onmouseover="this.style.color='#dc2626'" onmouseout="this.style.color='#9ca3af'">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6M10 11v6M14 11v6"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ─── DRAG & DROP STEPS ────────────────────────────────────────────────
+let dragSrcIdx = null;
+function dragStart(e, i) { dragSrcIdx = i; e.dataTransfer.effectAllowed = 'move'; setTimeout(() => document.getElementById('step-card-'+i)?.classList.add('dragging'), 0); }
+function dragOver(e, i) { e.preventDefault(); if (i !== dragSrcIdx) document.getElementById('step-card-'+i)?.classList.add('drag-over'); }
+function dragLeave(i) { document.getElementById('step-card-'+i)?.classList.remove('drag-over'); }
+function drop(e, i) {
+  e.preventDefault();
+  if (dragSrcIdx === null || dragSrcIdx === i) { dragSrcIdx = null; return; }
+  const moved = steps.splice(dragSrcIdx, 1)[0];
+  steps.splice(i, 0, moved);
+  dragSrcIdx = null;
+  renderSteps();
+}
+
+// ─── APPLY-FOR MULTI-SELECT ───────────────────────────────────────────
+const applyOptions = { vbd: 'Văn bản đi', vbden: 'Văn bản đến', 'noi-bo': 'Văn bản nội bộ' };
+function toggleApplySelect() {
+  const dd = document.getElementById('apply-dropdown');
+  const trigger = document.getElementById('apply-trigger');
+  const chevron = document.getElementById('apply-chevron');
+  const open = dd.style.display === 'block';
+  dd.style.display = open ? 'none' : 'block';
+  trigger.classList.toggle('open', !open);
+  chevron.style.transform = open ? '' : 'rotate(180deg)';
+}
+function toggleApplyOption(key, label) {
+  const idx = selectedApplyTypes.indexOf(key);
+  if (idx > -1) selectedApplyTypes.splice(idx, 1);
+  else selectedApplyTypes.push(key);
+  const chk = document.getElementById('chk-' + key);
+  if (chk) chk.checked = selectedApplyTypes.includes(key);
+  renderApplyTags();
+}
+function toggleApplyOptionFromChk(key, label) {
+  const chk = document.getElementById('chk-' + key);
+  const idx = selectedApplyTypes.indexOf(key);
+  if (chk.checked && idx === -1) selectedApplyTypes.push(key);
+  else if (!chk.checked && idx > -1) selectedApplyTypes.splice(idx, 1);
+  renderApplyTags();
+}
+function removeApplyTag(key) {
+  selectedApplyTypes = selectedApplyTypes.filter(k => k !== key);
+  const chk = document.getElementById('chk-' + key);
+  if (chk) chk.checked = false;
+  renderApplyTags();
+}
+function renderApplyTags() {
+  const el = document.getElementById('apply-tags');
+  if (selectedApplyTypes.length === 0) {
+    el.innerHTML = `<span style="color:#9ca3af;font-size:14px;">Chọn loại văn bản...</span>`;
+  } else {
+    el.innerHTML = selectedApplyTypes.map(k =>
+      `<span class="select-tag">${applyOptions[k]} <span class="select-tag-remove" onclick="event.stopPropagation();removeApplyTag('${k}')">×</span></span>`
+    ).join('');
+  }
+}
+
+// ─── ROLE MULTI-SELECT ────────────────────────────────────────────────
+const roleOptions = { vp: 'Văn phòng', pb: 'Phòng ban', ld: 'Lãnh đạo', vt: 'Văn thư', kh: 'Kế hoạch' };
+function toggleRoleSelect() {
+  const dd = document.getElementById('role-dropdown');
+  const trigger = document.getElementById('role-trigger');
+  const chevron = document.getElementById('role-chevron');
+  const open = dd.style.display === 'block';
+  dd.style.display = open ? 'none' : 'block';
+  trigger.classList.toggle('open', !open);
+  chevron.style.transform = open ? '' : 'rotate(180deg)';
+}
+function toggleRoleOption(key, label) {
+  const idx = selectedRoles.indexOf(key);
+  if (idx > -1) selectedRoles.splice(idx, 1);
+  else selectedRoles.push(key);
+  const chk = document.getElementById('chk-' + key);
+  if (chk) chk.checked = selectedRoles.includes(key);
+  renderRoleTags();
+}
+function toggleRoleOptionFromChk(key, label) {
+  const chk = document.getElementById('chk-' + key);
+  const idx = selectedRoles.indexOf(key);
+  if (chk.checked && idx === -1) selectedRoles.push(key);
+  else if (!chk.checked && idx > -1) selectedRoles.splice(idx, 1);
+  renderRoleTags();
+}
+function removeRoleTag(key) {
+  selectedRoles = selectedRoles.filter(k => k !== key);
+  const chk = document.getElementById('chk-' + key);
+  if (chk) chk.checked = false;
+  renderRoleTags();
+}
+function renderRoleTags() {
+  const el = document.getElementById('role-tags');
+  if (selectedRoles.length === 0) {
+    el.innerHTML = `<span style="color:#9ca3af;font-size:14px;">Chọn chức vụ người thực hiện</span>`;
+  } else {
+    el.innerHTML = selectedRoles.map(k =>
+      `<span class="select-tag">${roleOptions[k]} <span class="select-tag-remove" onclick="event.stopPropagation();removeRoleTag('${k}')">×</span></span>`
+    ).join('');
+  }
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', (e) => {
+  ['apply', 'role'].forEach(prefix => {
+    const wrap = document.getElementById(prefix + '-select');
+    const dd = document.getElementById(prefix + '-dropdown');
+    const trigger = document.getElementById(prefix + '-trigger');
+    const chevron = document.getElementById(prefix + '-chevron');
+    if (wrap && !wrap.contains(e.target)) {
+      if (dd) dd.style.display = 'none';
+      if (trigger) trigger.classList.remove('open');
+      if (chevron) chevron.style.transform = '';
+    }
+  });
+});
+
+// ─── FLOW STATUS TOGGLE ───────────────────────────────────────────────
+let flowStatusActive = true;
+function toggleFlowStatus() {
+  flowStatusActive = !flowStatusActive;
+  const toggle = document.getElementById('flow-toggle');
+  const label = document.getElementById('flow-status-label');
+  if (!toggle || !label) return;
+  if (flowStatusActive) {
+    toggle.style.background = '#16a34a';
+    toggle.querySelector('div').style.left = '18px';
+    label.textContent = 'Đang hoạt động';
+    label.style.color = '#16a34a';
+  } else {
+    toggle.style.background = '#d1d5db';
+    toggle.querySelector('div').style.left = '2px';
+    label.textContent = 'Không hoạt động';
+    label.style.color = '#9ca3af';
+  }
+}
+
+function saveFlow() {
+  const name = document.getElementById('flow-name').value.trim();
+  if (!name) { document.getElementById('flow-name').focus(); showToast('Vui lòng nhập tên quy trình trước khi lưu.', 'error'); return; }
+  const newFlow = {
+    id: Date.now(), name,
+    types: selectedApplyTypes.length ? selectedApplyTypes : ['vbd'],
+    status: flowStatusActive ? 'active' : 'inactive',
+    steps: steps.length,
+    created: new Date().toLocaleDateString('vi-VN'),
+    author: 'Nguyễn Văn An',
+    hasDoc: false,
+  };
+  allFlows.unshift(newFlow);
+  filterList();
+  goToList();
+  showToast('Đã lưu quy trình thành công.', 'success');
+}
+
+// ─── FLOW ACTIONS ─────────────────────────────────────────────────────
+function saveDraft() {
+  const name = document.getElementById('flow-name').value.trim();
+  if (!name) { document.getElementById('flow-name').focus(); showToast('Vui lòng nhập tên quy trình trước khi lưu nháp.', 'error'); return; }
+  showToast('Đã lưu nháp thành công.', 'success');
+}
+
+function activateFlow() {
+  const name = document.getElementById('flow-name').value.trim();
+  if (!name || steps.length === 0) {
+    showToast('Vui lòng hoàn thiện Tên quy trình và ít nhất một bước xử lý.', 'error');
+    return;
+  }
+  showModal('Kích hoạt quy trình', `Kích hoạt quy trình "<strong>${name}</strong>"? Quy trình sẽ sẵn sàng để áp dụng cho văn bản mới.`, 'Kích hoạt', () => {
+    const newFlow = {
+      id: Date.now(), name, types: selectedApplyTypes.length ? selectedApplyTypes : ['vbd'],
+      status: 'active', steps: steps.length, created: new Date().toLocaleDateString('vi-VN'), author: 'Người dùng hiện tại', hasDoc: false,
+    };
+    allFlows.unshift(newFlow);
+    filterList();
+    goToList();
+    showToast('Đã kích hoạt quy trình thành công.', 'success');
+  }, false);
+}
+
+// ─── MODAL ────────────────────────────────────────────────────────────
+let _confirmCb = null;
+function showModal(title, body, confirmLabel, cb, isDanger) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = body;
+  const btn = document.getElementById('modal-confirm');
+  btn.textContent = confirmLabel;
+  btn.className = isDanger ? 'btn-orange' : 'btn-orange';
+  btn.style.background = isDanger ? '#dc2626' : '#ea580c';
+  _confirmCb = cb;
+  btn.onclick = () => { closeModal(); if (_confirmCb) _confirmCb(); };
+  document.getElementById('modal-overlay').style.display = 'flex';
+}
+function closeModal() { document.getElementById('modal-overlay').style.display = 'none'; }
+function modalBackdropClick(e) { if (e.target === document.getElementById('modal-overlay')) closeModal(); }
+
+// ─── TOAST ────────────────────────────────────────────────────────────
+let _toastTimer = null;
+function showToast(msg, type) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `toast toast-${type}`;
+  if (_toastTimer) clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.add('hidden'), 3000);
+}
+
+// ─── SIDEBAR NAV ACTIVE ────────────────────────────────────────────────
+function setNavActive(id) {
+  document.querySelectorAll('.nav-sub-item').forEach(el => el.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+}
+
+// ─── SIDEBAR TOGGLE ───────────────────────────────────────────────────
+function toggleNav(key) {
+  const sub = document.getElementById('sub-' + key);
+  const arrow = document.getElementById('arrow-' + key);
+  if (!sub) return;
+  const isOpen = sub.style.display === 'block';
+  sub.style.display = isOpen ? 'none' : 'block';
+  if (arrow) arrow.classList.toggle('open', !isOpen);
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────
+filterList();
+</script>
+</div><!-- /main-content -->
+</div><!-- /app -->
+</body>
+</html>

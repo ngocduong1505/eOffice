@@ -1,0 +1,9 @@
+# UI Spec — Văn bản Đến (S1–S7)
+
+Đặt các file spec cho màn hình S1 đến S7 vào thư mục này.
+
+**Ví dụ:**
+- `S1-danh-sach.md`
+- `S2-tiep-nhan.md`
+- `S3-chi-tiet.md`
+- `S7-thiet-lap-luong.md`
