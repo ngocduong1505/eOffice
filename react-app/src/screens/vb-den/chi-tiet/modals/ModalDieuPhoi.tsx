@@ -30,12 +30,11 @@ const NGUOI_XU_LY_OPTIONS = [
 ]
 
 const TODAY = new Date().toISOString().slice(0, 16)
-const DEFAULT_HAN = '2026-03-28T17:00'
 
 let nextId = 1
 
 function makeRow(): AssigneeRow {
-  return { id: nextId++, nguoiXuLy: '', hanXuLy: DEFAULT_HAN, ghiChu: '' }
+  return { id: nextId++, nguoiXuLy: '', hanXuLy: '', ghiChu: '' }
 }
 
 export default function ModalDieuPhoi({ open, onClose, onSubmit, chiDaoInfo, defaultHanXuLy }: Props) {
@@ -44,7 +43,7 @@ export default function ModalDieuPhoi({ open, onClose, onSubmit, chiDaoInfo, def
 
   if (!open) return null
 
-  const defaultHan = defaultHanXuLy || DEFAULT_HAN
+  const defaultHan = defaultHanXuLy
 
   const updateRow = (id: number, field: keyof AssigneeRow, value: string) => {
     setRows(prev => prev.map(r => r.id === id ? { ...r, [field]: value } : r))

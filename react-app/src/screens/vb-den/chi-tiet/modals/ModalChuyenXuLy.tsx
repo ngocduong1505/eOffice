@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 // UI_DOC_IN_007_MODAL — Chuyển tiếp xử lý
 // Trigger: [Chuyển tiếp xử lý] trong Menu [...] khi trạng thái = "Chờ xử lý"
@@ -39,6 +39,17 @@ export default function ModalChuyenXuLy({ open, onClose, onSubmit, defaultHanXuL
   const [ykienChuyen, setYkienChuyen] = useState('')
   const [hanXuLy, setHanXuLy] = useState(defaultHanXuLy || DEFAULT_HAN)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [nguoiOpen, setNguoiOpen] = useState(false)
+  const nguoiRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!nguoiOpen) return
+    const handler = (e: MouseEvent) => {
+      if (nguoiRef.current && !nguoiRef.current.contains(e.target as Node)) setNguoiOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [nguoiOpen])
 
   if (!open) return null
 
@@ -101,36 +112,18 @@ export default function ModalChuyenXuLy({ open, onClose, onSubmit, defaultHanXuL
 
           {/* Loại chuyển */}
           <div className="fg">
-            <label style={{ fontSize: '.82rem', fontWeight: 600, color: 'var(--text2)', marginBottom: 10, display: 'block' }}>
+            <label style={{ fontSize: '.82rem', fontWeight: 600, color: 'var(--text2)', marginBottom: 6, display: 'block' }}>
               Loại chuyển <span className="req">*</span>
             </label>
-            <div style={{ display: 'flex', gap: 12 }}>
-              {([
-                { val: 'chinh', title: 'Chuyển chính', desc: 'Bàn giao toàn bộ trách nhiệm — bạn không còn hành động nào sau khi chuyển.' },
-                { val: 'phoi-hop', title: 'Chuyển phối hợp', desc: 'Bạn vẫn giữ trách nhiệm chính — thêm người xử lý song song.' },
-              ] as const).map(opt => (
-                <div
-                  key={opt.val}
-                  onClick={() => { setLoaiChuyen(opt.val); setErrors(p => ({ ...p, loaiChuyen: '' })) }}
-                  style={{
-                    flex: 1, border: `2px solid ${loaiChuyen === opt.val ? 'var(--orange)' : 'var(--border)'}`,
-                    borderRadius: 10, padding: '12px 14px', cursor: 'pointer',
-                    background: loaiChuyen === opt.val ? '#fff7ed' : '#fafbfc',
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                    <div style={{
-                      width: 16, height: 16, borderRadius: '50%',
-                      border: `2px solid ${loaiChuyen === opt.val ? 'var(--orange)' : '#cbd5e1'}`,
-                      background: loaiChuyen === opt.val ? 'var(--orange)' : '#fff',
-                      flexShrink: 0,
-                    }} />
-                    <span style={{ fontSize: '.82rem', fontWeight: 700, color: 'var(--dark)' }}>{opt.title}</span>
-                  </div>
-                  <div style={{ fontSize: '.72rem', color: 'var(--text3)', lineHeight: 1.5, paddingLeft: 24 }}>{opt.desc}</div>
-                </div>
-              ))}
-            </div>
+            <select
+              value={loaiChuyen}
+              onChange={e => { setLoaiChuyen(e.target.value as LoaiChuyen | ''); setErrors(p => ({ ...p, loaiChuyen: '' })) }}
+              style={{ width: '100%', boxSizing: 'border-box' }}
+            >
+              <option value="">-- Chọn loại chuyển --</option>
+              <option value="chinh">Chuyển chính — Bàn giao toàn bộ trách nhiệm</option>
+              <option value="phoi-hop">Chuyển phối hợp — Xử lý song song</option>
+            </select>
             {errors.loaiChuyen && <div style={{ fontSize: '.75rem', color: '#dc2626', marginTop: 4 }}>{errors.loaiChuyen}</div>}
           </div>
 
@@ -139,22 +132,68 @@ export default function ModalChuyenXuLy({ open, onClose, onSubmit, defaultHanXuL
             <label style={{ fontSize: '.82rem', fontWeight: 600, color: 'var(--text2)', marginBottom: 6, display: 'block' }}>
               Người nhận <span className="req">*</span>
             </label>
-            <div style={{ border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden' }}>
-              {NGUOI_OPTIONS.filter(o => o.value !== CURRENT_USER).map((o, i, arr) => (
-                <div
-                  key={o.value}
-                  onClick={() => toggleNguoiNhan(o.value)}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 10,
-                    padding: '10px 14px', cursor: 'pointer',
-                    background: nguoiNhan.includes(o.value) ? '#fff7ed' : '#fff',
-                    borderBottom: i < arr.length - 1 ? '1px solid var(--border)' : 'none',
-                  }}
-                >
-                  <input type="checkbox" checked={nguoiNhan.includes(o.value)} onChange={() => { }} style={{ cursor: 'pointer' }} />
-                  <span style={{ fontSize: '.82rem', color: 'var(--dark)' }}>{o.label}</span>
+            <div ref={nguoiRef} style={{ position: 'relative' }}>
+              {/* Trigger */}
+              <div
+                onClick={() => setNguoiOpen(o => !o)}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  border: `1px solid ${errors.nguoiNhan ? '#dc2626' : nguoiOpen ? 'var(--orange)' : 'var(--border)'}`,
+                  borderRadius: 8, padding: '8px 12px', cursor: 'pointer', background: '#fff', minHeight: 38,
+                  boxShadow: nguoiOpen ? '0 0 0 2px rgba(234,88,12,.2)' : 'none',
+                }}
+              >
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, flex: 1 }}>
+                  {nguoiNhan.length === 0
+                    ? <span style={{ fontSize: '.82rem', color: 'var(--text3)' }}>Chọn người nhận...</span>
+                    : nguoiNhan.map(v => {
+                        const opt = NGUOI_OPTIONS.find(o => o.value === v)
+                        const name = opt?.label.split(' — ')[0]
+                        return (
+                          <span key={v} style={{
+                            display: 'inline-flex', alignItems: 'center', gap: 4,
+                            background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: 4,
+                            padding: '2px 8px', fontSize: '.75rem', color: '#c2410c',
+                          }}>
+                            {name}
+                            <span
+                              onMouseDown={e => { e.stopPropagation(); toggleNguoiNhan(v) }}
+                              style={{ cursor: 'pointer', lineHeight: 1, marginLeft: 2 }}
+                            >×</span>
+                          </span>
+                        )
+                      })
+                  }
                 </div>
-              ))}
+                <span style={{ fontSize: '.7rem', color: 'var(--text3)', marginLeft: 8, flexShrink: 0 }}>
+                  {nguoiOpen ? '▲' : '▼'}
+                </span>
+              </div>
+
+              {/* Dropdown */}
+              {nguoiOpen && (
+                <div style={{
+                  position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0,
+                  border: '1px solid var(--border)', borderRadius: 8, background: '#fff',
+                  boxShadow: '0 8px 24px rgba(0,0,0,.12)', zIndex: 10, overflow: 'hidden',
+                }}>
+                  {NGUOI_OPTIONS.filter(o => o.value !== CURRENT_USER).map((o, i, arr) => (
+                    <div
+                      key={o.value}
+                      onMouseDown={e => { e.preventDefault(); toggleNguoiNhan(o.value) }}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 10,
+                        padding: '10px 14px', cursor: 'pointer',
+                        background: nguoiNhan.includes(o.value) ? '#fff7ed' : '#fff',
+                        borderBottom: i < arr.length - 1 ? '1px solid var(--border)' : 'none',
+                      }}
+                    >
+                      <input type="checkbox" checked={nguoiNhan.includes(o.value)} onChange={() => {}} style={{ cursor: 'pointer' }} />
+                      <span style={{ fontSize: '.82rem', color: 'var(--dark)' }}>{o.label}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             {errors.nguoiNhan && <div style={{ fontSize: '.75rem', color: '#dc2626', marginTop: 4 }}>{errors.nguoiNhan}</div>}
           </div>

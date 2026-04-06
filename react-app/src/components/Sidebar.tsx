@@ -12,6 +12,7 @@ interface SidebarGroup {
   badge?: { count: number; urgent?: boolean }
   defaultScreen: string
   items: SidebarNavItem[]
+  noDropdown?: boolean
 }
 
 const SIDEBAR_GROUPS: SidebarGroup[] = [
@@ -19,10 +20,9 @@ const SIDEBAR_GROUPS: SidebarGroup[] = [
     key: 'vb-den', icon: '📥', label: 'Văn bản Đến',
     badge: { count: 8, urgent: true },
     defaultScreen: 's1',
+    noDropdown: true,
     items: [
-      { id: 's1', label: 'Danh sách' },
-      { id: 's2', label: 'Tiếp nhận (Tạo văn bản)' },
-      { id: 's3', label: 'Chi tiết' },
+      { id: 's1', label: 'Danh sách' }
     ],
   },
   {
@@ -94,6 +94,24 @@ export default function Sidebar() {
         {SIDEBAR_GROUPS.map(group => {
           const isOpen = openGroups.has(group.key)
           const isParentActive = currentGroup === group.key
+
+          if (group.noDropdown) {
+            return (
+              <div key={group.key}>
+                <div
+                  className={`ni sub ${isParentActive ? 'on' : ''}`}
+                  onClick={() => goScreen(group.defaultScreen)}
+                >
+                  {group.icon} {group.label}
+                  {group.badge && (
+                    <span className={`nbg ${group.badge.urgent ? 'u' : ''}`} style={{ marginLeft: 4 }}>
+                      {group.badge.count}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )
+          }
 
           return (
             <div key={group.key}>

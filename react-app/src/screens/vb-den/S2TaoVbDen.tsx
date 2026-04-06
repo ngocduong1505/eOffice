@@ -116,7 +116,7 @@ function HoSoSelect({ value, onChange }: { value: string[]; onChange: (v: string
               onMouseEnter={e => { if (!value.includes(o.value)) e.currentTarget.style.background = '#f8fafc' }}
               onMouseLeave={e => { e.currentTarget.style.background = value.includes(o.value) ? '#eff6ff' : '#fff' }}
             >
-              <input type="checkbox" checked={value.includes(o.value)} onChange={() => {}} style={{ cursor: 'pointer' }} />
+              <input type="checkbox" checked={value.includes(o.value)} onChange={() => { }} style={{ cursor: 'pointer' }} />
               <span style={{ color: 'var(--dark)' }}>{o.label}</span>
             </div>
           ))}
@@ -321,10 +321,6 @@ export default function S2TaoVbDen() {
                 <div style={{ position: 'absolute', right: -8, top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', fontSize: '1.1rem' }}>›</div>
               </div>
               <WorkflowNode icon="🔀" title="Thư ký điều phối" sub="Thư ký / Văn thư" badge="Chờ thực hiện" />
-            </div>
-            <div className="fg" style={{ marginTop: 4 }}>
-              <label>Ý kiến xử lý</label>
-              <textarea placeholder="Ghi ý kiến hoặc ghi chú kèm theo..." style={{ height: 68 }} />
             </div>
           </div>
 

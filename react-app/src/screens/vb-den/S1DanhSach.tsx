@@ -361,7 +361,7 @@ export default function S1DanhSach() {
                     <td style={{ textAlign: 'center', color: 'var(--text3)', fontSize: '.82rem' }}>{idx + 1}</td>
                     <td style={{ fontWeight: 700, color: '#d94f1e', fontSize: '.9rem' }}>#{row.id}</td>
                     <td>
-                      <div style={{ fontSize: '.82rem', fontWeight: 600, color: 'var(--dark)', lineHeight: 1.35 }}>{row.trichYeu}</div>
+                      <div style={{ minWidth: 200, fontSize: '.82rem', fontWeight: 600, color: 'var(--dark)', lineHeight: 1.35 }}>{row.trichYeu}</div>
                     </td>
                     <td style={{ fontSize: '.8rem', fontFamily: 'monospace', fontWeight: 600 }}>{row.soKyHieu}</td>
                     <td style={{ fontSize: '.78rem', color: 'var(--text2)' }}>{row.loaiVB}</td>
@@ -371,7 +371,7 @@ export default function S1DanhSach() {
                       {row.hanXuLy}{row.isOverdue ? ' ⚠️' : ''}
                     </td>
                     <td style={{ fontSize: '.78rem' }}>{row.donViBanHanh}</td>
-                    <td><MucDoBadge mucDo={row.mucDo} /></td>
+                    <td style={{ minWidth: 100 }}><MucDoBadge mucDo={row.mucDo} /></td>
                     <td><span className={cfg.cls}>{cfg.label}</span></td>
                     <td onClick={e => e.stopPropagation()}>
                       <div className="row-act" style={{ position: 'relative' }}>

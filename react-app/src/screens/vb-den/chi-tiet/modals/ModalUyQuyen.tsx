@@ -7,7 +7,6 @@ interface SubmitData {
   nguoiNhan: string
   lyDo: string
   hanXuLy: string
-  ghiChu: string
 }
 
 interface Props {
@@ -31,7 +30,6 @@ export default function ModalUyQuyen({ open, onClose, onSubmit, defaultHanXuLy }
   const [nguoiNhan, setNguoiNhan] = useState('')
   const [lyDo, setLyDo] = useState('')
   const [hanXuLy, setHanXuLy] = useState(defaultHanXuLy || DEFAULT_HAN)
-  const [ghiChu, setGhiChu] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   if (!open) return null
@@ -50,8 +48,8 @@ export default function ModalUyQuyen({ open, onClose, onSubmit, defaultHanXuLy }
   const handleSubmit = () => {
     const e = validate()
     if (Object.keys(e).length) { setErrors(e); return }
-    onSubmit({ nguoiNhan, lyDo, hanXuLy, ghiChu })
-    setNguoiNhan(''); setLyDo(''); setHanXuLy(defaultHanXuLy || DEFAULT_HAN); setGhiChu(''); setErrors({})
+    onSubmit({ nguoiNhan, lyDo, hanXuLy })
+    setNguoiNhan(''); setLyDo(''); setHanXuLy(defaultHanXuLy || DEFAULT_HAN); setErrors({})
   }
 
   const canSubmit = nguoiNhan && lyDo.trim() && hanXuLy
@@ -124,19 +122,6 @@ export default function ModalUyQuyen({ open, onClose, onSubmit, defaultHanXuLy }
             />
             <div className="hint">Không được trễ hơn hạn xử lý gốc: 28/03/2026</div>
             {errors.hanXuLy && <div style={{ fontSize: '.75rem', color: '#dc2626', marginTop: 4 }}>{errors.hanXuLy}</div>}
-          </div>
-
-          {/* Ghi chú thêm */}
-          <div className="fg">
-            <label style={{ fontSize: '.82rem', fontWeight: 600, color: 'var(--text2)', marginBottom: 6, display: 'block' }}>
-              Ghi chú thêm
-            </label>
-            <textarea
-              value={ghiChu}
-              onChange={e => setGhiChu(e.target.value)}
-              placeholder="Nhập ghi chú (nếu có)..."
-              style={{ height: 80, resize: 'vertical', width: '100%', boxSizing: 'border-box' }}
-            />
           </div>
 
           {/* Lưu ý */}

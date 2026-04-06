@@ -280,24 +280,6 @@ export default function S3ChiTiet() {
             </div>
           )}
 
-          {status === 'cho-xu-ly' && (
-            <div style={{ padding: '12px 20px', background: '#fff7ed', borderBottom: '1px solid #fed7aa', flexShrink: 0 }}>
-              <div style={{ fontSize: '.72rem', fontWeight: 700, color: '#c2410c', textTransform: 'uppercase', letterSpacing: '.7px', marginBottom: 8 }}>
-                📌 Thông tin xử lý
-              </div>
-              {[
-                ['Đơn vị chủ trì', 'P. Kế hoạch TH'],
-                ['Đơn vị phối hợp', 'P. Tài chính KT'],
-                ['Người giao', 'Lê Văn Giám Đốc'],
-              ].map(([l, v]) => (
-                <div key={l} className="info-row" style={{ padding: '3px 0' }}>
-                  <div className="ir-l">{l}</div>
-                  <div className="ir-v" style={{ fontWeight: 600, color: '#c2410c' }}>{v}</div>
-                </div>
-              ))}
-            </div>
-          )}
-
           {/* Tab bar: Thông tin | Lịch sử xử lý */}
           <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', background: 'var(--bg)', flexShrink: 0 }}>
             {([
