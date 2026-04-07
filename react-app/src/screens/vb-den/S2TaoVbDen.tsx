@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import Topbar from '@/components/Topbar'
 import { useNavigation } from '@/hooks/useNavigation'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-interface UploadedFile { name: string; size: string; type: string }
+interface UploadedFile { name: string; size: string; type: string; url?: string }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const DON_VI_MAP: Record<string, string> = {
@@ -164,6 +164,26 @@ export default function S2TaoVbDen() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [showConfirmClose, setShowConfirmClose] = useState(false)
 
+  const mainFileInputRef = useRef<HTMLInputElement>(null)
+  const attachFileInputRef = useRef<HTMLInputElement>(null)
+
+  const addFiles = (
+    files: FileList | null,
+    setFiles: React.Dispatch<React.SetStateAction<UploadedFile[]>>,
+  ) => {
+    if (!files) return
+    Array.from(files).forEach(file => {
+      const url = URL.createObjectURL(file)
+      const type = file.name.split('.').pop()?.toLowerCase() ?? 'bin'
+      const size = file.size < 1024 * 1024
+        ? `${(file.size / 1024).toFixed(1)} KB`
+        : `${(file.size / 1024 / 1024).toFixed(1)} MB`
+      const newFile: UploadedFile = { name: file.name, size, type, url }
+      setFiles(prev => [...prev, newFile])
+      setSelectedPreview(newFile)
+    })
+  }
+
   const handleNoiGuiChange = (v: string) => {
     setNoiGui(v)
     setMaDonVi(DON_VI_MAP[v] ?? '')
@@ -210,7 +230,7 @@ export default function S2TaoVbDen() {
 
           {/* Khối 2: Thông tin văn bản */}
           <div className="form-card">
-            <div className="fc-title"><span>2</span> Thông tin văn bản</div>
+            <div className="fc-title">Thông tin văn bản</div>
 
             <div className="form-row">
               <div className="fg">
@@ -278,7 +298,7 @@ export default function S2TaoVbDen() {
 
           {/* Khối 3: Thông tin đăng ký */}
           <div className="form-card">
-            <div className="fc-title"><span>3</span> Thông tin đăng ký</div>
+            <div className="fc-title">Thông tin đăng ký</div>
 
             <div className="form-row">
               <div className="fg">
@@ -318,7 +338,7 @@ export default function S2TaoVbDen() {
 
           {/* Khối 4: Luồng xử lý */}
           <div className="form-card">
-            <div className="fc-title"><span>4</span> Luồng xử lý</div>
+            <div className="fc-title">Luồng xử lý</div>
             <div style={{ display: 'flex', alignItems: 'center', padding: '16px 8px', overflowX: 'auto', gap: 0 }}>
               <WorkflowNode icon="📝" title="Tạo VB" sub="Văn thư" badge="Đang thực hiện" active />
               <div style={{ flex: 1, height: 2, background: '#e2e4ed', position: 'relative', minWidth: 24 }}>
@@ -334,7 +354,7 @@ export default function S2TaoVbDen() {
 
           {/* Khối 5: Danh sách người nhận */}
           <div className="form-card">
-            <div className="fc-title"><span>5</span> Danh sách người nhận</div>
+            <div className="fc-title">Danh sách người nhận</div>
 
             {/* Bước 1 */}
             <div style={{ border: '1px solid var(--border)', borderRadius: 10, padding: '14px 16px', marginBottom: 14, background: '#fafbfc' }}>
@@ -449,14 +469,17 @@ export default function S2TaoVbDen() {
                         <div style={{ fontSize: '.8rem', fontWeight: 600, color: 'var(--dark)' }}>{f.name}</div>
                         <div style={{ fontSize: '.7rem', color: 'var(--text3)' }}>{f.type.toUpperCase()} · {f.size}</div>
                       </div>
-                      <button onClick={e => { e.stopPropagation(); setMainFiles(prev => prev.filter((_, j) => j !== i)) }} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text3)', fontSize: '.85rem' }}>✕</button>
+                      <button onClick={e => { e.stopPropagation(); if (f.url) URL.revokeObjectURL(f.url); setMainFiles(prev => prev.filter((_, j) => j !== i)); if (selectedPreview?.name === f.name) setSelectedPreview(null) }} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text3)', fontSize: '.85rem' }}>✕</button>
                     </div>
                   ))}
-                  <button style={{
-                    marginTop: 4, padding: '7px 14px', fontSize: '.8rem',
-                    border: '1px dashed var(--border)', borderRadius: 6,
-                    background: 'transparent', cursor: 'pointer', color: 'var(--text3)', width: '100%',
-                  }}>+ Thêm tệp chính</button>
+                  <input ref={mainFileInputRef} type="file" accept=".pdf,.doc,.docx,.xlsx,.xls,.png,.jpg,.jpeg" multiple style={{ display: 'none' }} onChange={e => addFiles(e.target.files, setMainFiles)} />
+                  <button
+                    onClick={() => mainFileInputRef.current?.click()}
+                    style={{
+                      marginTop: 4, padding: '7px 14px', fontSize: '.8rem',
+                      border: '1px dashed var(--border)', borderRadius: 6,
+                      background: 'transparent', cursor: 'pointer', color: 'var(--text3)', width: '100%',
+                    }}>+ Thêm tệp chính</button>
                 </>
               ) : (
                 <>
@@ -477,14 +500,19 @@ export default function S2TaoVbDen() {
                         <div style={{ fontSize: '.8rem', fontWeight: 600, color: 'var(--dark)' }}>{f.name}</div>
                         <div style={{ fontSize: '.7rem', color: 'var(--text3)' }}>{f.type.toUpperCase()} · {f.size}</div>
                       </div>
-                      <button onClick={e => { e.stopPropagation(); setAttachFiles(prev => prev.filter((_, j) => j !== i)) }} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text3)', fontSize: '.85rem' }}>✕</button>
+                      <button onClick={e => { e.stopPropagation(); if (f.url) URL.revokeObjectURL(f.url); setAttachFiles(prev => prev.filter((_, j) => j !== i)); if (selectedPreview?.name === f.name) setSelectedPreview(null) }} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text3)', fontSize: '.85rem' }}>✕</button>
                     </div>
                   ))}
-                  <div style={{
-                    border: '2px dashed var(--border)', borderRadius: 10, padding: '24px 20px',
-                    textAlign: 'center', color: 'var(--text3)', fontSize: '.82rem', cursor: 'pointer',
-                    background: '#fafbfc', marginTop: attachFiles.length > 0 ? 6 : 0,
-                  }}>
+                  <input ref={attachFileInputRef} type="file" accept=".pdf,.doc,.docx,.xlsx,.xls,.png,.jpg,.jpeg" multiple style={{ display: 'none' }} onChange={e => addFiles(e.target.files, setAttachFiles)} />
+                  <div
+                    onClick={() => attachFileInputRef.current?.click()}
+                    onDragOver={e => e.preventDefault()}
+                    onDrop={e => { e.preventDefault(); addFiles(e.dataTransfer.files, setAttachFiles) }}
+                    style={{
+                      border: '2px dashed var(--border)', borderRadius: 10, padding: '24px 20px',
+                      textAlign: 'center', color: 'var(--text3)', fontSize: '.82rem', cursor: 'pointer',
+                      background: '#fafbfc', marginTop: attachFiles.length > 0 ? 6 : 0,
+                    }}>
                     <div style={{ fontSize: '1.8rem', marginBottom: 8 }}>📎</div>
                     <div>Kéo thả hoặc <span style={{ color: 'var(--orange)', fontWeight: 600 }}>chọn tệp</span></div>
                     <div style={{ fontSize: '.72rem', marginTop: 4 }}>PDF, Word, Excel · Tối đa 20MB/tệp</div>
@@ -515,31 +543,33 @@ export default function S2TaoVbDen() {
             </div>
 
             {/* Preview body */}
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, overflowY: 'auto' }}>
-              {selectedPreview ? (
-                <div style={{
-                  width: '100%', maxWidth: 560, background: '#fff',
-                  boxShadow: '0 4px 24px rgba(0,0,0,.12)', borderRadius: 4,
-                  minHeight: 400, display: 'flex', flexDirection: 'column',
-                  alignItems: 'center', justifyContent: 'center', padding: 40, gap: 16,
-                }}>
-                  <div style={{ fontSize: '3rem' }}>📄</div>
-                  <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--dark)', textAlign: 'center' }}>{selectedPreview.name}</div>
-                  <div style={{ fontSize: '.82rem', color: 'var(--text3)', textAlign: 'center', maxWidth: 300 }}>
-                    Trình xem PDF sẽ hiển thị nội dung tệp tại đây.
-                  </div>
-                  <div style={{ background: '#f8fafc', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 20px', fontSize: '.78rem', color: 'var(--text3)', marginTop: 8 }}>
-                    Kích thước: {selectedPreview.size} · Loại: {selectedPreview.type.toUpperCase()}
-                  </div>
-                  <div style={{ width: '100%', marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    {Array.from({ length: 10 }).map((_, i) => (
-                      <div key={i} style={{ height: 10, borderRadius: 4, background: '#f1f5f9', width: i % 3 === 2 ? '60%' : i % 2 === 0 ? '100%' : '85%' }} />
-                    ))}
+            <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
+              {selectedPreview?.url && selectedPreview.type === 'pdf' ? (
+                <iframe
+                  src={selectedPreview.url}
+                  title={selectedPreview.name}
+                  style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
+                />
+              ) : selectedPreview?.url && ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(selectedPreview.type) ? (
+                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, overflow: 'auto', boxSizing: 'border-box' }}>
+                  <img src={selectedPreview.url} alt={selectedPreview.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: 4, boxShadow: '0 4px 24px rgba(0,0,0,.12)' }} />
+                </div>
+              ) : selectedPreview ? (
+                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, overflow: 'auto', boxSizing: 'border-box' }}>
+                  <div style={{ width: '100%', maxWidth: 560, background: '#fff', boxShadow: '0 4px 24px rgba(0,0,0,.12)', borderRadius: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 40, gap: 16 }}>
+                    <div style={{ fontSize: '3rem' }}>{selectedPreview.type === 'xlsx' || selectedPreview.type === 'xls' ? '📊' : selectedPreview.type === 'docx' || selectedPreview.type === 'doc' ? '📝' : '📄'}</div>
+                    <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--dark)', textAlign: 'center' }}>{selectedPreview.name}</div>
+                    <div style={{ fontSize: '.82rem', color: 'var(--text3)', textAlign: 'center', maxWidth: 300 }}>
+                      {selectedPreview.url ? `Không thể xem trực tiếp tệp ${selectedPreview.type.toUpperCase()} trên trình duyệt.` : 'Trình xem sẽ hiển thị nội dung tệp tại đây.'}
+                    </div>
+                    <div style={{ background: '#f8fafc', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 20px', fontSize: '.78rem', color: 'var(--text3)' }}>
+                      Kích thước: {selectedPreview.size} · Loại: {selectedPreview.type.toUpperCase()}
+                    </div>
                   </div>
                 </div>
               ) : (
-                <div style={{ textAlign: 'center', color: 'var(--text3)' }}>
-                  <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>📂</div>
+                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 10, color: 'var(--text3)' }}>
+                  <div style={{ fontSize: '2.5rem' }}>📂</div>
                   <div style={{ fontSize: '.85rem' }}>Chọn file để xem trước</div>
                 </div>
               )}

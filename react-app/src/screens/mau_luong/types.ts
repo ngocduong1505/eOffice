@@ -44,11 +44,11 @@ export const BEHAVIOR_LABELS: Record<string, string> = {
 }
 
 export const ROLE_LABELS: Record<string, string> = {
-  vp: 'Văn phòng',
-  pb: 'Phòng ban',
-  ld: 'Lãnh đạo',
+  vp: 'Thư ký',
+  pb: 'Trường phòng',
+  ld: 'Giám đốc',
   vt: 'Văn thư',
-  kh: 'Kế hoạch',
+  kh: 'Chuyên viên',
 }
 
 export const APPLY_OPTIONS: Record<string, string> = {
@@ -58,11 +58,11 @@ export const APPLY_OPTIONS: Record<string, string> = {
 }
 
 export const ROLE_OPTIONS: Record<string, string> = {
-  vp: 'Văn phòng',
-  pb: 'Phòng ban',
-  ld: 'Lãnh đạo',
+  vp: 'Thư ký',
+  pb: 'Trường phòng',
+  ld: 'Giám đốc',
   vt: 'Văn thư',
-  kh: 'Kế hoạch',
+  kh: 'Chuyên viên',
 }
 
 export const BEHAVIOR_SELECT_OPTIONS = [
