@@ -370,6 +370,8 @@ export default function S3ChiTiet() {
               </div>
             )}
 
+            
+
             {/* File sections — dưới cùng cột trái */}
             <div style={{ flexShrink: 0, borderTop: '1px solid var(--border)' }}>
               {/* Tệp chính */}
@@ -412,7 +414,41 @@ export default function S3ChiTiet() {
                 </div>
               </div>
             </div>
+
+          {/* Danh sách người nhận — sát trên file sections */}
+            <div style={{ flexShrink: 0, borderTop: '1px solid var(--border)', padding: '10px 20px 12px', background: '#fafbfc' }}>
+              <div style={{ fontSize: '.7rem', fontWeight: 700, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '.55px', marginBottom: 8 }}>
+                Thông tin xử lý
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {([
+                  { av: 'GĐ', avColor: '#c2410c', name: 'Lê Văn Giám Đốc', dept: 'BGĐ', role: 'Chỉ đạo xử lý', roleColor: '#c2410c', roleBg: '#fff7ed' },
+                  { av: 'TK', avColor: '#2563eb', name: 'Trần Thị Thư Ký',   dept: 'Văn phòng',  role: 'Điều phối xử lý', roleColor: '#1d4ed8', roleBg: '#eff6ff' },
+                  { av: 'NA', avColor: '#059669', name: 'Nguyễn Văn A',      dept: 'P. KHTH',    role: 'Xử lý',           roleColor: '#059669', roleBg: '#f0fdf4' },
+                ] as { av: string; avColor: string; name: string; dept: string; role: string; roleColor: string; roleBg: string }[]).map((p, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{
+                      width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
+                      background: p.avColor, color: '#fff',
+                      fontSize: '.6rem', fontWeight: 700,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>{p.av}</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <span style={{ fontSize: '.8rem', fontWeight: 600, color: 'var(--dark)' }}>{p.name}</span>
+                      <span style={{ fontSize: '.75rem', color: 'var(--text3)', marginLeft: 4 }}>· {p.dept}</span>
+                    </div>
+                    <span style={{
+                      fontSize: '.68rem', fontWeight: 600, flexShrink: 0,
+                      background: p.roleBg, color: p.roleColor,
+                      borderRadius: 20, padding: '2px 8px',
+                      border: `1px solid ${p.roleBg === '#fff7ed' ? '#fdba74' : p.roleBg === '#eff6ff' ? '#93c5fd' : '#86efac'}`,
+                    }}>{p.role}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
+
         </div>
 
         {/* ===== CỘT PHẢI — PDF Viewer (full height) ===== */}

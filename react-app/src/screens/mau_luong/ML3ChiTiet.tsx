@@ -1,9 +1,73 @@
 import { useNavigation } from '@/hooks/useNavigation'
-import type { FlowItem } from './types'
+import type { FlowItem, StepItem } from './types'
 import {
   INITIAL_FLOWS, TYPE_LABELS, STATUS_LABELS,
   BEHAVIOR_LABELS, ROLE_LABELS, getMockSteps,
 } from './types'
+
+// ─── Step colour config ───────────────────────────────────────────────────────
+const STEP_COLORS: Record<string, { bg: string; border: string; text: string; icon: string }> = {
+  'luu-ho-so': { bg: '#f0fdf4', border: '#86efac', text: '#15803d', icon: '🗄️' },
+  'y-kien':    { bg: '#fff7ed', border: '#fdba74', text: '#c2410c', icon: '✏️' },
+  'phan-cong': { bg: '#eff6ff', border: '#93c5fd', text: '#1d4ed8', icon: '👤' },
+  'duyet':     { bg: '#faf5ff', border: '#c4b5fd', text: '#7c3aed', icon: '✅' },
+  'ky-so':     { bg: '#eff6ff', border: '#60a5fa', text: '#1d4ed8', icon: '🔐' },
+  'dong-dau':  { bg: '#fef2f2', border: '#fca5a5', text: '#b91c1c', icon: '🏛️' },
+  'ban-hanh':  { bg: '#f0fdf4', border: '#4ade80', text: '#15803d', icon: '📤' },
+}
+
+function FlowTimeline({ steps }: { steps: StepItem[] }) {
+  return (
+    <div style={{ padding: '4px 0' }}>
+      {steps.map((s, i) => {
+        const c = STEP_COLORS[s.behavior] ?? { bg: '#f9fafb', border: '#e5e7eb', text: '#374151', icon: '📋' }
+        const isLast = i === steps.length - 1
+        return (
+          <div key={i} style={{ display: 'flex', gap: 0 }}>
+            {/* Connector column */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 36, flexShrink: 0 }}>
+              <div style={{
+                width: 28, height: 28, borderRadius: '50%',
+                background: c.bg, border: `2px solid ${c.border}`,
+                color: c.text, fontSize: 13, fontWeight: 700,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                flexShrink: 0, zIndex: 1,
+              }}>{i + 1}</div>
+              {!isLast && (
+                <div style={{ flex: 1, width: 2, background: '#e5e7eb', minHeight: 16, margin: '2px 0' }} />
+              )}
+            </div>
+
+            {/* Card */}
+            <div style={{
+              flex: 1, marginBottom: isLast ? 0 : 10, marginLeft: 8,
+              background: c.bg, border: `1.5px solid ${c.border}`,
+              borderRadius: 10, padding: '10px 12px',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                <span style={{ fontSize: 14 }}>{c.icon}</span>
+                <span style={{ fontSize: 13.5, fontWeight: 700, color: '#1f2937' }}>{s.name}</span>
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                <span style={{ fontSize: 11, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 5, padding: '2px 8px', color: '#6b7280' }}>
+                  {BEHAVIOR_LABELS[s.behavior] || s.behavior}
+                </span>
+                <span style={{ fontSize: 11, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 5, padding: '2px 8px', color: '#6b7280' }}>
+                  ⏱ {s.deadline}h
+                </span>
+                {s.roles.map(r => (
+                  <span key={r} style={{ fontSize: 11, background: '#ede9fe', border: '1px solid #ddd6fe', borderRadius: 5, padding: '2px 8px', color: '#7c3aed' }}>
+                    {ROLE_LABELS[r] || r}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
 
 export default function ML3ChiTiet() {
   const { goScreen, screenParams } = useNavigation()
@@ -18,9 +82,6 @@ export default function ML3ChiTiet() {
   const totalHours = steps.reduce((s, x) => s + x.deadline, 0)
   const uniqueBehaviors = [...new Set(steps.map(s => s.behavior))]
   const uniqueRoles = [...new Set(steps.flatMap(s => s.roles))]
-
-  const timeoutLabel = (t: string) =>
-    t === 'stop' ? 'Dừng khi quá hạn' : t === 'skip' ? 'Bỏ qua khi quá hạn' : 'Thông báo & tiếp tục'
 
   return (
     <div className="cw" style={{ overflow: 'hidden' }}>
@@ -107,34 +168,8 @@ export default function ML3ChiTiet() {
               <span style={{ fontSize: 13, fontWeight: 700, color: '#374151', textTransform: 'uppercase', letterSpacing: '.05em' }}>Các bước xử lý</span>
               <span style={{ background: '#fff7ed', color: '#ea580c', fontSize: 11, fontWeight: 700, padding: '1px 8px', borderRadius: 99, border: '1px solid #fed7aa', marginLeft: 2 }}>{steps.length} bước</span>
             </div>
-            <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {steps.map((s, i) => (
-                <div key={i} style={{ background: '#fff', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '12px 14px', display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-                  <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#fff7ed', border: '2px solid #ea580c', color: '#ea580c', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 600, color: '#1f2937', fontSize: 14, marginBottom: 5 }}>{s.name}</div>
-                    <div style={{ fontSize: 12, color: '#6b7280', display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                        {BEHAVIOR_LABELS[s.behavior] || s.behavior}
-                      </span>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                        {s.deadline} giờ
-                      </span>
-                      {s.roles.length > 0 && (
-                        <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                          <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-                          {s.roles.map(r => ROLE_LABELS[r] || r).join(', ')}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <div style={{ flexShrink: 0 }}>
-                    <span style={{ fontSize: 11, background: '#f3f4f6', color: '#6b7280', padding: '2px 8px', borderRadius: 4 }}>{timeoutLabel(s.timeout)}</span>
-                  </div>
-                </div>
-              ))}
+            <div style={{ padding: '12px 16px' }}>
+              <FlowTimeline steps={steps} />
             </div>
           </div>
         </div>

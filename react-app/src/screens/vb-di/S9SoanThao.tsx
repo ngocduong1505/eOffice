@@ -166,8 +166,9 @@ export default function S9SoanThao() {
                 <select><option>Sổ VB Đi 2026 (hiện tại: 47)</option><option>Sổ Nội bộ 2026</option></select>
               </div>
               <div className="fg">
-                <label>Số ký hiệu <span style={{ fontSize: '.68rem', color: '#9ca3af', fontWeight: 400 }}>(cấp sau khi ban hành)</span></label>
-                <input className="auto" defaultValue="Tự động cấp sau khi ban hành" disabled />
+                <label>Số đi <span style={{ fontSize: '.68rem', color: '#9ca3af', fontWeight: 400 }}>(để trống = tự động)</span></label>
+                <input type="number" min={1} placeholder="VD: 48" style={{ width: '100%', boxSizing: 'border-box' }} />
+                <div className="hint">Nhập thủ công hoặc để trống để hệ thống cấp tự động</div>
               </div>
             </div>
 
@@ -287,7 +288,13 @@ export default function S9SoanThao() {
                     </div>
                   </div>
                   <div className="fg" style={{ marginBottom: 10 }}>
-                    <label>Danh sách người duyệt <span className="req">*</span></label>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                      <label style={{ marginBottom: 0 }}>Danh sách người duyệt <span className="req">*</span></label>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: 5, cursor: 'pointer', fontSize: '.75rem', color: 'var(--text3)', userSelect: 'none' }}>
+                        <input type="checkbox" style={{ cursor: 'pointer' }} />
+                        Chưa biết người xử lý
+                      </label>
+                    </div>
                     <div className="s9-person-list">
                       <div className="person-item">
                         <div className="pi-av orange">PG</div>
@@ -342,7 +349,13 @@ export default function S9SoanThao() {
                     </div>
                   </div>
                   <div className="fg" style={{ marginBottom: 10 }}>
-                    <label>Danh sách lãnh đạo ký số <span className="req">*</span></label>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                      <label style={{ marginBottom: 0 }}>Danh sách lãnh đạo ký số <span className="req">*</span></label>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: 5, cursor: 'pointer', fontSize: '.75rem', color: 'var(--text3)', userSelect: 'none' }}>
+                        <input type="checkbox" style={{ cursor: 'pointer' }} />
+                        Chưa biết người xử lý
+                      </label>
+                    </div>
                     <div className="s9-person-list">
                       <div className="person-item">
                         <div className="pi-av" style={{ background: '#c2410c' }}>GĐ</div>
@@ -388,7 +401,13 @@ export default function S9SoanThao() {
                     </div>
                   </div>
                   <div className="fg" style={{ marginBottom: 10 }}>
-                    <label>Cán bộ văn thư thực hiện <span className="req">*</span></label>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                      <label style={{ marginBottom: 0 }}>Cán bộ văn thư thực hiện <span className="req">*</span></label>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: 5, cursor: 'pointer', fontSize: '.75rem', color: 'var(--text3)', userSelect: 'none' }}>
+                        <input type="checkbox" style={{ cursor: 'pointer' }} />
+                        Chưa biết người xử lý
+                      </label>
+                    </div>
                     <div className="s9-person-list">
                       <div className="person-item">
                         <div className="pi-av" style={{ background: '#059669' }}>VT</div>

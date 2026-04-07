@@ -79,25 +79,23 @@ export const BEHAVIOR_SELECT_OPTIONS = [
 
 export const MOCK_STEP_POOLS: Record<string, StepItem[]> = {
   vbd: [
-    { name: 'Văn thư tiếp nhận hồ sơ',      behavior: 'luu-ho-so', deadline: 4,  timeout: 'stop',   roles: ['vt'] },
-    { name: 'Lãnh đạo phòng soạn thảo',      behavior: 'y-kien',    deadline: 8,  timeout: 'notify', roles: ['pb'] },
-    { name: 'Duyệt nội dung văn bản',         behavior: 'duyet',     deadline: 8,  timeout: 'stop',   roles: ['pb', 'ld'] },
-    { name: 'Phê duyệt lãnh đạo cơ quan',    behavior: 'duyet',     deadline: 4,  timeout: 'stop',   roles: ['ld'] },
-    { name: 'Ký số văn bản',                  behavior: 'ky-so',     deadline: 4,  timeout: 'stop',   roles: ['ld'] },
-    { name: 'Đóng dấu & Cấp số phát hành',   behavior: 'dong-dau',  deadline: 2,  timeout: 'stop',   roles: ['vt'] },
-    { name: 'Ban hành văn bản',               behavior: 'ban-hanh',  deadline: 2,  timeout: 'stop',   roles: ['vt'] },
+    { name: 'Soạn thảo nội dung',              behavior: 'y-kien',    deadline: 8,  timeout: 'notify', roles: ['pb'] },
+    { name: 'Lãnh đạo phòng ban duyệt nội dung', behavior: 'duyet',   deadline: 8,  timeout: 'stop',   roles: ['pb'] },
+    { name: 'Giám đốc ký số',                  behavior: 'ky-so',     deadline: 4,  timeout: 'stop',   roles: ['ld'] },
+    { name: 'Văn thư đóng dấu & cấp số',       behavior: 'dong-dau',  deadline: 2,  timeout: 'stop',   roles: ['vt'] },
+    { name: 'Thư ký ban hành',                  behavior: 'ban-hanh',  deadline: 2,  timeout: 'stop',   roles: ['vp'] },
   ],
   vbden: [
-    { name: 'Văn thư tiếp nhận & Đăng ký',   behavior: 'luu-ho-so', deadline: 2,  timeout: 'stop',   roles: ['vt'] },
-    { name: 'Lãnh đạo phân công xử lý',       behavior: 'phan-cong', deadline: 4,  timeout: 'stop',   roles: ['ld'] },
-    { name: 'Phòng ban nghiên cứu, xử lý',    behavior: 'duyet',     deadline: 16, timeout: 'notify', roles: ['pb'] },
-    { name: 'Ghi ý kiến chuyên môn',           behavior: 'y-kien',    deadline: 8,  timeout: 'notify', roles: ['pb'] },
-    { name: 'Lưu hồ sơ theo dõi',             behavior: 'luu-ho-so', deadline: 2,  timeout: 'notify', roles: ['vt'] },
+    { name: 'Văn thư tiếp nhận & đăng ký',     behavior: 'luu-ho-so', deadline: 2,  timeout: 'stop',   roles: ['vt'] },
+    { name: 'Lãnh đạo chỉ đạo bút phê',        behavior: 'y-kien',    deadline: 4,  timeout: 'stop',   roles: ['ld'] },
+    { name: 'Thư ký điều phối xử lý',          behavior: 'phan-cong', deadline: 2,  timeout: 'notify', roles: ['vp'] },
+    { name: 'Chuyên viên xử lý & phản hồi',    behavior: 'duyet',     deadline: 16, timeout: 'notify', roles: ['kh'] },
+    { name: 'Hoàn thành & lưu trữ',            behavior: 'luu-ho-so', deadline: 2,  timeout: 'notify', roles: ['vt'] },
   ],
   'noi-bo': [
-    { name: 'Phòng ban khởi tạo tài liệu',   behavior: 'y-kien',    deadline: 4,  timeout: 'notify', roles: ['pb'] },
-    { name: 'Duyệt nội bộ cấp phòng',         behavior: 'duyet',     deadline: 8,  timeout: 'stop',   roles: ['pb'] },
-    { name: 'Phê duyệt lãnh đạo',             behavior: 'duyet',     deadline: 4,  timeout: 'stop',   roles: ['ld'] },
+    { name: 'Phòng ban khởi tạo tài liệu',     behavior: 'y-kien',    deadline: 4,  timeout: 'notify', roles: ['pb'] },
+    { name: 'Duyệt nội bộ cấp phòng',          behavior: 'duyet',     deadline: 8,  timeout: 'stop',   roles: ['pb'] },
+    { name: 'Phê duyệt lãnh đạo',              behavior: 'duyet',     deadline: 4,  timeout: 'stop',   roles: ['ld'] },
     { name: 'Lưu hồ sơ nội bộ',               behavior: 'luu-ho-so', deadline: 2,  timeout: 'notify', roles: ['vt'] },
   ],
 }
