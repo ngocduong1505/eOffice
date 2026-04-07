@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import Topbar from '@/components/Topbar'
 import { useNavigation } from '@/hooks/useNavigation'
 
-interface UploadedFile { name: string; size: string; ext: string }
+interface UploadedFile { name: string; size: string; ext: string; url?: string }
 
 const MOCK_MAIN: UploadedFile = { name: 'BaoCao_KCB_Q1_2026.docx', size: '2.4 MB', ext: 'docx' }
 
@@ -55,6 +55,26 @@ export default function S9SoanThao() {
   const [preview, setPreview] = useState<UploadedFile | null>(MOCK_MAIN)
   const [showConfirm, setShowConfirm] = useState(false)
 
+  const mainFileInputRef = useRef<HTMLInputElement>(null)
+  const attachFileInputRef = useRef<HTMLInputElement>(null)
+
+  const addFiles = (
+    files: FileList | null,
+    setFiles: React.Dispatch<React.SetStateAction<UploadedFile[]>>,
+  ) => {
+    if (!files) return
+    Array.from(files).forEach(file => {
+      const url = URL.createObjectURL(file)
+      const ext = file.name.split('.').pop()?.toLowerCase() ?? 'bin'
+      const size = file.size < 1024 * 1024
+        ? `${(file.size / 1024).toFixed(1)} KB`
+        : `${(file.size / 1024 / 1024).toFixed(1)} MB`
+      const newFile: UploadedFile = { name: file.name, size, ext, url }
+      setFiles(prev => [...prev, newFile])
+      setPreview(newFile)
+    })
+  }
+
   // collapsible proc-step state
   const [step1Open, setStep1Open] = useState(true)
   const [step2Open, setStep2Open] = useState(false)
@@ -82,7 +102,7 @@ export default function S9SoanThao() {
 
           {/* Card 1: Thông tin văn bản */}
           <div className="form-card">
-            <div className="fc-title"><span>1</span> Thông tin văn bản</div>
+            <div className="fc-title">Thông tin văn bản</div>
 
             <div className="form-row full">
               <div className="fg">
@@ -150,7 +170,7 @@ export default function S9SoanThao() {
 
           {/* Card 2: Quy trình xử lý */}
           <div className="form-card">
-            <div className="fc-title"><span style={{ background: '#374151' }}>2</span> Quy trình xử lý</div>
+            <div className="fc-title"> Quy trình xử lý</div>
 
             <div className="qt-flow">
 
@@ -226,7 +246,7 @@ export default function S9SoanThao() {
 
           {/* Card 3: Danh sách người xử lý */}
           <div className="form-card">
-            <div className="fc-title"><span style={{ background: '#374151' }}>3</span> Danh sách người xử lý</div>
+            <div className="fc-title">Danh sách người xử lý</div>
 
             {/* Bước 1 — Duyệt nội dung */}
             <div className="proc-step" style={{ borderLeft: '3px solid var(--orange)' }}>
@@ -405,10 +425,11 @@ export default function S9SoanThao() {
                   key={i} file={f}
                   selected={preview?.name === f.name}
                   onClick={() => setPreview(f)}
-                  onRemove={() => { setMainFiles(p => p.filter((_, j) => j !== i)); if (preview?.name === f.name) setPreview(null) }}
+                  onRemove={() => { if (f.url) URL.revokeObjectURL(f.url); setMainFiles(p => p.filter((_, j) => j !== i)); if (preview?.name === f.name) setPreview(null) }}
                 />
               ))}
-              <button style={{ marginTop: 4, padding: '7px 14px', fontSize: '.8rem', border: '1px dashed var(--border)', borderRadius: 6, background: 'transparent', cursor: 'pointer', color: 'var(--text3)', width: '100%' }}>
+              <input ref={mainFileInputRef} type="file" accept=".pdf,.doc,.docx,.xlsx,.xls,.png,.jpg,.jpeg" multiple style={{ display: 'none' }} onChange={e => addFiles(e.target.files, setMainFiles)} />
+              <button onClick={() => mainFileInputRef.current?.click()} style={{ marginTop: 4, padding: '7px 14px', fontSize: '.8rem', border: '1px dashed var(--border)', borderRadius: 6, background: 'transparent', cursor: 'pointer', color: 'var(--text3)', width: '100%' }}>
                 + Tải lên tệp Word/PDF
               </button>
             </div>
@@ -422,10 +443,15 @@ export default function S9SoanThao() {
                   key={i} file={f}
                   onClick={() => setPreview(f)}
                   selected={preview?.name === f.name}
-                  onRemove={() => setAttachFiles(p => p.filter((_, j) => j !== i))}
+                  onRemove={() => { if (f.url) URL.revokeObjectURL(f.url); setAttachFiles(p => p.filter((_, j) => j !== i)); if (preview?.name === f.name) setPreview(null) }}
                 />
               ))}
-              <div style={{ border: '2px dashed var(--border)', borderRadius: 8, padding: '24px 16px', textAlign: 'center', color: 'var(--text3)', fontSize: '.82rem', cursor: 'pointer', background: '#fafbfc' }}>
+              <input ref={attachFileInputRef} type="file" accept=".pdf,.doc,.docx,.xlsx,.xls,.png,.jpg,.jpeg" multiple style={{ display: 'none' }} onChange={e => addFiles(e.target.files, setAttachFiles)} />
+              <div
+                onClick={() => attachFileInputRef.current?.click()}
+                onDragOver={e => e.preventDefault()}
+                onDrop={e => { e.preventDefault(); addFiles(e.dataTransfer.files, setAttachFiles) }}
+                style={{ border: '2px dashed var(--border)', borderRadius: 8, padding: '24px 16px', textAlign: 'center', color: 'var(--text3)', fontSize: '.82rem', cursor: 'pointer', background: '#fafbfc' }}>
                 <div style={{ fontSize: '1.6rem', marginBottom: 6 }}>📎</div>
                 <div>Kéo thả hoặc <span style={{ color: 'var(--orange)', fontWeight: 600 }}>chọn tệp</span></div>
                 <div style={{ fontSize: '.72rem', marginTop: 4 }}>PDF, Word, Excel · Tối đa 20MB/tệp</div>
@@ -517,17 +543,23 @@ export default function S9SoanThao() {
                   </>
                 )}
               </div>
-              {preview ? (
-                <div style={{ flex: 1, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: 16, overflowY: 'auto' }}>
-                  <div style={{ width: '100%', maxWidth: 540, background: '#fff', boxShadow: '0 4px 20px rgba(0,0,0,.1)', borderRadius: 4, minHeight: 480, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 28, gap: 10 }}>
-                    <div style={{ fontSize: '2.5rem' }}>📝</div>
+              {preview?.url && preview.ext === 'pdf' ? (
+                <iframe
+                  src={preview.url}
+                  title={preview.name}
+                  style={{ flex: 1, width: '100%', border: 'none', display: 'block' }}
+                />
+              ) : preview?.url && ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(preview.ext) ? (
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, overflow: 'auto' }}>
+                  <img src={preview.url} alt={preview.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: 4, boxShadow: '0 4px 20px rgba(0,0,0,.1)' }} />
+                </div>
+              ) : preview ? (
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, overflow: 'auto' }}>
+                  <div style={{ width: '100%', maxWidth: 540, background: '#fff', boxShadow: '0 4px 20px rgba(0,0,0,.1)', borderRadius: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 28, gap: 10 }}>
+                    <div style={{ fontSize: '2.5rem' }}>{preview.ext === 'xlsx' || preview.ext === 'xls' ? '📊' : preview.ext === 'docx' || preview.ext === 'doc' ? '📝' : '📄'}</div>
                     <div style={{ fontWeight: 700, fontSize: '.88rem', color: 'var(--dark)', textAlign: 'center' }}>{preview.name}</div>
                     <div style={{ fontSize: '.75rem', color: 'var(--text3)' }}>{preview.ext.toUpperCase()} · {preview.size}</div>
-                    <div style={{ width: '100%', marginTop: 10, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                      {Array.from({ length: 10 }).map((_, i) => (
-                        <div key={i} style={{ height: 8, borderRadius: 4, background: '#f1f5f9', width: i % 3 === 2 ? '55%' : i % 2 === 0 ? '100%' : '80%' }} />
-                      ))}
-                    </div>
+                    {preview.url && <div style={{ fontSize: '.75rem', color: 'var(--text3)', textAlign: 'center' }}>Không thể xem trực tiếp tệp {preview.ext.toUpperCase()} trên trình duyệt.</div>}
                   </div>
                 </div>
               ) : (

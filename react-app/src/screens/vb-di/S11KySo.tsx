@@ -25,7 +25,8 @@ export default function S11KySo() {
   const readOnly = !!screenParams.readOnly
 
   const [tab,          setTab]          = useState<'info' | 'approved'>('info')
-  const [fileType,     setFileType]     = useState<'main' | 'attach'>('main')
+  const mainFiles   = FILES.filter(f => f.type === 'main')
+  const attachFiles = FILES.filter(f => f.type === 'attach')
   const [selectedFile, setSelectedFile] = useState<FileItem>(FILES[0])
   const [sigPos,       setSigPos]       = useState<SigPos>('Góc dưới-phải')
   const [ghiChu,       setGhiChu]       = useState('')
@@ -52,8 +53,6 @@ export default function S11KySo() {
     window.addEventListener('mousemove', onMove)
     window.addEventListener('mouseup', onUp)
   }
-
-  const visibleFiles = FILES.filter(f => f.type === fileType)
 
   return (
     <div className="cw" style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
@@ -248,47 +247,57 @@ export default function S11KySo() {
             </div>
             }
           </div>
+
+          {/* ── File sections ── */}
+          <div style={{ flexShrink: 0, borderTop: '1px solid var(--border)' }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 16px', background: '#f9fafb', borderBottom: '1px solid var(--border)' }}>
+                <span style={{ fontSize: '.72rem', fontWeight: 700, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '.5px' }}>📄 Tệp chính</span>
+                <span style={{ background: '#e5e7eb', color: '#6b7280', fontSize: '.65rem', fontWeight: 700, borderRadius: 99, padding: '1px 6px' }}>{mainFiles.length}</span>
+              </div>
+              <div style={{ padding: '6px 12px' }}>
+                {mainFiles.map(f => {
+                  const active = selectedFile.name === f.name
+                  return (
+                    <div key={f.name} onClick={() => setSelectedFile(f)} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', borderRadius: 8, cursor: 'pointer', marginBottom: 4, border: `1px solid ${active ? 'var(--orange)' : 'var(--border)'}`, background: active ? '#fff7ed' : '#fff' }}>
+                      <span style={{ fontSize: '1.1rem' }}>📄</span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: '.8rem', fontWeight: 600, color: 'var(--dark)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.name}</div>
+                        <div style={{ fontSize: '.7rem', color: 'var(--text3)' }}>{f.size}</div>
+                      </div>
+                      <button onClick={e => e.stopPropagation()} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text3)', fontSize: '.8rem' }}>⬇</button>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+            <div style={{ borderTop: '1px solid var(--border)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 16px', background: '#f9fafb', borderBottom: '1px solid var(--border)' }}>
+                <span style={{ fontSize: '.72rem', fontWeight: 700, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '.5px' }}>📎 Tệp đính kèm</span>
+                <span style={{ background: '#e5e7eb', color: '#6b7280', fontSize: '.65rem', fontWeight: 700, borderRadius: 99, padding: '1px 6px' }}>{attachFiles.length}</span>
+              </div>
+              <div style={{ padding: '6px 12px' }}>
+                {attachFiles.map(f => {
+                  const active = selectedFile.name === f.name
+                  return (
+                    <div key={f.name} onClick={() => setSelectedFile(f)} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', borderRadius: 8, cursor: 'pointer', marginBottom: 4, border: `1px solid ${active ? 'var(--orange)' : 'var(--border)'}`, background: active ? '#fff7ed' : '#fff' }}>
+                      <span style={{ fontSize: '1.1rem' }}>{f.name.endsWith('.xlsx') ? '📊' : '📄'}</span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: '.8rem', fontWeight: 600, color: 'var(--dark)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.name}</div>
+                        <div style={{ fontSize: '.7rem', color: 'var(--text3)' }}>{f.size}</div>
+                      </div>
+                      <button onClick={e => e.stopPropagation()} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text3)', fontSize: '.8rem' }}>⬇</button>
+                    </div>
+                  )
+                })}
+                {attachFiles.length === 0 && <div style={{ textAlign: 'center', color: 'var(--text3)', fontSize: '.8rem', padding: '10px 0' }}>Không có tệp đính kèm</div>}
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* ═══ CỘT PHẢI ═══ */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-
-          {/* File tabs */}
-          <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', background: '#fff', flexShrink: 0 }}>
-            {([
-              { key: 'main'   as const, label: '📄 Tệp chính' },
-              { key: 'attach' as const, label: '📎 Đính kèm' },
-            ]).map(t => (
-              <div key={t.key} onClick={() => setFileType(t.key)} style={{
-                flex: 1, textAlign: 'center', padding: '10px 0',
-                fontSize: '.78rem', fontWeight: 600, cursor: 'pointer',
-                color: fileType === t.key ? '#1d4ed8' : 'var(--text3)',
-                borderBottom: fileType === t.key ? '2px solid #1d4ed8' : '2px solid transparent',
-              }}>{t.label}</div>
-            ))}
-          </div>
-
-          {/* File list */}
-          <div style={{ padding: '10px 16px', borderBottom: '1px solid var(--border)', flexShrink: 0, background: '#fff', maxHeight: 200, overflowY: 'auto' }}>
-            {visibleFiles.map(f => {
-              const active = selectedFile.name === f.name
-              return (
-                <div key={f.name} onClick={() => setSelectedFile(f)} style={{
-                  display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px',
-                  borderRadius: 8, cursor: 'pointer', marginBottom: 6,
-                  border: `1px solid ${active ? '#3b82f6' : 'var(--border)'}`,
-                  background: active ? '#eff6ff' : '#fafbfc',
-                }}>
-                  <span style={{ fontSize: '1.1rem' }}>{f.name.endsWith('.xlsx') ? '📊' : '📄'}</span>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: '.8rem', fontWeight: 600, color: 'var(--dark)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.name}</div>
-                    <div style={{ fontSize: '.7rem', color: 'var(--text3)' }}>{f.size}</div>
-                  </div>
-                  <button onClick={e => e.stopPropagation()} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text3)', fontSize: '.8rem' }}>⬇</button>
-                </div>
-              )
-            })}
-          </div>
 
           {/* PDF preview */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: '#f1f3f7', overflow: 'hidden' }}>

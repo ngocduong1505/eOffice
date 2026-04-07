@@ -148,7 +148,6 @@ function Toolbar({ status, role, onAction }: {
       )
     if (status === 'hoan-thanh' && can('them-ho-so'))
       return <button className="dp-btn primary" onClick={() => onAction('them-ho-so')}>Thêm vào hồ sơ</button>
-    // Không có quyền → badge chỉ đọc
     return (
       <span style={{ fontSize: '.75rem', color: 'var(--text3)', padding: '6px 10px', border: '1px solid var(--border)', borderRadius: 6, background: '#f8fafc' }}>
         Chỉ xem
@@ -229,7 +228,8 @@ export default function S3ChiTiet() {
 
   const [selectedFile, setSelectedFile] = useState<FileItem>(FILES[0])
   const [tab, setTab] = useState<'info' | 'history'>('info')
-  const [fileType, setFileType] = useState<'main' | 'attach'>('main')
+  const mainFiles   = FILES.filter(f => f.type === 'main')
+  const attachFiles = FILES.filter(f => f.type === 'attach')
 
   // Modal open states
   const [openChiDao, setOpenChiDao] = useState(false)
@@ -317,9 +317,11 @@ export default function S3ChiTiet() {
             ))}
           </div>
 
-          {/* Tab: Thông tin */}
-          {tab === 'info' && (
-            <div style={{ overflowY: 'auto', flex: 1 }}>
+          {/* Tab content + file list — scrollable together */}
+          <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+
+            {/* Tab: Thông tin */}
+            {tab === 'info' && (
               <div style={{ padding: '12px 20px' }}>
                 <div className="info-section">
                   <div className="is-title">Văn bản gốc</div>
@@ -356,100 +358,95 @@ export default function S3ChiTiet() {
                   ))}
                 </div>
               </div>
+            )}
 
-            </div>
-          )}
+            {/* Tab: Lịch sử xử lý */}
+            {tab === 'history' && (
+              <div>
+                <Timeline steps={flowSteps} />
+              </div>
+            )}
 
-          {/* Tab: Lịch sử xử lý */}
-          {tab === 'history' && (
-            <div style={{ overflowY: 'auto', flex: 1 }}>
-              <Timeline steps={flowSteps} />
-            </div>
-          )}
-        </div>
-
-        {/* ===== CỘT PHẢI — File list + PDF Viewer ===== */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: '#f1f3f7', overflow: 'hidden' }}>
-
-          {/* Phần trên — File list */}
-          <div style={{ flexShrink: 0, background: '#fff', borderBottom: '1px solid var(--border)' }}>
-            {/* Tab bar */}
-            <div style={{ display: 'flex', borderBottom: '1px solid var(--border)' }}>
-              {([['main', '📄 Tệp chính'], ['attach', '📎 Tệp đính kèm']] as const).map(([key, label]) => (
-                <div
-                  key={key}
-                  onClick={() => setFileType(key)}
-                  style={{
-                    flex: 1, textAlign: 'center', padding: '10px 0',
-                    fontSize: '.8rem', fontWeight: 600, cursor: 'pointer',
-                    color: fileType === key ? 'var(--orange)' : 'var(--text3)',
-                    borderBottom: fileType === key ? '2px solid var(--orange)' : '2px solid transparent',
-                  }}
-                >
-                  {label}
+            {/* File sections — dưới cùng cột trái */}
+            <div style={{ flexShrink: 0, borderTop: '1px solid var(--border)' }}>
+              {/* Tệp chính */}
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 16px', background: '#f9fafb', borderBottom: '1px solid var(--border)' }}>
+                  <span style={{ fontSize: '.72rem', fontWeight: 700, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '.5px' }}>📄 Tệp chính</span>
+                  <span style={{ background: '#e5e7eb', color: '#6b7280', fontSize: '.65rem', fontWeight: 700, borderRadius: 99, padding: '1px 6px' }}>{mainFiles.length}</span>
                 </div>
-              ))}
-            </div>
-
-            {/* File list */}
-            <div style={{ maxHeight: 220, overflowY: 'auto', padding: '8px 16px' }}>
-              {FILES.filter(f => f.type === fileType).map(f => (
-                <div
-                  key={f.name}
-                  onClick={() => setSelectedFile(f)}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px',
-                    borderRadius: 8, cursor: 'pointer', marginBottom: 6, transition: 'all .15s',
-                    border: `1px solid ${selectedFile.name === f.name ? 'var(--orange)' : 'var(--border)'}`,
-                    background: selectedFile.name === f.name ? '#fff7ed' : '#fff',
-                  }}
-                >
-                  <span style={{ fontSize: '1.3rem' }}>{f.name.endsWith('.xlsx') ? '📊' : '📄'}</span>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '.8rem', fontWeight: 600, color: 'var(--dark)' }}>{f.name}</div>
-                    <div style={{ fontSize: '.7rem', color: 'var(--text3)' }}>{f.name.endsWith('.xlsx') ? 'Excel' : 'PDF'} · {f.size}</div>
-                  </div>
-                  <button onClick={e => e.stopPropagation()} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text3)', fontSize: '.8rem' }}>⬇</button>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Phần dưới — PDF Viewer */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-            {/* Viewer header */}
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px',
-              background: '#2d3142', color: '#fff', fontSize: '.78rem', flexShrink: 0,
-            }}>
-              <span style={{ flex: 1, fontSize: '.8rem', fontWeight: 500, opacity: .9 }}>📄 {selectedFile.name}</span>
-              <button style={{ background: 'rgba(255,255,255,.15)', border: 'none', color: '#fff', borderRadius: 4, padding: '3px 8px', cursor: 'pointer', fontSize: '.75rem' }}>🔍−</button>
-              <span style={{ fontSize: '.75rem', opacity: .7 }}>100%</span>
-              <button style={{ background: 'rgba(255,255,255,.15)', border: 'none', color: '#fff', borderRadius: 4, padding: '3px 8px', cursor: 'pointer', fontSize: '.75rem' }}>🔍+</button>
-              <button style={{ background: 'rgba(255,255,255,.15)', border: 'none', color: '#fff', borderRadius: 4, padding: '4px 10px', cursor: 'pointer', fontSize: '.75rem' }}>⬇ Tải về</button>
-            </div>
-
-            {/* Mock PDF body */}
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, overflowY: 'auto' }}>
-              <div style={{
-                width: '100%', maxWidth: 680, background: '#fff',
-                boxShadow: '0 4px 24px rgba(0,0,0,.12)', borderRadius: 4,
-                minHeight: 600, display: 'flex', flexDirection: 'column',
-                alignItems: 'center', justifyContent: 'center', padding: 40, gap: 16,
-              }}>
-                <div style={{ fontSize: '3rem' }}>📄</div>
-                <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--dark)', textAlign: 'center' }}>{selectedFile.name}</div>
-                <div style={{ fontSize: '.82rem', color: 'var(--text3)', textAlign: 'center', maxWidth: 340 }}>
-                  Trình xem PDF sẽ hiển thị nội dung tệp tại đây. Nhấp vào tên tệp ở trên để đổi tài liệu.
-                </div>
-                <div style={{ background: '#f8fafc', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 20px', fontSize: '.78rem', color: 'var(--text3)', marginTop: 8 }}>
-                  Kích thước: {selectedFile.size}&nbsp;·&nbsp;Loại: {selectedFile.name.endsWith('.xlsx') ? 'Excel' : 'PDF'}
-                </div>
-                <div style={{ width: '100%', marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {Array.from({ length: 12 }).map((_, i) => (
-                    <div key={i} style={{ height: 10, borderRadius: 4, background: '#f1f5f9', width: i % 3 === 2 ? '60%' : i % 2 === 0 ? '100%' : '85%' }} />
+                <div style={{ padding: '6px 12px' }}>
+                  {mainFiles.map(f => (
+                    <div key={f.name} onClick={() => setSelectedFile(f)} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', borderRadius: 8, cursor: 'pointer', marginBottom: 4, border: `1px solid ${selectedFile.name === f.name ? 'var(--orange)' : 'var(--border)'}`, background: selectedFile.name === f.name ? '#fff7ed' : '#fff' }}>
+                      <span style={{ fontSize: '1.2rem' }}>📄</span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: '.8rem', fontWeight: 600, color: 'var(--dark)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.name}</div>
+                        <div style={{ fontSize: '.7rem', color: 'var(--text3)' }}>PDF · {f.size}</div>
+                      </div>
+                      <button onClick={e => e.stopPropagation()} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text3)', fontSize: '.8rem' }}>⬇</button>
+                    </div>
                   ))}
                 </div>
+              </div>
+              {/* Tệp đính kèm */}
+              <div style={{ borderTop: '1px solid var(--border)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 16px', background: '#f9fafb', borderBottom: '1px solid var(--border)' }}>
+                  <span style={{ fontSize: '.72rem', fontWeight: 700, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '.5px' }}>📎 Tệp đính kèm</span>
+                  <span style={{ background: '#e5e7eb', color: '#6b7280', fontSize: '.65rem', fontWeight: 700, borderRadius: 99, padding: '1px 6px' }}>{attachFiles.length}</span>
+                </div>
+                <div style={{ padding: '6px 12px' }}>
+                  {attachFiles.map(f => (
+                    <div key={f.name} onClick={() => setSelectedFile(f)} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', borderRadius: 8, cursor: 'pointer', marginBottom: 4, border: `1px solid ${selectedFile.name === f.name ? 'var(--orange)' : 'var(--border)'}`, background: selectedFile.name === f.name ? '#fff7ed' : '#fff' }}>
+                      <span style={{ fontSize: '1.2rem' }}>{f.name.endsWith('.xlsx') ? '📊' : '📄'}</span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: '.8rem', fontWeight: 600, color: 'var(--dark)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.name}</div>
+                        <div style={{ fontSize: '.7rem', color: 'var(--text3)' }}>{f.name.endsWith('.xlsx') ? 'Excel' : 'PDF'} · {f.size}</div>
+                      </div>
+                      <button onClick={e => e.stopPropagation()} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text3)', fontSize: '.8rem' }}>⬇</button>
+                    </div>
+                  ))}
+                  {attachFiles.length === 0 && <div style={{ textAlign: 'center', color: 'var(--text3)', fontSize: '.8rem', padding: '10px 0' }}>Không có tệp đính kèm</div>}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ===== CỘT PHẢI — PDF Viewer (full height) ===== */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: '#f1f3f7', overflow: 'hidden' }}>
+
+          {/* Viewer header */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px',
+            background: '#2d3142', color: '#fff', fontSize: '.78rem', flexShrink: 0,
+          }}>
+            <span style={{ flex: 1, fontSize: '.8rem', fontWeight: 500, opacity: .9 }}>📄 {selectedFile.name}</span>
+            <button style={{ background: 'rgba(255,255,255,.15)', border: 'none', color: '#fff', borderRadius: 4, padding: '3px 8px', cursor: 'pointer', fontSize: '.75rem' }}>🔍−</button>
+            <span style={{ fontSize: '.75rem', opacity: .7 }}>100%</span>
+            <button style={{ background: 'rgba(255,255,255,.15)', border: 'none', color: '#fff', borderRadius: 4, padding: '3px 8px', cursor: 'pointer', fontSize: '.75rem' }}>🔍+</button>
+            <button style={{ background: 'rgba(255,255,255,.15)', border: 'none', color: '#fff', borderRadius: 4, padding: '4px 10px', cursor: 'pointer', fontSize: '.75rem' }}>⬇ Tải về</button>
+          </div>
+
+          {/* Mock PDF body */}
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, overflowY: 'auto' }}>
+            <div style={{
+              width: '100%', maxWidth: 680, background: '#fff',
+              boxShadow: '0 4px 24px rgba(0,0,0,.12)', borderRadius: 4,
+              minHeight: 600, display: 'flex', flexDirection: 'column',
+              alignItems: 'center', justifyContent: 'center', padding: 40, gap: 16,
+            }}>
+              <div style={{ fontSize: '3rem' }}>📄</div>
+              <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--dark)', textAlign: 'center' }}>{selectedFile.name}</div>
+              <div style={{ fontSize: '.82rem', color: 'var(--text3)', textAlign: 'center', maxWidth: 340 }}>
+                Trình xem PDF sẽ hiển thị nội dung tệp tại đây. Nhấp vào tên tệp ở trên để đổi tài liệu.
+              </div>
+              <div style={{ background: '#f8fafc', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 20px', fontSize: '.78rem', color: 'var(--text3)', marginTop: 8 }}>
+                Kích thước: {selectedFile.size}&nbsp;·&nbsp;Loại: {selectedFile.name.endsWith('.xlsx') ? 'Excel' : 'PDF'}
+              </div>
+              <div style={{ width: '100%', marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {Array.from({ length: 12 }).map((_, i) => (
+                  <div key={i} style={{ height: 10, borderRadius: 4, background: '#f1f5f9', width: i % 3 === 2 ? '60%' : i % 2 === 0 ? '100%' : '85%' }} />
+                ))}
               </div>
             </div>
           </div>

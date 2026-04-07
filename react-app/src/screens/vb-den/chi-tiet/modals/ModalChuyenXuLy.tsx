@@ -67,8 +67,8 @@ export default function ModalChuyenXuLy({ open, onClose, onSubmit, defaultHanXuL
     if (!loaiChuyen) e.loaiChuyen = 'Vui lòng chọn loại chuyển xử lý.'
     if (nguoiNhan.length === 0) e.nguoiNhan = 'Vui lòng chọn ít nhất một người nhận.'
     if (nguoiNhan.includes(CURRENT_USER)) e.nguoiNhan = 'Không thể chuyển xử lý cho chính mình.'
-    if (!hanXuLy || hanXuLy < TODAY) e.hanXuLy = 'Hạn xử lý không hợp lệ.'
-    else if (hanXuLy > defaultHan) e.hanXuLy = 'Hạn xử lý không được trễ hơn hạn xử lý gốc.'
+    // if (!hanXuLy || hanXuLy < TODAY) e.hanXuLy = 'Hạn xử lý không hợp lệ.'
+    // else if (hanXuLy > defaultHan) e.hanXuLy = 'Hạn xử lý không được trễ hơn hạn xử lý gốc.'
     return e
   }
 

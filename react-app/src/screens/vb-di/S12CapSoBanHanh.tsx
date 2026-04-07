@@ -26,8 +26,9 @@ export default function S12CapSoBanHanh() {
   const { goScreen } = useNavigation()
 
   const [tab,          setTab]          = useState<'info' | 'history'>('info')
-  const [fileType,     setFileType]     = useState<'main' | 'attach'>('main')
   const [selectedFile, setSelectedFile] = useState<FileItem>(FILES[0])
+  const mainFiles   = FILES.filter(f => f.type === 'main')
+  const attachFiles = FILES.filter(f => f.type === 'attach')
   const [stampPos,     setStampPos]     = useState<StampPos>('Chữ ký phải · Dấu trái')
   const [ghiChu,       setGhiChu]       = useState('')
 
