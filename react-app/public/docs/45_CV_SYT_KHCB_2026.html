@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>45/CV-SYT – Báo cáo KCB Q1/2026</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 13pt;
+    color: #111;
+    background: #fff;
+    padding: 32px 48px 48px;
+    line-height: 1.7;
+  }
+  /* ── Header ── */
+  .header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    margin-bottom: 24px;
+  }
+  .header-left {
+    text-align: center;
+    border-right: 1px solid #333;
+    padding-right: 20px;
+  }
+  .header-right {
+    text-align: center;
+    padding-left: 20px;
+  }
+  .org-name {
+    font-weight: bold;
+    font-size: 11pt;
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+  .doc-ref {
+    font-size: 11pt;
+    margin-top: 6px;
+  }
+  .doc-ref span {
+    font-weight: bold;
+  }
+  .underline-center {
+    width: 70%;
+    height: 1px;
+    background: #111;
+    margin: 4px auto 0;
+  }
+  .nation-label {
+    font-weight: bold;
+    font-size: 12pt;
+    text-transform: uppercase;
+  }
+  .nation-motto {
+    font-size: 11pt;
+    font-style: italic;
+  }
+  /* ── Document type + location ── */
+  .doc-meta {
+    text-align: right;
+    font-size: 11pt;
+    margin-bottom: 20px;
+  }
+  /* ── Title block ── */
+  .title-block {
+    text-align: center;
+    margin: 24px 0 20px;
+  }
+  .title-block .doc-type {
+    font-weight: bold;
+    font-size: 14pt;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .title-block .doc-subject {
+    font-size: 12pt;
+    font-weight: bold;
+    margin-top: 4px;
+  }
+  .title-block .recipient {
+    font-size: 12pt;
+    font-style: italic;
+    margin-top: 8px;
+  }
+  /* ── Body ── */
+  .body {
+    text-align: justify;
+    margin-top: 16px;
+  }
+  .body p {
+    margin-bottom: 10px;
+    text-indent: 2em;
+  }
+  .body p.no-indent {
+    text-indent: 0;
+  }
+  .body h3 {
+    font-size: 13pt;
+    font-weight: bold;
+    margin: 16px 0 6px;
+    text-indent: 0;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 11pt;
+  }
+  th, td {
+    border: 1px solid #555;
+    padding: 6px 10px;
+    text-align: left;
+  }
+  th {
+    background: #f0f0f0;
+    font-weight: bold;
+    text-align: center;
+  }
+  td.num { text-align: right; }
+  td.center { text-align: center; }
+  /* ── Signature block ── */
+  .sig-block {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 32px;
+  }
+  .sig-inner {
+    text-align: center;
+    min-width: 220px;
+  }
+  .sig-inner .sig-place {
+    font-style: italic;
+    font-size: 12pt;
+  }
+  .sig-inner .sig-title {
+    font-weight: bold;
+    font-size: 12pt;
+    margin-top: 6px;
+    text-transform: uppercase;
+  }
+  .sig-inner .sig-name {
+    font-weight: bold;
+    font-size: 13pt;
+    margin-top: 56px;
+  }
+  .stamp {
+    position: absolute;
+    left: 72px;
+    bottom: 0;
+    width: 90px;
+    height: 90px;
+    border: 3px solid #c00;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #c00;
+    font-weight: bold;
+    font-size: 7pt;
+    text-align: center;
+    line-height: 1.3;
+    opacity: 0.75;
+  }
+  .stamp-wrap {
+    position: relative;
+    margin-top: 8px;
+  }
+  .note {
+    font-size: 10pt;
+    color: #555;
+    font-style: italic;
+    margin-top: 6px;
+  }
+  hr.divider {
+    border: none;
+    border-top: 1px solid #ccc;
+    margin: 20px 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<div class="header">
+  <div class="header-left">
+    <div class="org-name">Ủy ban nhân dân thành phố Hồ Chí Minh<br/>Sở Y tế</div>
+    <div class="doc-ref">Số: <span>45/CV-SYT-KHCB</span></div>
+    <div class="underline-center"></div>
+  </div>
+  <div class="header-right">
+    <div class="nation-label">Cộng hòa xã hội chủ nghĩa Việt Nam</div>
+    <div class="nation-motto">Độc lập – Tự do – Hạnh phúc</div>
+    <div class="underline-center"></div>
+    <div class="doc-meta" style="text-align:center; margin-top:6px; font-style:italic; font-size:11pt;">
+      TP. Hồ Chí Minh, ngày 24 tháng 03 năm 2026
+    </div>
+  </div>
+</div>
+
+<!-- ── TITLE ── -->
+<div class="title-block">
+  <div class="doc-type">Công văn</div>
+  <div class="doc-subject">V/v báo cáo tình hình thực hiện kế hoạch khám chữa bệnh quý I/2026</div>
+  <div class="recipient">
+    Kính gửi: Bệnh viện Đa khoa Tỉnh và các đơn vị trực thuộc Sở Y tế
+  </div>
+</div>
+
+<hr class="divider"/>
+
+<!-- ── BODY ── -->
+<div class="body">
+  <p>Thực hiện Kế hoạch số 12/KH-SYT ngày 05/01/2026 của Sở Y tế TP.HCM về việc triển khai công tác khám chữa bệnh (KCB) năm 2026 và Công văn số 1245/BYT-KCB ngày 10/03/2026 của Bộ Y tế về việc báo cáo tình hình KCB quý I/2026;</p>
+
+  <p>Sở Y tế yêu cầu các đơn vị trực thuộc khẩn trương thực hiện các nội dung sau:</p>
+
+  <h3>I. NỘI DUNG BÁO CÁO</h3>
+
+  <p class="no-indent">1. <strong>Kết quả thực hiện chỉ tiêu KCB:</strong> Tổng hợp số lượt khám bệnh, điều trị nội trú, điều trị ngoại trú, thực hiện các kỹ thuật chuyên sâu trong quý I/2026, so sánh với cùng kỳ năm 2025 và kế hoạch năm 2026.</p>
+
+  <p class="no-indent">2. <strong>Công tác đảm bảo chất lượng KCB:</strong> Tình hình thực hiện quy trình chuyên môn, an toàn người bệnh, phòng ngừa nhiễm khuẩn bệnh viện. Kết quả kiểm tra, giám sát nội bộ trong quý.</p>
+
+  <p class="no-indent">3. <strong>Triển khai hệ thống thông tin:</strong> Tỷ lệ bệnh viện đạt chuẩn bệnh án điện tử (EMR), kết nối liên thông dữ liệu KCB với cổng thông tin Bộ Y tế và BHXH.</p>
+
+  <p class="no-indent">4. <strong>Tình hình tài chính – viện phí:</strong> Doanh thu dịch vụ y tế, tỷ lệ thu hồi chi phí KCB BHYT, công nợ BHXH tồn đọng (nếu có).</p>
+
+  <p class="no-indent">5. <strong>Tồn tại, khó khăn và kiến nghị:</strong> Nêu rõ các vướng mắc phát sinh, đề xuất hướng giải quyết và kiến nghị với Sở Y tế, Bộ Y tế.</p>
+
+  <h3>II. BẢNG TỔNG HỢP CHỈ TIÊU KCB (MINH HỌA)</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th rowspan="2">STT</th>
+        <th rowspan="2">Chỉ tiêu</th>
+        <th colspan="2">Quý I/2026</th>
+        <th rowspan="2">So với KH (%)</th>
+        <th rowspan="2">So với CK 2025 (%)</th>
+      </tr>
+      <tr>
+        <th>Kế hoạch</th>
+        <th>Thực hiện</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="center">1</td>
+        <td>Lượt khám bệnh ngoại trú</td>
+        <td class="num">48.000</td>
+        <td class="num">47.235</td>
+        <td class="num">98,4%</td>
+        <td class="num">+5,2%</td>
+      </tr>
+      <tr>
+        <td class="center">2</td>
+        <td>Lượt điều trị nội trú</td>
+        <td class="num">8.400</td>
+        <td class="num">8.642</td>
+        <td class="num">102,9%</td>
+        <td class="num">+7,8%</td>
+      </tr>
+      <tr>
+        <td class="center">3</td>
+        <td>Công suất sử dụng giường bệnh</td>
+        <td class="num">85%</td>
+        <td class="num">88,3%</td>
+        <td class="num">103,9%</td>
+        <td class="num">+3,1 đpt</td>
+      </tr>
+      <tr>
+        <td class="center">4</td>
+        <td>Doanh thu dịch vụ y tế (tỷ đồng)</td>
+        <td class="num">13,0</td>
+        <td class="num">12,4</td>
+        <td class="num">95,4%</td>
+        <td class="num">+10,7%</td>
+      </tr>
+      <tr>
+        <td class="center">5</td>
+        <td>Tỷ lệ hài lòng người bệnh</td>
+        <td class="num">≥ 85%</td>
+        <td class="num">87,6%</td>
+        <td class="num">—</td>
+        <td class="num">+2,1 đpt</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>III. THỜI GIAN VÀ HÌNH THỨC BÁO CÁO</h3>
+
+  <p class="no-indent">– <strong>Hạn nộp báo cáo:</strong> Trước 17 giờ ngày <strong>28/03/2026</strong> (thứ Sáu).</p>
+  <p class="no-indent">– <strong>Hình thức:</strong> Gửi bản điện tử qua hệ thống eOffice và bản chính có dấu đỏ về Phòng Kế hoạch – Tài chính, Sở Y tế TP.HCM.</p>
+  <p class="no-indent">– <strong>Mẫu biểu:</strong> Sử dụng mẫu đính kèm công văn này (file Excel Phu_luc_mau_bao_cao_Q1_2026.xlsx).</p>
+
+  <p>Sở Y tế đề nghị Thủ trưởng các đơn vị trực thuộc nghiêm túc thực hiện, đảm bảo chất lượng và thời hạn báo cáo. Trong quá trình thực hiện, nếu có vướng mắc, liên hệ Phòng KHTH – Sở Y tế (điện thoại: 028.3930.1234, email: khth@soyte.hochiminhcity.gov.vn).</p>
+
+  <p>Trân trọng./.</p>
+</div>
+
+<!-- ── SIGNATURE ── -->
+<div class="stamp-wrap">
+  <div class="sig-block">
+    <div class="sig-inner">
+      <div class="sig-place">TL. GIÁM ĐỐC</div>
+      <div class="sig-title">Phó Giám đốc Sở</div>
+      <div class="sig-name">Nguyễn Văn Phó GĐ</div>
+      <div class="note">(Đã ký số – STS-2026-SYT-045)</div>
+    </div>
+  </div>
+  <div class="stamp">
+    <div>SỞ Y TẾ</div>
+    <div style="font-size:9pt;">★</div>
+    <div>TP.HCM</div>
+  </div>
+</div>
+
+<hr class="divider" style="margin-top:48px;"/>
+<p class="note" style="text-align:center;">Nơi nhận: BGĐ Sở (để b/c); Các BV, TTYT trực thuộc (để t/h); Lưu VT, KHTH.</p>
+
+</body>
+</html>

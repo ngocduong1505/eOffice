@@ -1,9 +1,8 @@
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import Topbar from '@/components/Topbar'
 import { useNavigation } from '@/hooks/useNavigation'
-import { useCurrentUser, ACCOUNTS } from '@/hooks/useCurrentUser'
-import type { UserAccount } from '@/hooks/useCurrentUser'
-import HandoffToast from '@/components/HandoffToast'
+import { useCurrentUser } from '@/hooks/useCurrentUser'
+import SimpleToast from '@/components/SimpleToast'
 import ModalChiDao from './chi-tiet/modals/ModalChiDao'
 import ModalDieuPhoi from './chi-tiet/modals/ModalDieuPhoi'
 import ModalUyQuyen from './chi-tiet/modals/ModalUyQuyen'
@@ -222,12 +221,13 @@ const STATUS_PRIMARY_ROLE: Partial<Record<VbStatus, string>> = {
 }
 
 // ─── Row action menu ──────────────────────────────────────────────────────────
-function RowMenu({ status, role, onClose, onUyQuyen, onChuyenXuLy }: {
+function RowMenu({ status, role, onClose, onUyQuyen, onChuyenXuLy, onTaoVbDi }: {
   status: VbStatus
   role: string
   onClose: () => void
   onUyQuyen: () => void
   onChuyenXuLy: () => void
+  onTaoVbDi: () => void
 }) {
   const items: { label: string; danger?: boolean; action?: () => void }[] = [
     ...(role === 'giam-doc' ? [
@@ -236,7 +236,7 @@ function RowMenu({ status, role, onClose, onUyQuyen, onChuyenXuLy }: {
     ] : []),
     ...(status === 'cho-xu-ly' && role === 'xu-ly' ? [
       { label: 'Chuyển tiếp xử lý', action: onChuyenXuLy },
-      { label: 'Tạo văn bản đi' },
+      { label: 'Tạo văn bản đi', action: onTaoVbDi },
     ] : []),
     ...(role === 'van-thu' ? [
       { label: 'Thêm vào hồ sơ' },
@@ -276,7 +276,7 @@ const ROLE_STATUSES: Record<string, VbStatus[]> = {
 // ─── Main ─────────────────────────────────────────────────────────────────────
 export default function S1DanhSach() {
   const { goScreen } = useNavigation()
-  const { currentUser, setCurrentUser } = useCurrentUser()
+  const { currentUser } = useCurrentUser()
   const { screenParams } = useNavigation()
   const [checked, setChecked] = useState<Set<number>>(new Set())
   const [allChecked, setAllChecked] = useState(false)
@@ -287,16 +287,15 @@ export default function S1DanhSach() {
   const [openChuyenXuLy, setOpenChuyenXuLy] = useState<number | null>(null)
   const [openHoanThanh, setOpenHoanThanh] = useState<number | null>(null)
   const [pageSize, setPageSize] = useState(10)
-  const [toast, setToast] = useState<{ msg: string; nextUser: UserAccount } | null>(null)
+  const [toast, setToast] = useState<string | null>(null)
 
   const dismissToast = useCallback(() => setToast(null), [])
 
-  // Nhận handoff từ S2 (Văn Thư tiếp nhận xong → GĐ)
+  // Nhận handoff từ S2
   useEffect(() => {
     if (screenParams.handoff) {
-      const { msg, nextUserId } = screenParams.handoff as { msg: string; nextUserId: string }
-      const nextUser = ACCOUNTS.find(a => a.id === nextUserId)
-      if (nextUser) setToast({ msg, nextUser })
+      const { msg } = screenParams.handoff as { msg: string; nextUserId: string }
+      setToast(msg)
     }
   }, [screenParams.handoff])
 
@@ -420,7 +419,7 @@ export default function S1DanhSach() {
                       <input type="checkbox" checked={checked.has(row.id)} onChange={() => toggleOne(row.id)} />
                     </td>
                     <td style={{ textAlign: 'center', color: 'var(--text3)', fontSize: '.82rem' }}>{idx + 1}</td>
-                    <td style={{ fontWeight: 700, color: '#d94f1e', fontSize: '.9rem' }}>#{row.id}</td>
+                    <td style={{ fontWeight: 700, color: '#d94f1e', fontSize: '.9rem' }}>{row.id}</td>
                     <td>
                       <div style={{ minWidth: 200, fontSize: '.82rem', fontWeight: 600, color: 'var(--dark)', lineHeight: 1.35 }}>{row.trichYeu}</div>
                     </td>
@@ -473,6 +472,7 @@ export default function S1DanhSach() {
                               onClose={() => setOpenMenu(null)}
                               onUyQuyen={() => { setOpenUyQuyen(row.id); setOpenMenu(null) }}
                               onChuyenXuLy={() => { setOpenChuyenXuLy(row.id); setOpenMenu(null) }}
+                              onTaoVbDi={() => { setOpenMenu(null); goScreen('s9', { vbDenGoc: row.trichYeu }) }}
                             />
                           )}
                         </div>
@@ -509,18 +509,12 @@ export default function S1DanhSach() {
       <ModalChiDao
         open={openChiDao !== null}
         onClose={() => setOpenChiDao(null)}
-        onSubmit={() => {
-          setOpenChiDao(null)
-          setToast({ msg: 'Đã ghi ý kiến chỉ đạo. Chuyển Thư ký phân công xử lý.', nextUser: ACCOUNTS.find(a => a.id === 'thu-ky')! })
-        }}
+        onSubmit={() => { setOpenChiDao(null); setToast('Đã ghi ý kiến chỉ đạo. Chuyển Thư ký phân công xử lý.') }}
       />
       <ModalDieuPhoi
         open={openDieuPhoi !== null}
         onClose={() => setOpenDieuPhoi(null)}
-        onSubmit={() => {
-          setOpenDieuPhoi(null)
-          setToast({ msg: 'Đã điều phối. Chuyên viên nhận nhiệm vụ xử lý văn bản.', nextUser: ACCOUNTS.find(a => a.id === 'xu-ly')! })
-        }}
+        onSubmit={() => { setOpenDieuPhoi(null); setToast('Đã điều phối. Chuyên viên nhận nhiệm vụ xử lý văn bản.') }}
       />
       <ModalUyQuyen
         open={openUyQuyen !== null}
@@ -530,28 +524,15 @@ export default function S1DanhSach() {
       <ModalChuyenXuLy
         open={openChuyenXuLy !== null}
         onClose={() => setOpenChuyenXuLy(null)}
-        onSubmit={() => {
-          setOpenChuyenXuLy(null)
-          setToast({ msg: 'Đã chuyển tiếp xử lý. Chuyên viên tiếp nhận nhiệm vụ.', nextUser: ACCOUNTS.find(a => a.id === 'xu-ly')! })
-        }}
+        onSubmit={() => { setOpenChuyenXuLy(null); setToast('Đã chuyển tiếp xử lý. Chuyên viên tiếp nhận nhiệm vụ.') }}
       />
       <ModalHoanThanh
         open={openHoanThanh !== null}
         onClose={() => setOpenHoanThanh(null)}
-        onSubmit={() => {
-          setOpenHoanThanh(null)
-          setToast({ msg: 'Đã hoàn thành xử lý. Văn thư lưu hồ sơ và đóng quy trình.', nextUser: ACCOUNTS.find(a => a.id === 'van-thu')! })
-        }}
+        onSubmit={() => { setOpenHoanThanh(null); setToast('Đã hoàn thành xử lý. Văn thư lưu hồ sơ và đóng quy trình.') }}
       />
 
-      {toast && (
-        <HandoffToast
-          msg={toast.msg}
-          nextUser={toast.nextUser}
-          onDismiss={dismissToast}
-          onSwitch={() => { setCurrentUser(toast.nextUser); dismissToast() }}
-        />
-      )}
+      {toast && <SimpleToast msg={toast} onDismiss={dismissToast} />}
     </div>
   )
 }

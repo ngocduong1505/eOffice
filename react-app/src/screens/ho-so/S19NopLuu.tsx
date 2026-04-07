@@ -14,7 +14,7 @@ export default function S19NopLuu() {
         </div>
 
         <div className="form-card">
-          <div className="fc-title"><span>1</span> Kiểm tra trước khi nộp lưu</div>
+          <div className="fc-title"> Kiểm tra trước khi nộp lưu</div>
           {[
             {done:true, label:'Tất cả văn bản đã được số hóa'},
             {done:true, label:'Mục lục hồ sơ đầy đủ (22/22 tài liệu)'},

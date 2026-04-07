@@ -9,7 +9,7 @@ export default function S17TaoHoSo() {
       <Topbar breadcrumb={['Hồ sơ lưu trữ', 'Tạo hồ sơ mới']} onNavClick={() => goScreen('s16')} />
       <div className="work-area"><div className="form-pane" style={{maxWidth:700}}>
         <div className="form-card">
-          <div className="fc-title"><span>1</span> Thông tin hồ sơ</div>
+          <div className="fc-title">Thông tin hồ sơ</div>
           <div className="form-row full"><div className="fg"><label>Tên hồ sơ <span className="req">*</span></label><input placeholder="VD: Hồ sơ VB Đến tháng 4/2026..." /></div></div>
           <div className="form-row">
             <div className="fg"><label>Phân loại hồ sơ <span className="req">*</span></label><select><option>Văn bản đến</option><option>Văn bản đi</option><option>Tài chính - Kế toán</option><option>Nhân sự</option><option>Hợp đồng</option></select></div>

@@ -6,7 +6,7 @@ export default function S21CauHinhSo() {
       <Topbar breadcrumb={['Sổ & Báo cáo', 'Cấu hình sổ đăng ký']} />
       <div className="work-area"><div className="content-pane" style={{maxWidth:700}}>
         <div className="form-card">
-          <div className="fc-title"><span>1</span> Cấu hình sổ Văn bản Đến</div>
+          <div className="fc-title"> Cấu hình sổ Văn bản Đến</div>
           <div className="form-row full"><div className="fg"><label>Tên sổ <span className="req">*</span></label><input defaultValue="Sổ Văn bản Đến 2026" /></div></div>
           <div className="form-row">
             <div className="fg"><label>Tiền tố số đến</label><input defaultValue="#" placeholder="VD: #" /></div>
@@ -23,7 +23,7 @@ export default function S21CauHinhSo() {
         </div>
 
         <div className="form-card">
-          <div className="fc-title"><span>2</span> Cấu hình sổ Văn bản Đi</div>
+          <div className="fc-title">Cấu hình sổ Văn bản Đi</div>
           <div className="form-row full"><div className="fg"><label>Tên sổ <span className="req">*</span></label><input defaultValue="Sổ Văn bản Đi 2026" /></div></div>
           <div className="form-row">
             <div className="fg"><label>Định dạng ký hiệu</label><input defaultValue="{số}/CV-BV" placeholder="{số}/{loại}-{đơnvị}" /></div>
@@ -36,7 +36,7 @@ export default function S21CauHinhSo() {
         </div>
 
         <div className="form-card">
-          <div className="fc-title"><span>3</span> Số liệu thống kê sổ</div>
+          <div className="fc-title">Số liệu thống kê sổ</div>
           <div className="form-row">
             <div className="sg-item"><label>Năm hiện tại</label><div className="sv">2026</div></div>
             <div className="sg-item"><label>Tổng VB Đến</label><div className="sv big">47</div></div>

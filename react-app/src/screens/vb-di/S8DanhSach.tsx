@@ -325,7 +325,7 @@ export default function S8DanhSach() {
                       <input type="checkbox" checked={checked.has(row.id)} onChange={() => toggleOne(row.id)} />
                     </td>
                     <td style={{ textAlign: 'center', color: 'var(--text3)', fontSize: '.82rem' }}>{idx + 1}</td>
-                    <td style={{ fontWeight: 700, color: '#d94f1e', fontSize: '.9rem' }}>#{row.id}</td>
+                    <td style={{ fontWeight: 700, color: '#d94f1e', fontSize: '.9rem' }}>{row.id}</td>
                     <td>
                       <div style={{ minWidth: 200, fontSize: '.82rem', fontWeight: 600, color: 'var(--dark)', lineHeight: 1.35 }}>{row.ten}</div>
                       <div style={{ fontSize: '.72rem', color: 'var(--text3)', marginTop: 2, lineHeight: 1.3 }}>{row.trichYeu}</div>

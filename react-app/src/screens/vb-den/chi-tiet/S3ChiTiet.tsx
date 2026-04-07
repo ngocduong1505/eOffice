@@ -7,18 +7,19 @@ import ModalDieuPhoi from './modals/ModalDieuPhoi'
 import ModalUyQuyen from './modals/ModalUyQuyen'
 import ModalChuyenXuLy from './modals/ModalChuyenXuLy'
 import ModalHoanThanh from './modals/ModalHoanThanh'
+import SimpleToast from '@/components/SimpleToast'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type VbStatus = 'cho-chi-dao' | 'cho-dieu-phoi' | 'cho-xu-ly' | 'hoan-thanh'
-type FileItem = { name: string; size: string; type: 'main' | 'attach' }
+type FileItem = { name: string; size: string; type: 'main' | 'attach'; url?: string; ext?: string }
 type StepStatus = 'done' | 'active' | 'pending'
 type FlowStep = { label: string; sub: string; status: StepStatus; note?: string; time?: string }
 
 // ─── Static data ──────────────────────────────────────────────────────────────
 const FILES: FileItem[] = [
-  { name: '45_CV_SYT_KCB_Q1_2026.pdf', size: '2.4 MB', type: 'main' },
-  { name: 'Phu_luc_bao_cao.pdf', size: '850 KB', type: 'attach' },
-  { name: 'Bang_tong_hop.xlsx', size: '120 KB', type: 'attach' },
+  { name: '45_CV_SYT_KHCB_2026.pdf', size: '2.4 MB', type: 'main', ext: 'pdf', url: '/docs/45_CV_SYT_KHCB_2026.html' },
+  { name: 'Phu_luc_bao_cao.pdf', size: '850 KB', type: 'attach', ext: 'pdf' },
+  { name: 'Bang_tong_hop.xlsx', size: '120 KB', type: 'attach', ext: 'xlsx' },
 ]
 
 const FLOW_STEPS: Record<VbStatus, FlowStep[]> = {
@@ -129,7 +130,7 @@ const ROLE_ACTIONS: Record<string, Set<string>> = {
 function Toolbar({ status, role, onAction }: {
   status: VbStatus
   role: string
-  onAction: (action: 'chi-dao' | 'dieu-phoi' | 'hoan-thanh' | 'chuyen-xu-ly' | 'uy-quyen' | 'tu-choi' | 'them-ho-so' | 'lich-su') => void
+  onAction: (action: 'chi-dao' | 'dieu-phoi' | 'hoan-thanh' | 'chuyen-xu-ly' | 'uy-quyen' | 'tu-choi' | 'them-ho-so' | 'lich-su' | 'tao-vb-di') => void
 }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const allowed = ROLE_ACTIONS[role] ?? new Set<string>()
@@ -202,7 +203,7 @@ function Toolbar({ status, role, onAction }: {
             {menuItems().map(item => (
               <div
                 key={item.key}
-                onClick={() => { setMenuOpen(false); if (item.key !== 'tao-vb-di') onAction(item.key as Parameters<typeof onAction>[0]) }}
+                onClick={() => { setMenuOpen(false); onAction(item.key as Parameters<typeof onAction>[0]) }}
                 style={{
                   padding: '9px 16px', fontSize: '.82rem', cursor: 'pointer',
                   color: (item as { danger?: boolean }).danger ? '#dc2626' : 'var(--dark)',
@@ -237,6 +238,7 @@ export default function S3ChiTiet() {
   const [openUyQuyen, setOpenUyQuyen] = useState(false)
   const [openChuyenXuLy, setOpenChuyenXuLy] = useState(false)
   const [openHoanThanh, setOpenHoanThanh] = useState(false)
+  const [toast, setToast] = useState<string | null>(null)
 
   const handleAction = (action: string) => {
     if (action === 'chi-dao') setOpenChiDao(true)
@@ -244,6 +246,7 @@ export default function S3ChiTiet() {
     else if (action === 'hoan-thanh') setOpenHoanThanh(true)
     else if (action === 'chuyen-xu-ly') setOpenChuyenXuLy(true)
     else if (action === 'uy-quyen') setOpenUyQuyen(true)
+    else if (action === 'tao-vb-di') goScreen('s9', { vbDenGoc: 'V/v báo cáo tình hình thực hiện kế hoạch KCB quý I/2026 · 45/CV-SYT' })
   }
 
   const flowSteps = FLOW_STEPS[status]
@@ -340,8 +343,8 @@ export default function S3ChiTiet() {
                 <div className="info-section">
                   <div className="is-title">Thông tin tiếp nhận</div>
                   {[
-                    ['Sổ đến', 'Sổ công văn đến 2026'],
-                    ['Số đến', '#47'],
+                    ['Sổ đến', 'Sổ văn bản đến 2026'],
+                    ['Số đến', '47'],
                     ['Ngày đến', '25/03/2026 08:15'],
                     ['Người tiếp nhận', 'Nguyễn Thị Văn Thư'],
                     ['Hạn xử lý', '10/04/2026'],
@@ -427,28 +430,28 @@ export default function S3ChiTiet() {
             <button style={{ background: 'rgba(255,255,255,.15)', border: 'none', color: '#fff', borderRadius: 4, padding: '4px 10px', cursor: 'pointer', fontSize: '.75rem' }}>⬇ Tải về</button>
           </div>
 
-          {/* Mock PDF body */}
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, overflowY: 'auto' }}>
-            <div style={{
-              width: '100%', maxWidth: 680, background: '#fff',
-              boxShadow: '0 4px 24px rgba(0,0,0,.12)', borderRadius: 4,
-              minHeight: 600, display: 'flex', flexDirection: 'column',
-              alignItems: 'center', justifyContent: 'center', padding: 40, gap: 16,
-            }}>
-              <div style={{ fontSize: '3rem' }}>📄</div>
-              <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--dark)', textAlign: 'center' }}>{selectedFile.name}</div>
-              <div style={{ fontSize: '.82rem', color: 'var(--text3)', textAlign: 'center', maxWidth: 340 }}>
-                Trình xem PDF sẽ hiển thị nội dung tệp tại đây. Nhấp vào tên tệp ở trên để đổi tài liệu.
+          {/* Preview body */}
+          <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
+            {selectedFile.url ? (
+              <iframe
+                src={selectedFile.url}
+                title={selectedFile.name}
+                style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
+              />
+            ) : (
+              <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, overflow: 'auto', boxSizing: 'border-box' }}>
+                <div style={{ width: '100%', maxWidth: 560, background: '#fff', boxShadow: '0 4px 24px rgba(0,0,0,.12)', borderRadius: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 40, gap: 16 }}>
+                  <div style={{ fontSize: '3rem' }}>{selectedFile.name.endsWith('.xlsx') ? '📊' : '📄'}</div>
+                  <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--dark)', textAlign: 'center' }}>{selectedFile.name}</div>
+                  <div style={{ fontSize: '.82rem', color: 'var(--text3)', textAlign: 'center', maxWidth: 300 }}>
+                    Không thể xem trực tiếp tệp {selectedFile.name.endsWith('.xlsx') ? 'Excel' : 'PDF'} trên trình duyệt.
+                  </div>
+                  <div style={{ background: '#f8fafc', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 20px', fontSize: '.78rem', color: 'var(--text3)' }}>
+                    Kích thước: {selectedFile.size}
+                  </div>
+                </div>
               </div>
-              <div style={{ background: '#f8fafc', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 20px', fontSize: '.78rem', color: 'var(--text3)', marginTop: 8 }}>
-                Kích thước: {selectedFile.size}&nbsp;·&nbsp;Loại: {selectedFile.name.endsWith('.xlsx') ? 'Excel' : 'PDF'}
-              </div>
-              <div style={{ width: '100%', marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {Array.from({ length: 12 }).map((_, i) => (
-                  <div key={i} style={{ height: 10, borderRadius: 4, background: '#f1f5f9', width: i % 3 === 2 ? '60%' : i % 2 === 0 ? '100%' : '85%' }} />
-                ))}
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
@@ -457,28 +460,29 @@ export default function S3ChiTiet() {
       <ModalChiDao
         open={openChiDao}
         onClose={() => setOpenChiDao(false)}
-        onSubmit={() => { setOpenChiDao(false); goScreen('s3', { status: 'cho-dieu-phoi' }) }}
+        onSubmit={() => { setOpenChiDao(false); setToast('Đã ghi ý kiến chỉ đạo. Chuyển Thư ký phân công xử lý.'); goScreen('s3', { status: 'cho-dieu-phoi' }) }}
       />
       <ModalDieuPhoi
         open={openDieuPhoi}
         onClose={() => setOpenDieuPhoi(false)}
-        onSubmit={() => { setOpenDieuPhoi(false); goScreen('s3', { status: 'cho-xu-ly' }) }}
+        onSubmit={() => { setOpenDieuPhoi(false); setToast('Đã điều phối. Chuyên viên nhận nhiệm vụ xử lý văn bản.'); goScreen('s3', { status: 'cho-xu-ly' }) }}
       />
       <ModalUyQuyen
         open={openUyQuyen}
         onClose={() => setOpenUyQuyen(false)}
-        onSubmit={() => setOpenUyQuyen(false)}
+        onSubmit={() => { setOpenUyQuyen(false); setToast('Đã ủy quyền thành công.') }}
       />
       <ModalChuyenXuLy
         open={openChuyenXuLy}
         onClose={() => setOpenChuyenXuLy(false)}
-        onSubmit={() => { setOpenChuyenXuLy(false); goScreen('s3', { status: 'cho-xu-ly' }) }}
+        onSubmit={() => { setOpenChuyenXuLy(false); setToast('Đã chuyển tiếp xử lý. Chuyên viên tiếp nhận nhiệm vụ.'); goScreen('s3', { status: 'cho-xu-ly' }) }}
       />
       <ModalHoanThanh
         open={openHoanThanh}
         onClose={() => setOpenHoanThanh(false)}
-        onSubmit={() => { setOpenHoanThanh(false); goScreen('s3', { status: 'hoan-thanh' }) }}
+        onSubmit={() => { setOpenHoanThanh(false); setToast('Đã hoàn thành xử lý. Văn thư lưu hồ sơ và đóng quy trình.'); goScreen('s3', { status: 'hoan-thanh' }) }}
       />
+      {toast && <SimpleToast msg={toast} onDismiss={() => setToast(null)} />}
     </div>
   )
 }

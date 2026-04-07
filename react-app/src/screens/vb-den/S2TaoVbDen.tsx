@@ -146,11 +146,11 @@ export default function S2TaoVbDen() {
 
   const [fileTab, setFileTab] = useState<'main' | 'attach'>('main')
   const [mainFiles, setMainFiles] = useState<UploadedFile[]>([
-    { name: '45_CV_SYT_KHCB_2026.pdf', size: '2.4 MB', type: 'pdf' },
+    { name: '45_CV_SYT_KHCB_2026.pdf', size: '2.4 MB', type: 'pdf', url: '/docs/45_CV_SYT_KHCB_2026.html' },
   ])
   const [attachFiles, setAttachFiles] = useState<UploadedFile[]>([])
   const [selectedPreview, setSelectedPreview] = useState<UploadedFile | null>(
-    { name: '45_CV_SYT_KHCB_2026.pdf', size: '2.4 MB', type: 'pdf' }
+    { name: '45_CV_SYT_KHCB_2026.pdf', size: '2.4 MB', type: 'pdf', url: '/docs/45_CV_SYT_KHCB_2026.html' }
   )
 
   const [hoSo, setHoSo] = useState<string[]>([])
@@ -304,14 +304,12 @@ export default function S2TaoVbDen() {
               <div className="fg">
                 <label>Sổ đến <span className="req">*</span></label>
                 <select>
-                  <option>Sổ công văn đến 2026</option>
-                  <option>Sổ quyết định đến 2026</option>
-                  <option>Sổ thông báo đến 2026</option>
+                  <option>Sổ văn bản đến 2026</option>
                 </select>
               </div>
               <div className="fg">
                 <label>Số đến</label>
-                <input className="auto" defaultValue="#47" readOnly />
+                <input className="auto" defaultValue="47" readOnly />
                 <div className="hint">Tự động cấp liên tiếp theo Sổ đến</div>
               </div>
             </div>
@@ -544,7 +542,7 @@ export default function S2TaoVbDen() {
 
             {/* Preview body */}
             <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
-              {selectedPreview?.url && selectedPreview.type === 'pdf' ? (
+              {selectedPreview?.url && (selectedPreview.type === 'pdf' || selectedPreview.url.endsWith('.html')) ? (
                 <iframe
                   src={selectedPreview.url}
                   title={selectedPreview.name}

@@ -4,7 +4,7 @@ import { useNavigation } from '@/hooks/useNavigation'
 
 interface UploadedFile { name: string; size: string; ext: string; url?: string }
 
-const MOCK_MAIN: UploadedFile = { name: 'BaoCao_KCB_Q1_2026.docx', size: '2.4 MB', ext: 'docx' }
+const MOCK_MAIN: UploadedFile = { name: 'BaoCao_KCB_Q1_2026.pdf', size: '2.4 MB', ext: 'pdf', url: '/docs/BaoCao_KCB_Q1_2026.html' }
 
 function FileRow({ file, selected, onClick, onRemove }: {
   file: UploadedFile; selected?: boolean
@@ -47,7 +47,8 @@ function RemoveBtn({ onClick }: { onClick: () => void }) {
 }
 
 export default function S9SoanThao() {
-  const { goScreen } = useNavigation()
+  const { goScreen, screenParams } = useNavigation()
+  const vbDenGoc = (screenParams?.vbDenGoc as string) ?? ''
 
   const [fileTab, setFileTab] = useState<'main' | 'attach' | 'draft'>('main')
   const [mainFiles, setMainFiles] = useState<UploadedFile[]>([MOCK_MAIN])
@@ -103,6 +104,16 @@ export default function S9SoanThao() {
           {/* Card 1: Thông tin văn bản */}
           <div className="form-card">
             <div className="fc-title">Thông tin văn bản</div>
+
+            {vbDenGoc && (
+              <div className="form-row full">
+                <div className="fg">
+                  <label>Văn bản đến gốc</label>
+                  <input className="auto" value={vbDenGoc} readOnly />
+                  <div className="hint">Văn bản đến được phản hồi bởi văn bản đi này</div>
+                </div>
+              </div>
+            )}
 
             <div className="form-row full">
               <div className="fg">
@@ -543,7 +554,7 @@ export default function S9SoanThao() {
                   </>
                 )}
               </div>
-              {preview?.url && preview.ext === 'pdf' ? (
+              {preview?.url && (preview.ext === 'pdf' || preview.url.endsWith('.html')) ? (
                 <iframe
                   src={preview.url}
                   title={preview.name}

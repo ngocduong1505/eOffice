@@ -6,7 +6,7 @@ export default function S7ThietLapLuong() {
 
   return (
     <div className="cw">
-      <Topbar breadcrumb={['Văn bản Đến', '#47 · 45/CV-SYT', 'Thiết lập luồng xử lý']} onNavClick={i => { if (i === 0) goScreen('s1') }} />
+      <Topbar breadcrumb={['Văn bản Đến', '47 · 45/CV-SYT', 'Thiết lập luồng xử lý']} onNavClick={i => { if (i === 0) goScreen('s1') }} />
       <div className="work-area">
         <div className="content-pane" style={{maxWidth:640}}>
           <div className="form-card" style={{borderLeft:'3px solid #c2410c',padding:'14px 18px',marginBottom:12}}>
@@ -18,7 +18,7 @@ export default function S7ThietLapLuong() {
           </div>
 
           <div className="form-card">
-            <div className="fc-title"><span>1</span> Chọn đơn vị / người xử lý chính</div>
+            <div className="fc-title"> Chọn đơn vị / người xử lý chính</div>
             <div className="routing-type">
               <div className="rt-opt on"><div className="rt-ico">🏢</div><div className="rt-lbl">Phòng ban</div><div className="rt-sub">Trưởng phòng phân công</div></div>
               <div className="rt-opt"><div className="rt-ico">👤</div><div className="rt-lbl">Cá nhân cụ thể</div><div className="rt-sub">Giao trực tiếp</div></div>

@@ -187,7 +187,7 @@ export default function S12CapSoBanHanh() {
                 <div className="form-row">
                   <div className="fg">
                     <label>Số đi (tự động)</label>
-                    <input className="auto" defaultValue="#48" readOnly />
+                    <input className="auto" defaultValue="48" readOnly />
                     <div className="hint">Theo sổ VB Đi 2026</div>
                   </div>
                   <div className="fg">
