@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useNavigation } from '@/hooks/useNavigation'
 
 interface SidebarNavItem { id: string; label: string }
@@ -99,6 +100,74 @@ function GroupIcon({ groupKey }: { groupKey: string }) {
   )
 }
 
+const WORKSPACES = [
+  {
+    value: 'van-phong-so', label: 'Văn phòng số',
+    color: '#ea580c',
+    icon: <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2"><path strokeLinecap="round" d="M3 7a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/><path strokeLinecap="round" d="M3 7l9 6 9-6"/></svg>,
+  },
+  {
+    value: 'hop-dong', label: 'Hợp đồng điện tử',
+    color: '#2563eb',
+    icon: <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2"><path strokeLinecap="round" d="M9 12h6M9 16h6M7 4h10a2 2 0 012 2v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z"/><path strokeLinecap="round" d="M9 4v4h6V4"/></svg>,
+  },
+]
+
+function WorkspaceSwitcher() {
+  const [active, setActive] = useState('van-phong-so')
+  const [open, setOpen] = useState(false)
+  const current = WORKSPACES.find(w => w.value === active)!
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <button
+        onClick={() => setOpen(p => !p)}
+        style={{
+          width: '100%', display: 'flex', alignItems: 'center', gap: 8,
+          padding: '8px 10px', borderRadius: 9, cursor: 'pointer',
+          border: '1.5px solid #e2e8f0', background: '#f8fafc',
+          boxShadow: '0 1px 3px rgba(0,0,0,.06)', textAlign: 'left',
+        }}
+      >
+        <span style={{ color: current.color, flexShrink: 0, display: 'flex' }}>{current.icon}</span>
+        <span style={{ flex: 1, fontSize: 12.5, fontWeight: 700, color: '#1f2937', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{current.label}</span>
+        <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="#9ca3af" strokeWidth="2.5" style={{ flexShrink: 0, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .15s' }}>
+          <path strokeLinecap="round" d="M19 9l-7 7-7-7"/>
+        </svg>
+      </button>
+
+      {open && (
+        <div
+          onMouseLeave={() => setOpen(false)}
+          style={{
+            position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, zIndex: 300,
+            background: '#fff', border: '1px solid #e2e8f0', borderRadius: 10,
+            boxShadow: '0 6px 20px rgba(0,0,0,.12)', overflow: 'hidden',
+          }}
+        >
+          {WORKSPACES.map(w => (
+            <div
+              key={w.value}
+              onClick={() => { setActive(w.value); setOpen(false) }}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 9, padding: '9px 12px',
+                cursor: 'pointer', fontSize: 12.5, fontWeight: w.value === active ? 700 : 500,
+                color: '#1f2937', background: w.value === active ? '#fff7ed' : '#fff',
+              }}
+              onMouseEnter={e => { if (w.value !== active) e.currentTarget.style.background = '#f8fafc' }}
+              onMouseLeave={e => { e.currentTarget.style.background = w.value === active ? '#fff7ed' : '#fff' }}
+            >
+              <span style={{ color: w.color, display: 'flex', flexShrink: 0 }}>{w.icon}</span>
+              <span style={{ flex: 1 }}>{w.label}</span>
+              {w.value === active && <span style={{ color: w.color, fontSize: 11, fontWeight: 800 }}>✓</span>}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function Sidebar() {
   const { currentScreen, currentGroup, openGroups, goScreen, toggleNavGroup } = useNavigation()
 
@@ -127,18 +196,12 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* ── CTA ── */}
-      <div style={{ padding: '12px 12px 8px', flexShrink: 0 }}>
-        <button
-          className="new-btn"
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, margin: 0, width: '100%' }}
-          onClick={() => goScreen('s2')}
-        >
-          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-            <path strokeLinecap="round" d="M12 4v16m8-8H4" />
-          </svg>
-          Tiếp nhận văn bản
-        </button>
+      {/* ── Workspace Switcher ── */}
+      <div style={{ padding: '10px 12px 8px', flexShrink: 0 }}>
+        <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 5, paddingLeft: 2 }}>
+          
+        </div>
+        <WorkspaceSwitcher />
       </div>
 
       {/* ── Nav: Văn phòng số ── */}
